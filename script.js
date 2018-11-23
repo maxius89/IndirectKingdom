@@ -12,11 +12,15 @@ $( document ).ready(function() {
 	g.resizeTimeout = null;
 	$( window ).resize(function() {
 		if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
-	  	g.resizeTimeout = setTimeout( function() {
+  	g.resizeTimeout = setTimeout( function() {
+			g.wWidth = $(document).width();
+			g.wHeigth = $(document).height();
 			rethinkPanels();
 			g.resizeTimeout = null;
 		}, 200);
 	});
+	
+	setTimeout(test,500);
 });
 
 function setConsts()
@@ -90,10 +94,7 @@ function rethinkPanels()
 
 function decideOrientation()
 {
-	g.wWidth = $(document).width();
-	g.wHeigth = $(document).height();
-	
-	g.orientation = ( g.wWidth > g.wHeigth ? "L" : "P");
+	g.orientation = ( g.wWidth > g.wHeight ? "L" : "P");
 	if (g.orientation == "P")
 	{
 		g.wShort = g.wWidth;
