@@ -9,14 +9,14 @@ $( document ).ready(function() {
 	$(".cell").attr("clicked",0);
 	
 	
-	g.resizeTimeout = null;
+	resizeTimeout = null;
 	$( window ).resize(function() {
-		if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
-  	g.resizeTimeout = setTimeout( function() {
-			g.wWidth = $(document).width();
-			g.wHeigth = $(document).height();
+		if (resizeTimeout != null) clearTimeout(resizeTimeout);
+  	resizeTimeout = setTimeout( function() {
+			g.w.width= $(document).width();
+			g.w.height = $(document).height();
 			rethinkPanels();
-			g.resizeTimeout = null;
+			resizeTimeout = null;
 		}, 200);
 	});
 	
@@ -25,14 +25,22 @@ $( document ).ready(function() {
 
 function setConsts()
 {
-	g = {};
-	g.sceneRows = 20;
-	g.sceneCols = 30;
-	g.dAspectRatio = 4/3;
-	g.gapRatio = 1/6;
-	g.actualCellSize = 40; 	// px
-	g.minCellSize = 30; 		// px
-	g.stepCellSize = 5; 		// px
+	g = {};                              // Global variables
+	g.w = {};                            // Window variables
+	g.d = {};                            // Dashboard variables
+	g.m = {};                            // Map variables
+	
+	g.sceneRows = 20;                    // Number of the rows of the Map
+	g.sceneCols = 30;                    // Number of the coloumns of the Map
+	
+	g.m.actualCellSize = 40; 	// px        // Actual size of the drawn cells
+	g.m.minCellSize = 30; 		// px        // Minimum size of the drawn cells
+	g.m.stepCellSize = 5; 		// px        // Cell-size increment/decrement constant 
+	
+	g.d.thicknessRatio = 0.2;
+	g.d.minThickness = 200;   // px
+	g.d.maxThickness = 400;   // px
+		
 }
 
 function later()
@@ -82,9 +90,10 @@ function createMap(width, height)
 
 function rethinkPanels()
 {
-	decideOrientation();	
+	decideWindowOrientation();	
 	calcDashboardSize();	
 	calcMapSize();
+	calcCellNum();
 	
 
 	g.cols = 5; // tmp
@@ -92,67 +101,74 @@ function rethinkPanels()
 	console.log(g);
 }
 
-function decideOrientation()
+function decideWindowOrientation()
 {
-	g.orientation = ( g.wWidth > g.wHeight ? "L" : "P");
-	if (g.orientation == "P")
+	g.w.orientation = ( g.w.width> g.w.height ? "L" : "P");
+	if (g.w.orientation == "P")
 	{
-		g.wShort = g.wWidth;
-		g.wLong = g.wHeigth;
+		g.w.short = g.w.width;
+		g.w.long = g.w.height;
 	}
 	else
 	{
-		g.wShort = g.wHeigth;
-		g.wLong = g.wWidth;
+		g.w.short = g.w.height;
+		g.w.long = g.w.width;
 	}
 }
 
 function calcDashboardSize()
 {
-	g.dShort = g.wShort;
-	g.dLong = Math.floor(g.dAspectRatio * g.dShort);
+	g.d.length = g.w.short;
+	g.d.thickness = Math.floor(g.d.length * g.d.thicknessRatio);
+	g.d.thickness = Math.max(g.d.thickness, g.d.minThickness);
+	g.d.thickness = Math.min(g.d.thickness, g.d.maxThickness);
 }
 
 function calcMapSize()
 {
-	g.mShort = g.wShort;
-	g.mLong = g.wLong - g.dLong;
+	g.m.width = g.w.width;
+	g.m.height = g.w.height;
 	
-	g.mShorterSide = ( g.mShort < g.mLong ? g.mShort : g.mLong );
-	// n*cell.width+(n+1)*gap =g.mShorterSide
-	// cell.width * gapRatio =  gap
-	// n*cell.width+ (n+1)*cell.width * gapRatio =g.mShorterSide
-	//cell.width * (n+ (n+1)* gapRatio = g.mShorterSide 
-	
-	calcCellNum(); 
+	if (g.w.orientation == "L")
+	{
+		g.m.width -= g.d.thickness;
+	}
+	else
+	{
+		g.m.height -= g.d.thickness;
+	} 
 }
 
 function calcCellNum()
 {
-	// ha eleg nagy a terulet --> mindent kirajzol actual merettel (g.actualCellSize)
-	// ha nem                 --> g.actualCellSize = mShort/ cell.width
+	g.m.upscaled = upscaleCells();
+	if (g.m.upscaled) return;
+
 	
-	var currentTableSize = 0; //tmp
-	if (true)   // if kifer az osszes
+	if (true)  // legalabb 3 kifer
 	{
-		// upscale
+		// megmutatjuk a kiszamolt meretben
 	}
-	else  // csak resz-scene lesz mutatva
+	else  // nem fer ki 3
 	{
-		if (true)  // legalabb 3 kifer
-		{
-			// megmutatjuk a kiszamolt meretben
-		}
-		else  // nem fer ki 3
-		{
-			// de, 3, lemegyunk a min. meret ala
-		}
+		// de, 3, lemegyunk a min. meret ala
 	}
 
 }
 
-function getMapSize(cellSize)
+
+function upscaleCells()
 {
-	var gap = Math.floor(cellSize * g.gapRatio);
-	var mapSize = 0; //tmp
-	}
+	var verticalMapSize = g.cols * g.m.actualCellSize;
+	if (g.m.width < verticalMapSize ) return false; 
+
+	var horizontalMapSize = g.rows * g.m.actualCellSize;
+	if (g.m.height < horizontalMapSize ) return false;
+		
+	var verticalScale = g.m.width / verticalMapSize;
+	var horizontalScale = g.m.height / horizontalMapSize;
+	var scale = Math.min(verticalScale, horizontalScale);
+	g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
+
+	return true;
+}

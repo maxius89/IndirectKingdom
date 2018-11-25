@@ -8,6 +8,7 @@ function assert(cond, text)
 	else
 		{
 		text =	"[fail] " + text;
+		failCounter++;
 		}
 		
 	console.groupCollapsed(text);
@@ -15,29 +16,110 @@ function assert(cond, text)
 	console.groupEnd();	
 	}
 
-function initTest(width = 1024, height = 768)
+function initTest(width, height)
 {
 	setConsts();
-	g.wWidth = width;
-	g.wHeight = height;
-	
+	g.w.width = width;
+	g.w.height = height;
 }
 
 
 function test()
 {
 	console.clear();
+  failCounter = 0;
 
 	testOrientation();
+	testDashboardBeforeCorr();
+	testCellUpscale();
+	
+	console.log("Failed tests: " + failCounter);
 }
 
 function testOrientation()
 {
 	initTest(1024,768);
-	decideOrientation();
-	assert(g.orientation == "L", "Landscape");
+	decideWindowOrientation();
+	assert(g.w.orientation == "L", "Landscape");
 	
 	initTest(768,1024);
-	decideOrientation();
-	assert(g.orientation == "P", "Portrait");
+	decideWindowOrientation();
+	assert(g.w.orientation == "P", "Portrait");
+}
+
+function testDashboardBeforeCorr()
+{
+  initTest(800,600);	
+  decideWindowOrientation();
+  calcDashboardSize();
+	
+	assert(g.d.length == 600, "Dashboard: Length");
+	assert(g.d.thickness == g.d.minThickness , "Dashboard: Thickness");
+	
+	initTest(600,800);	
+  decideWindowOrientation();
+  calcDashboardSize();
+	
+	assert(g.d.length == 600, "Dashboard: Length");
+	assert(g.d.thickness == g.d.minThickness , "Dashboard: Thickness");
+	
+	initTest(600,600);	
+  decideWindowOrientation();
+  calcDashboardSize();
+	
+	assert(g.d.length == 600, "Dashboard: Length");
+	assert(g.d.thickness == g.d.minThickness , "Dashboard: Thickness");
+	
+	initTest(1280,1024);	
+  decideWindowOrientation();
+  calcDashboardSize();
+	
+	assert(g.d.length == 1024, "Dashboard: Length");
+	assert(g.d.thickness == 204, "Dashboard: Thickness");
+	
+	initTest(2501,2500);	
+  decideWindowOrientation();
+  calcDashboardSize();
+	
+	assert(g.d.length == 2500, "Dashboard: Length");
+	assert(g.d.thickness == g.d.maxThickness, "Dashboard: Thickness");
+}
+
+
+function initTestCellUpscale(width, height)
+{
+	initTest(width, height);
+	decideWindowOrientation();	
+	calcDashboardSize();	
+	calcMapSize();
+}
+
+function testCellUpscale()
+{
+	initTestCellUpscale(800, 600);
+	g.cols = 5;
+	g.rows = 5;
+
+	calcCellNum();
+
+	assert(g.m.upscaled, "Map: Upscaled");
+	assert(g.m.actualCellSize == 120, "Map: CellUpscale");
+
+	initTestCellUpscale(800, 600);
+	g.cols = 100;
+	g.rows = 5;
+	g.m.actualCellSize = 40;
+
+	calcCellNum();
+	assert(!g.m.upscaled, "Map: Not Upscaled");
+	assert(g.m.actualCellSize == 40, "Map: CellUpscale");
+	
+		initTestCellUpscale(800, 600);
+	g.cols = 5;
+	g.rows = 6;
+
+	calcCellNum();
+
+	assert(g.m.upscaled, "Map: Upscaled");
+	assert(g.m.actualCellSize == 100, "Map: CellUpscale");
 }
