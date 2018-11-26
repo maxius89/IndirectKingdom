@@ -33,13 +33,15 @@ function setConsts()
 	g.sceneRows = 20;                    // Number of the rows of the Map
 	g.sceneCols = 30;                    // Number of the coloumns of the Map
 	
-	g.m.actualCellSize = 40; 	// px        // Actual size of the drawn cells
-	g.m.minCellSize = 30; 		// px        // Minimum size of the drawn cells
-	g.m.stepCellSize = 5; 		// px        // Cell-size increment/decrement constant 
+	g.m.actualCellSize = 40; 	// px      // Actual size of the drawn cells
+	g.m.minCellSize = 30; 		// px      // Minimum size of the drawn cells
+	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant 
+	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
 	
-	g.d.thicknessRatio = 0.2;
-	g.d.minThickness = 200;   // px
-	g.d.maxThickness = 400;   // px
+	g.d.thicknessRatio = 0.2;              
+	g.d.minThickness = 200;   // px      // Dashboard thickness minimum
+	g.d.maxThickness = 400;   // px      // Dashboard thickness maximum
+	g.d.minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 		
 }
 
@@ -90,14 +92,14 @@ function createMap(width, height)
 
 function rethinkPanels()
 {
+	g.cols = 5; // tmp
+	g.rows = 5; // tmp
+	
 	decideWindowOrientation();	
 	calcDashboardSize();	
 	calcMapSize();
 	calcCellNum();
-	
 
-	g.cols = 5; // tmp
-	g.rows = 5; // tmp
 	console.log(g);
 }
 
@@ -118,10 +120,20 @@ function decideWindowOrientation()
 
 function calcDashboardSize()
 {
-	g.d.length = g.w.short;
-	g.d.thickness = Math.floor(g.d.length * g.d.thicknessRatio);
-	g.d.thickness = Math.max(g.d.thickness, g.d.minThickness);
-	g.d.thickness = Math.min(g.d.thickness, g.d.maxThickness);
+	if (g.w.long < g.d.minThickness * g.d.minDashboardThickessRatio)
+	{
+		g.d.length = 0;
+		g.d.thickness = 0;
+		g.d.disabled = true;
+	}
+	else
+	{
+		g.d.length = g.w.short;
+		g.d.thickness = Math.floor(g.d.length * g.d.thicknessRatio);
+		g.d.thickness = Math.max(g.d.thickness, g.d.minThickness);
+		g.d.thickness = Math.min(g.d.thickness, g.d.maxThickness);
+		g.d.disabled = false;
+	}
 }
 
 function calcMapSize()
@@ -144,25 +156,16 @@ function calcCellNum()
 	g.m.upscaled = upscaleCells();
 	if (g.m.upscaled) return;
 
-	
-	if (true)  // legalabb 3 kifer
-	{
-		// megmutatjuk a kiszamolt meretben
-	}
-	else  // nem fer ki 3
-	{
-		// de, 3, lemegyunk a min. meret ala
-	}
-
+  g.m.downscaled = makeCellsFit();
 }
 
 
 function upscaleCells()
 {
-	var verticalMapSize = g.cols * g.m.actualCellSize;
+	var verticalMapSize = g.rows * g.m.actualCellSize;
 	if (g.m.width < verticalMapSize ) return false; 
 
-	var horizontalMapSize = g.rows * g.m.actualCellSize;
+	var horizontalMapSize = g.cols * g.m.actualCellSize;
 	if (g.m.height < horizontalMapSize ) return false;
 		
 	var verticalScale = g.m.width / verticalMapSize;
@@ -170,5 +173,18 @@ function upscaleCells()
 	var scale = Math.min(verticalScale, horizontalScale);
 	g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
 
+	return true;
+}
+
+function makeCellsFit()
+{
+	var minMapSize = g.m.minDrawnCells * g.m.actualCellSize;	
+	if (g.m.width >= minMapSize && g.m.height >= minMapSize) return false;
+	
+	var verticalScale = g.m.width / minMapSize;
+	var horizontalScale = g.m.height / minMapSize;
+	var scale = Math.min(verticalScale, horizontalScale);
+  g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
+	
 	return true;
 }

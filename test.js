@@ -32,6 +32,7 @@ function test()
 	testOrientation();
 	testDashboardBeforeCorr();
 	testCellUpscale();
+	testCellDownscale();
 	
 	console.log("Failed tests: " + failCounter);
 }
@@ -114,7 +115,7 @@ function testCellUpscale()
 	assert(!g.m.upscaled, "Map: Not Upscaled");
 	assert(g.m.actualCellSize == 40, "Map: CellUpscale");
 	
-		initTestCellUpscale(800, 600);
+	initTestCellUpscale(800, 600);
 	g.cols = 5;
 	g.rows = 6;
 
@@ -122,4 +123,29 @@ function testCellUpscale()
 
 	assert(g.m.upscaled, "Map: Upscaled");
 	assert(g.m.actualCellSize == 100, "Map: CellUpscale");
+}
+
+function testCellDownscale()
+{
+	initTestCellUpscale(800, 600);
+	g.cols = 5;
+	g.rows = 5;
+	g.m.actualCellSize = 300;
+	g.m.minDrawnCells = 3;
+	
+	calcCellNum();
+
+	assert(g.m.downscaled, "Map: Downscaled");
+	assert(g.m.actualCellSize == 200, "Map: CellDownscale");
+	
+	initTestCellUpscale(100, 200);
+	g.cols = 5;
+	g.rows = 5;
+	g.m.actualCellSize = 40;
+	g.m.minDrawnCells = 4;
+	
+	calcCellNum();
+
+	assert(g.m.downscaled, "Map: Downscaled");
+	assert(g.m.actualCellSize == 25, "Map: CellDownscale");
 }
