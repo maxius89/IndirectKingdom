@@ -8,7 +8,7 @@ body {
 
 #map{
 	background-color: #ffffff;
-    border-spacing: 5px;
+    border-spacing: 0px;
 	border-collapse: separate;
 }
 

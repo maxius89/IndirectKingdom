@@ -1,13 +1,10 @@
 $( document ).ready(function() {
 	setConsts();
+	initLayout();
 
-	rethinkPanels();
-
-	$("body").append(createMap(g.cols, g.rows));
-	setTimeout(later,1800);
+ 	setTimeout(later,1800);
 	$(".cell").click(clicked);
 	$(".cell").attr("clicked",0);
-	
 	
 	resizeTimeout = null;
 	$( window ).resize(function() {
@@ -15,11 +12,12 @@ $( document ).ready(function() {
   	resizeTimeout = setTimeout( function() {
 			g.w.width= $(document).width();
 			g.w.height = $(document).height();
+			
 			rethinkPanels();
 			resizeTimeout = null;
 		}, 200);
 	});
-	
+		
 	setTimeout(test,500);
 });
 
@@ -38,11 +36,55 @@ function setConsts()
 	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant 
 	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
 	
-	g.d.thicknessRatio = 0.2;              
+	g.d.thicknessRatio = 0.2; 
 	g.d.minThickness = 200;   // px      // Dashboard thickness minimum
 	g.d.maxThickness = 400;   // px      // Dashboard thickness maximum
 	g.d.minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 		
+}
+
+function initLayout()
+{
+	g.rows = 5;
+	g.cols = 5;
+	g.w.width= $(document).width();
+	g.w.height = $(document).height();
+	
+	drawLayout();
+	$("#mapDiv").append(createMap(g.rows , g.rows));
+	
+	$("#mapDiv").css("background-color","#00ff00");  // Test color
+	$("#dashDiv").css("background-color","#ff00ff"); // Test color
+	
+	$("#mapDiv").css("position", "absolute");
+	$("#mapDiv").css("top", "0px");
+	$("#mapDiv").css("left", "0px");
+	$("#dashDiv").css("position", "absolute");
+	
+	rethinkPanels();
+}
+
+function updateLayout()
+{
+	$("#mapDiv").css("width", g.m.width + "px");
+	$("#mapDiv").css("height", g.m.height + "px");
+	
+	if (g.w.orientation == "L")
+	{
+		$("#dashDiv").css("width", g.d.thickness + "px");
+		$("#dashDiv").css("height", g.d.length + "px");
+		
+		$("#dashDiv").css("top", "0px");
+		$("#dashDiv").css("left", g.m.width + "px");
+	}
+	else
+	{	
+		$("#dashDiv").css("width", g.d.length + "px");
+		$("#dashDiv").css("height", g.d.thickness + "px");
+		
+		$("#dashDiv").css("top", g.m.width + "px");
+	  $("#dashDiv").css("left", "0px");
+	}
 }
 
 function later()
@@ -89,16 +131,27 @@ function createMap(width, height)
 	return table;
 }
 
+function drawLayout()
+{
+	var mapDiv = $(document.createElement('div'));
+	var dashDiv = $(document.createElement('div'));
+		
+	$("body").append(mapDiv);
+	$("body").append(dashDiv);
+		
+	mapDiv.attr("id","mapDiv");
+	dashDiv.attr("id","dashDiv");
+	
+}
 
 function rethinkPanels()
 {
-	g.cols = 5; // tmp
-	g.rows = 5; // tmp
-	
 	decideWindowOrientation();	
 	calcDashboardSize();	
 	calcMapSize();
-	calcCellNum();
+	calcCellSize();
+  updateLayout();
+
 
 	console.log(g);
 }
@@ -159,6 +212,12 @@ function calcCellNum()
   g.m.downscaled = makeCellsFit();
 }
 
+function calcCellSize()
+{
+	calcCellNum();
+	$(".cell").css("width", g.m.actualCellSize + "px");
+	$(".cell").css("height", g.m.actualCellSize + "px");
+}
 
 function upscaleCells()
 {
