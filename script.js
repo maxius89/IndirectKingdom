@@ -18,8 +18,25 @@ $( document ).ready(function() {
 		}, 200);
 	});
 		
+	document.getElementById("mapDiv").addEventListener("wheel", zoom);
+		
 	setTimeout(test,500);
 });
+
+function zoom(event)
+{
+	if (event.deltaY < 0)
+	{
+	newSize = g.m.actualCellSize + g.m.stepCellSize;
+	}
+	else
+	{
+	newSize = g.m.actualCellSize - g.m.stepCellSize;
+	}
+
+	$(".cell").css("width", newSize + "px");
+	$(".cell").css("height", newSize + "px");
+}
 
 function setConsts()
 {
@@ -215,8 +232,8 @@ function calcCellNum()
 function calcCellSize()
 {
 	calcCellNum();
+  $(".cell").css("height", g.m.actualCellSize + "px")
 	$(".cell").css("width", g.m.actualCellSize + "px");
-	$(".cell").css("height", g.m.actualCellSize + "px");
 }
 
 function upscaleCells()
