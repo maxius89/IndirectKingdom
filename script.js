@@ -2,40 +2,44 @@ $( document ).ready(function() {
 	setConsts();
 	initLayout();
 
- 	setTimeout(later,1800);
+	setTimeout(later,1800);
 	$(".cell").click(clicked);
 	$(".cell").attr("clicked",0);
-	
+
 	resizeTimeout = null;
 	$( window ).resize(function() {
 		if (resizeTimeout != null) clearTimeout(resizeTimeout);
-  	resizeTimeout = setTimeout( function() {
-			g.w.width= $(document).width();
-			g.w.height = $(document).height();
-			
+		resizeTimeout = setTimeout( function() {
+			g.w.width= $(window).width();
+			g.w.height = $(window).height();
+
 			rethinkPanels();
 			resizeTimeout = null;
 		}, 200);
 	});
-		
+
 	document.getElementById("mapDiv").addEventListener("wheel", zoom);
-		
-	setTimeout(test,500);
+
+	//setTimeout(test,500);
 });
 
 function zoom(event)
 {
+
+
 	if (event.deltaY < 0)
 	{
-	newSize = g.m.actualCellSize + g.m.stepCellSize;
+		g.m.actualCellSize += g.m.stepCellSize;
 	}
 	else
 	{
-	newSize = g.m.actualCellSize - g.m.stepCellSize;
+		g.m.actualCellSize -= g.m.stepCellSize;
 	}
 
-	$(".cell").css("width", newSize + "px");
-	$(".cell").css("height", newSize + "px");
+	$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
+
+	$(".cell").css("width", g.m.actualCellSize + "px");
+	$(".cell").css("height", g.m.actualCellSize + "px");
 }
 
 function setConsts()
@@ -44,40 +48,38 @@ function setConsts()
 	g.w = {};                            // Window variables
 	g.d = {};                            // Dashboard variables
 	g.m = {};                            // Map variables
-	
-	g.sceneRows = 20;                    // Number of the rows of the Map
-	g.sceneCols = 30;                    // Number of the coloumns of the Map
-	
+
+	g.sceneRows = 25;                    // Number of the rows of the Map
+	g.sceneCols = 25;                    // Number of the coloumns of the Map
+
 	g.m.actualCellSize = 40; 	// px      // Actual size of the drawn cells
 	g.m.minCellSize = 30; 		// px      // Minimum size of the drawn cells
-	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant 
+	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
 	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
-	
-	g.d.thicknessRatio = 0.2; 
+
+	g.d.thicknessRatio = 0.2;
 	g.d.minThickness = 200;   // px      // Dashboard thickness minimum
 	g.d.maxThickness = 400;   // px      // Dashboard thickness maximum
 	g.d.minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
-		
+
 }
 
 function initLayout()
 {
-	g.rows = 5;
-	g.cols = 5;
-	g.w.width= $(document).width();
-	g.w.height = $(document).height();
-	
+	g.w.width= $(window).width();
+	g.w.height = $(window).height();
+
 	drawLayout();
-	$("#mapDiv").append(createMap(g.rows , g.rows));
-	
+	$("#mapDiv").append(createMap(g.sceneCols , g.sceneRows));
+
 	$("#mapDiv").css("background-color","#00ff00");  // Test color
 	$("#dashDiv").css("background-color","#ff00ff"); // Test color
-	
+
 	$("#mapDiv").css("position", "absolute");
 	$("#mapDiv").css("top", "0px");
 	$("#mapDiv").css("left", "0px");
 	$("#dashDiv").css("position", "absolute");
-	
+
 	rethinkPanels();
 }
 
@@ -85,22 +87,23 @@ function updateLayout()
 {
 	$("#mapDiv").css("width", g.m.width + "px");
 	$("#mapDiv").css("height", g.m.height + "px");
-	
+	$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
+
 	if (g.w.orientation == "L")
 	{
 		$("#dashDiv").css("width", g.d.thickness + "px");
 		$("#dashDiv").css("height", g.d.length + "px");
-		
+
 		$("#dashDiv").css("top", "0px");
 		$("#dashDiv").css("left", g.m.width + "px");
 	}
 	else
-	{	
+	{
 		$("#dashDiv").css("width", g.d.length + "px");
 		$("#dashDiv").css("height", g.d.thickness + "px");
-		
+
 		$("#dashDiv").css("top", g.m.width + "px");
-	  $("#dashDiv").css("left", "0px");
+		$("#dashDiv").css("left", "0px");
 	}
 }
 
@@ -110,12 +113,12 @@ function later()
 }
 
 function clicked()
-{ 
+{
 	if ($(this).attr("clicked") == 1)
 	{
 		$(this).css("background-color","#fafafa");
-		$(this).attr("clicked",0);	
-	}	
+		$(this).attr("clicked",0);
+	}
 	else
 	{
 		$(this).css("background-color","#fedcba");
@@ -134,7 +137,7 @@ function createMap(width, height)
 	{
 		var newRow = $(document.createElement("tr"));
 		table.append(newRow);
-		
+
 		for (var j = 0; j < width ; ++j)
 		{
 			var newCol = $(document.createElement("td"));
@@ -152,22 +155,25 @@ function drawLayout()
 {
 	var mapDiv = $(document.createElement('div'));
 	var dashDiv = $(document.createElement('div'));
-		
+
 	$("body").append(mapDiv);
 	$("body").append(dashDiv);
-		
+
 	mapDiv.attr("id","mapDiv");
 	dashDiv.attr("id","dashDiv");
-	
+
+	$("#mapDiv").css("overflow-x", "scroll");
+	$("#mapDiv").css("overflow-y", "scroll");
+
 }
 
 function rethinkPanels()
 {
-	decideWindowOrientation();	
-	calcDashboardSize();	
+	decideWindowOrientation();
+	calcDashboardSize();
 	calcMapSize();
 	calcCellSize();
-  updateLayout();
+	updateLayout();
 
 
 	console.log(g);
@@ -210,7 +216,7 @@ function calcMapSize()
 {
 	g.m.width = g.w.width;
 	g.m.height = g.w.height;
-	
+
 	if (g.w.orientation == "L")
 	{
 		g.m.width -= g.d.thickness;
@@ -218,7 +224,7 @@ function calcMapSize()
 	else
 	{
 		g.m.height -= g.d.thickness;
-	} 
+	}
 }
 
 function calcCellNum()
@@ -226,24 +232,24 @@ function calcCellNum()
 	g.m.upscaled = upscaleCells();
 	if (g.m.upscaled) return;
 
-  g.m.downscaled = makeCellsFit();
+	g.m.downscaled = makeCellsFit();
 }
 
 function calcCellSize()
 {
 	calcCellNum();
-  $(".cell").css("height", g.m.actualCellSize + "px")
+	$(".cell").css("height", g.m.actualCellSize + "px")
 	$(".cell").css("width", g.m.actualCellSize + "px");
 }
 
 function upscaleCells()
 {
-	var verticalMapSize = g.rows * g.m.actualCellSize;
-	if (g.m.width < verticalMapSize ) return false; 
+	var verticalMapSize = g.sceneRows * g.m.actualCellSize;
+	if (g.m.width < verticalMapSize ) return false;
 
-	var horizontalMapSize = g.cols * g.m.actualCellSize;
+	var horizontalMapSize = g.sceneCols * g.m.actualCellSize;
 	if (g.m.height < horizontalMapSize ) return false;
-		
+
 	var verticalScale = g.m.width / verticalMapSize;
 	var horizontalScale = g.m.height / horizontalMapSize;
 	var scale = Math.min(verticalScale, horizontalScale);
@@ -254,13 +260,13 @@ function upscaleCells()
 
 function makeCellsFit()
 {
-	var minMapSize = g.m.minDrawnCells * g.m.actualCellSize;	
+	var minMapSize = g.m.minDrawnCells * g.m.actualCellSize;
 	if (g.m.width >= minMapSize && g.m.height >= minMapSize) return false;
-	
+
 	var verticalScale = g.m.width / minMapSize;
 	var horizontalScale = g.m.height / minMapSize;
 	var scale = Math.min(verticalScale, horizontalScale);
-  g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
-	
+	g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
+
 	return true;
 }
