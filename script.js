@@ -38,8 +38,7 @@ function zoom(event)
 
 	$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
 
-	$(".cell").css("width", g.m.actualCellSize + "px");
-	$(".cell").css("height", g.m.actualCellSize + "px");
+	resizeCells();
 }
 
 function setConsts()
@@ -53,6 +52,7 @@ function setConsts()
 	g.sceneCols = 25;                    // Number of the coloumns of the Map
 
 	g.m.actualCellSize = 40; 	// px      // Actual size of the drawn cells
+	g.m.borderRatio = 0.02;              // Cell-size/border thickness ratio
 	g.m.minCellSize = 30; 		// px      // Minimum size of the drawn cells
 	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
 	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
@@ -102,7 +102,7 @@ function updateLayout()
 		$("#dashDiv").css("width", g.d.length + "px");
 		$("#dashDiv").css("height", g.d.thickness + "px");
 
-		$("#dashDiv").css("top", g.m.width + "px");
+		$("#dashDiv").css("top", g.m.height + "px");
 		$("#dashDiv").css("left", "0px");
 	}
 }
@@ -238,8 +238,7 @@ function calcCellNum()
 function calcCellSize()
 {
 	calcCellNum();
-	$(".cell").css("height", g.m.actualCellSize + "px")
-	$(".cell").css("width", g.m.actualCellSize + "px");
+	resizeCells();
 }
 
 function upscaleCells()
@@ -269,4 +268,14 @@ function makeCellsFit()
 	g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
 
 	return true;
+}
+
+function resizeCells()
+{
+	$(".cell").css("height", g.m.actualCellSize + "px")
+	$(".cell").css("width", g.m.actualCellSize + "px");
+
+	var bordersize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
+	$(".cell").css("box-shadow", "inset " + bordersize +"px "  + bordersize +"px #ffffff," +
+															 "inset -"+ bordersize +"px -" + bordersize +"px #ffffff");
 }
