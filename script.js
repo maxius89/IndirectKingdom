@@ -25,20 +25,23 @@ $( document ).ready(function() {
 
 function zoom(event)
 {
-
-
-	if (event.deltaY < 0)
+  if (event.ctrlKey == true)
 	{
-		g.m.actualCellSize += g.m.stepCellSize;
-	}
-	else
-	{
-		g.m.actualCellSize -= g.m.stepCellSize;
-	}
+		event.preventDefault();
 
-	$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
+		if (event.deltaY < 0)
+		{
+			g.m.actualCellSize += g.m.stepCellSize;
+		}
+		else
+		{
+			g.m.actualCellSize -= g.m.stepCellSize;
+		}
 
-	resizeCells();
+		resizeCells();
+		$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
+		$("#map").css("height", g.m.actualCellSize * g.sceneRows +"px");
+	}
 }
 
 function setConsts()
@@ -53,7 +56,8 @@ function setConsts()
 
 	g.m.actualCellSize = 40; 	// px      // Actual size of the drawn cells
 	g.m.borderRatio = 0.02;              // Cell-size/border thickness ratio
-	g.m.minCellSize = 30; 		// px      // Minimum size of the drawn cells
+	g.m.minCellSize = 20; 		// px      // Minimum size of the drawn cells
+	g.m.maxCellSize = 100; 		// px      // Maximum size of the drawn cells
 	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
 	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
 
@@ -272,6 +276,9 @@ function makeCellsFit()
 
 function resizeCells()
 {
+	g.m.actualCellSize = Math.max(g.m.actualCellSize, g.m.minCellSize);
+	g.m.actualCellSize = Math.min(g.m.actualCellSize, g.m.maxCellSize);
+
 	$(".cell").css("height", g.m.actualCellSize + "px")
 	$(".cell").css("width", g.m.actualCellSize + "px");
 
