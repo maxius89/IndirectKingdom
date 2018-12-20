@@ -1,3 +1,6 @@
+var redKingdom = new Kingdom("Red Kingdom","red", ["r0c0", "r0c1", "r1c0","r2c0"]);
+var blueKingdom = new Kingdom("Blue Kingdom","blue", ["r4c2", "r3c2","r4c3","r3c3"]);
+
 $( document ).ready(function() {
 	setConsts();
 	initLayout();
@@ -21,6 +24,15 @@ $( document ).ready(function() {
 	document.getElementById("mapDiv").addEventListener("wheel", zoom);
 
 	//setTimeout(test,500);
+	//var redKingdom = new Kingdom("Red Kingdom","red", ["r0c0", "r0c1", "r1c0","r2c0"]);
+	redKingdom.claimTerritory("r10c0");
+	redKingdom.loseTerritory("r2c0");
+	redKingdom.drawTerritory();
+
+
+	//var blueKingdom = new Kingdom("Blue Kingdom","blue", ["r4c2", "r3c2","r4c3","r3c3"]);
+	blueKingdom.drawTerritory();
+
 });
 
 function zoom(event)
@@ -85,6 +97,7 @@ function initLayout()
 	$("#dashDiv").css("position", "absolute");
 
 	rethinkPanels();
+	addButtons();
 }
 
 function updateLayout()
@@ -148,6 +161,7 @@ function createMap(width, height)
 			newRow.append(newCol);
 			newCol.addClass("cell");
 			newCol.attr("id", "r" + i + "c" + j);
+			newCol.attr("status","unclaimed");
 			newCol.html("&nbsp;");
 		}
 	}
@@ -178,7 +192,6 @@ function rethinkPanels()
 	calcMapSize();
 	calcCellSize();
 	updateLayout();
-
 
 	console.log(g);
 }
@@ -285,4 +298,22 @@ function resizeCells()
 	var bordersize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
 	$(".cell").css("box-shadow", "inset " + bordersize +"px "  + bordersize +"px #ffffff," +
 															 "inset -"+ bordersize +"px -" + bordersize +"px #ffffff");
+}
+
+function addButtons()
+{
+	var button = document.createElement("Button");
+	var text = document.createTextNode("Next Round");
+	button.appendChild(text);
+	button.onclick = nextRound;
+	document.getElementById("dashDiv").appendChild(button);
+}
+
+function nextRound()
+{
+ var attackList = redKingdom.findNeighbourCells();
+ var target = Math.floor((Math.random() * attackList.length));
+
+ redKingdom.claimTerritory(attackList[target]);
+ redKingdom.drawTerritory();
 }
