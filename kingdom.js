@@ -1,7 +1,9 @@
-function Kingdom(name, color, cells){
+function Kingdom(name, color, cells) {
+
   this.name = name;
   this.color = color;
   this.cells=[];
+
   for (i = 0; i < cells.length; i++)
   {
     this.cells.push(cells[i]);
@@ -27,7 +29,7 @@ function Kingdom(name, color, cells){
     this.setTerritoryStatus();
   }
 
-  this.loseTerritory =function(cell){
+  this.loseTerritory = function(cell){
     this.cells.splice( this.cells.indexOf(cell), 1 );
     $("#" + cell).attr("status","unclaimed");
   }
@@ -46,7 +48,8 @@ function Kingdom(name, color, cells){
 }
 
 
-function analizeNeighbours(inputID, kingdomName){
+function analizeNeighbours(inputID, kingdomName) {
+
   var outputList = [];
   var posRow = inputID.indexOf("r");
   var posCol = inputID.indexOf("c");
@@ -56,30 +59,31 @@ function analizeNeighbours(inputID, kingdomName){
 
   var checkedID;
   var checkedStatus;
- if (rowNum > 0)
- {
+
+  if (rowNum > 0)
+  {
    checkedID = "r" + (rowNum-1) + "c"+ colNum;
    checkedStatus = $("#" + checkedID).attr("status");
 
-   if(checkedStatus != kingdomName)
+   if (checkedStatus != kingdomName)
    {
      outputList.push(checkedID);
    }
- }
+  }
 
- if (rowNum < g.sceneRows-1)
- {
+  if (rowNum < g.sceneRows-1)
+  {
    checkedID = "r" + (rowNum+1) + "c"+ colNum;
    checkedStatus = $("#" + checkedID).attr("status");
 
-   if(checkedStatus != kingdomName)
+   if (checkedStatus != kingdomName)
    {
      outputList.push(checkedID);
    }
- }
+  }
 
- if (colNum > 0)
- {
+  if (colNum > 0)
+  {
    checkedID = "r" + rowNum + "c"+ (colNum-1);
    checkedStatus = $("#" + checkedID).attr("status");
 
@@ -87,10 +91,10 @@ function analizeNeighbours(inputID, kingdomName){
    {
      outputList.push(checkedID);
    }
- }
+  }
 
- if (colNum < g.sceneCols-1)
- {
+  if (colNum < g.sceneCols-1)
+  {
    checkedID = "r" + rowNum + "c"+ (colNum+1);
    checkedStatus = $("#" + checkedID).attr("status");
 
@@ -98,7 +102,7 @@ function analizeNeighbours(inputID, kingdomName){
    {
      outputList.push(checkedID);
    }
- }
+  }
 
-return outputList;
+  return outputList;
 }

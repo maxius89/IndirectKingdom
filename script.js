@@ -29,7 +29,6 @@ $( document ).ready(function() {
 	redKingdom.loseTerritory("r2c0");
 	redKingdom.drawTerritory();
 
-
 	//var blueKingdom = new Kingdom("Blue Kingdom","blue", ["r4c2", "r3c2","r4c3","r3c3"]);
 	blueKingdom.drawTerritory();
 
@@ -302,11 +301,9 @@ function resizeCells()
 
 function addButtons()
 {
-	var button = document.createElement("Button");
-	var text = document.createTextNode("Next Round");
-	button.appendChild(text);
-	button.onclick = nextRound;
-	document.getElementById("dashDiv").appendChild(button);
+	var button = $("<button>").text("Next Round");
+	button.click(nextRound);
+	$("#dashDiv").append(button);
 }
 
 function nextRound()
