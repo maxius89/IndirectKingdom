@@ -1,5 +1,12 @@
-var redKingdom = new Kingdom("Red Kingdom","red", ["r0c0", "r0c1", "r1c0","r2c0"]);
-var blueKingdom = new Kingdom("Blue Kingdom","blue", ["r4c2", "r3c2","r4c3","r3c3"]);
+var kingdomNames = ["Red Kingdom", "Blue Kingdom"];
+
+var redKingdom = new Kingdom(kingdomNames[0],"red", ["r0c0", "r0c1", "r1c0","r2c0"]);
+var blueKingdom = new Kingdom(kingdomNames[1],"blue", ["r4c2", "r3c2","r4c3","r3c3"]);
+
+var listOfKingdoms = [redKingdom, blueKingdom];
+
+var started = 0;
+var runner = null;
 
 $( document ).ready(function() {
 	setConsts();
@@ -8,6 +15,7 @@ $( document ).ready(function() {
 	setTimeout(later,1800);
 	$(".cell").click(clicked);
 	$(".cell").attr("clicked",0);
+
 
 	resizeTimeout = null;
 	$( window ).resize(function() {
@@ -24,13 +32,13 @@ $( document ).ready(function() {
 	document.getElementById("mapDiv").addEventListener("wheel", zoom);
 
 	//setTimeout(test,500);
-	//var redKingdom = new Kingdom("Red Kingdom","red", ["r0c0", "r0c1", "r1c0","r2c0"]);
-	redKingdom.claimTerritory("r10c0");
-	redKingdom.loseTerritory("r2c0");
+	redKingdom.setTerritoryStatus();
 	redKingdom.drawTerritory();
+	redKingdom.updateCellsList();
 
-	//var blueKingdom = new Kingdom("Blue Kingdom","blue", ["r4c2", "r3c2","r4c3","r3c3"]);
+	blueKingdom.setTerritoryStatus();
 	blueKingdom.drawTerritory();
+	blueKingdom.updateCellsList();
 
 });
 
@@ -301,9 +309,25 @@ function resizeCells()
 
 function addButtons()
 {
-	var button = $("<button>").text("Next Round");
-	button.click(nextRound);
+	var button = $("<button>").text("Start / Stop");
+	button.click(runGame);
 	$("#dashDiv").append(button);
+}
+
+function runGame()
+{
+	if (started == 0)
+	{
+		runner = setInterval(function() {
+		  nextRound();
+		}, 100);
+		started = 1;
+  }
+	else
+	{
+		clearInterval(runner);
+		started = 0;
+	}
 }
 
 function nextRound()
@@ -313,4 +337,10 @@ function nextRound()
 
  redKingdom.claimTerritory(attackList[target]);
  redKingdom.drawTerritory();
+
+ var attackList = blueKingdom.findNeighbourCells();
+ var target = Math.floor((Math.random() * attackList.length));
+
+ blueKingdom.claimTerritory(attackList[target]);
+ blueKingdom.drawTerritory();
 }
