@@ -1,0 +1,21 @@
+body {
+	background-color: #000000;
+	width: 100%;
+	margin: 0;
+  padding: 0;
+	overflow: hidden;
+}
+
+#map{
+	background-color: #ffffff;
+  border-spacing: 0px;
+	border-collapse: collapse;
+}
+
+.cell {
+	background-color: #7777cc;
+	width: 30px;
+	height: 30px;
+	margin: 0px;
+	border: none;
+}
