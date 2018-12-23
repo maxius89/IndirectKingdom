@@ -54,6 +54,12 @@ function Kingdom(name, color, cells) {
     return neighbours;
   }
 
+  this.init = function(){
+    this.setTerritoryStatus();
+    this.drawTerritory();
+    this.updateCellsList();
+  }
+
 }
 
 

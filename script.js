@@ -1,22 +1,18 @@
-var kingdomNames = ["Red Kingdom", "Blue Kingdom"];
-
-var redKingdom = new Kingdom(kingdomNames[0],"red", ["r0c0", "r0c1", "r1c0","r2c0"]);
-var blueKingdom = new Kingdom(kingdomNames[1],"blue", ["r4c2", "r3c2","r4c3","r3c3"]);
-
-var listOfKingdoms = [redKingdom, blueKingdom];
-
-var started = 0;
-var runner = null;
-
 $( document ).ready(function() {
+
+// Initializations
 	setConsts();
 	initLayout();
+	initKingdoms();
 
-	setTimeout(later,1800);
+	started = 0;
+	runner = null;
+
+// Temporary test function
 	$(".cell").click(clicked);
 	$(".cell").attr("clicked",0);
 
-
+// Event Listeners
 	resizeTimeout = null;
 	$( window ).resize(function() {
 		if (resizeTimeout != null) clearTimeout(resizeTimeout);
@@ -31,16 +27,27 @@ $( document ).ready(function() {
 
 	document.getElementById("mapDiv").addEventListener("wheel", zoom);
 
+// Initialize kingdoms on map
+	for (var i = 0; i < 3; i++)
+	{
+		listOfKingdoms[i].init();
+	}
+
 	//setTimeout(test,500);
-	redKingdom.setTerritoryStatus();
-	redKingdom.drawTerritory();
-	redKingdom.updateCellsList();
-
-	blueKingdom.setTerritoryStatus();
-	blueKingdom.drawTerritory();
-	blueKingdom.updateCellsList();
-
 });
+
+
+
+function initKingdoms(){
+  kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom"];
+
+  redKingdom   = new Kingdom(kingdomNames[0],"red",   ["r0c0", "r0c1", "r1c0", "r2c0"]);
+  blueKingdom  = new Kingdom(kingdomNames[1],"blue",  ["r4c2", "r3c2", "r4c3", "r3c3"]);
+  greenKingdom = new Kingdom(kingdomNames[2],"green", ["r9c7", "r9c6", "r9c5", "r8c6"]);
+
+  listOfKingdoms = [redKingdom, blueKingdom, greenKingdom];
+}
+
 
 function zoom(event)
 {
@@ -129,11 +136,6 @@ function updateLayout()
 		$("#dashDiv").css("top", g.m.height + "px");
 		$("#dashDiv").css("left", "0px");
 	}
-}
-
-function later()
-{
-	$("#r2c2").css("background-color","#abcdef");
 }
 
 function clicked()
@@ -343,4 +345,10 @@ function nextRound()
 
  blueKingdom.claimTerritory(attackList[target]);
  blueKingdom.drawTerritory();
+
+ var attackList = greenKingdom.findNeighbourCells();
+ var target = Math.floor((Math.random() * attackList.length));
+
+ greenKingdom.claimTerritory(attackList[target]);
+ greenKingdom.drawTerritory();
 }
