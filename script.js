@@ -17,9 +17,6 @@ $( document ).ready(function() {
 	$( window ).resize(function() {
 		if (resizeTimeout != null) clearTimeout(resizeTimeout);
 		resizeTimeout = setTimeout( function() {
-			g.w.width= $(window).width();
-			g.w.height = $(window).height();
-
 			rethinkPanels();
 			resizeTimeout = null;
 		}, 200);
@@ -28,7 +25,7 @@ $( document ).ready(function() {
 	document.getElementById("mapDiv").addEventListener("wheel", zoom);
 
 // Initialize kingdoms on map
-	for (var i = 0; i < 3; i++)
+	for (var i = 0; i < listOfKingdoms.length; i++)
 	{
 		listOfKingdoms[i].init();
 	}
@@ -39,11 +36,9 @@ $( document ).ready(function() {
 
 
 function initKingdoms(){
-  kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom"];
-
-  redKingdom   = new Kingdom(kingdomNames[0],"red",   ["r0c0", "r0c1", "r1c0", "r2c0"]);
-  blueKingdom  = new Kingdom(kingdomNames[1],"blue",  ["r4c2", "r3c2", "r4c3", "r3c3"]);
-  greenKingdom = new Kingdom(kingdomNames[2],"green", ["r9c7", "r9c6", "r9c5", "r8c6"]);
+  redKingdom   = new Kingdom(g.kingdomNames[0],"red",   ["r0c0", "r0c1", "r1c0", "r2c0"]);
+  blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",  ["r4c2", "r3c2", "r4c3", "r3c3"]);
+  greenKingdom = new Kingdom(g.kingdomNames[2],"green", ["r9c7", "r9c6", "r9c5", "r8c6"]);
 
   listOfKingdoms = [redKingdom, blueKingdom, greenKingdom];
 }
@@ -77,6 +72,10 @@ function setConsts()
 	g.d = {};                            // Dashboard variables
 	g.m = {};                            // Map variables
 
+	g.randomSeed = "0001";               // Seed for random number generation
+
+	g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom"];  // Name of the kingdoms
+
 	g.sceneRows = 25;                    // Number of the rows of the Map
 	g.sceneCols = 25;                    // Number of the coloumns of the Map
 
@@ -86,6 +85,8 @@ function setConsts()
 	g.m.maxCellSize = 100; 		// px      // Maximum size of the drawn cells
 	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
 	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
+	g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
+	g.m.listOfCells = [];                // List of map cells for data storage
 
 	g.d.thicknessRatio = 0.2;
 	g.d.minThickness = 200;   // px      // Dashboard thickness minimum
@@ -96,7 +97,7 @@ function setConsts()
 
 function initLayout()
 {
-	g.w.width= $(window).width();
+	g.w.width = $(window).width();
 	g.w.height = $(window).height();
 
 	drawLayout();
@@ -171,7 +172,10 @@ function createMap(width, height)
 			newCol.addClass("cell");
 			newCol.attr("id", "r" + i + "c" + j);
 			newCol.attr("status","unclaimed");
+			newCol.attr("type","none");
 			newCol.html("&nbsp;");
+
+			initCell(newCol);
 		}
 	}
 
@@ -196,6 +200,9 @@ function drawLayout()
 
 function rethinkPanels()
 {
+	g.w.width= $(window).width();
+	g.w.height = $(window).height();
+
 	decideWindowOrientation();
 	calcDashboardSize();
 	calcMapSize();
@@ -321,7 +328,7 @@ function runGame()
 	if (started == 0)
 	{
 		runner = setInterval(function() {
-		  nextRound();
+			nextRound();
 		}, 100);
 		started = 1;
   }
@@ -334,21 +341,68 @@ function runGame()
 
 function nextRound()
 {
- var attackList = redKingdom.findNeighbourCells();
- var target = Math.floor((Math.random() * attackList.length));
+	Math.seedrandom();
 
- redKingdom.claimTerritory(attackList[target]);
- redKingdom.drawTerritory();
+	for (var i = 0; i < listOfKingdoms.length; i++)
+	{
+		var attackList = listOfKingdoms[i].findNeighbourCells();
+		var target = Math.floor(Math.random() * attackList.length);
 
- var attackList = blueKingdom.findNeighbourCells();
- var target = Math.floor((Math.random() * attackList.length));
+		listOfKingdoms[i].claimTerritory(attackList[target]);
+		listOfKingdoms[i].drawTerritory();
+		listOfKingdoms[i].calculateEconomy();
+	}
 
- blueKingdom.claimTerritory(attackList[target]);
- blueKingdom.drawTerritory();
+}
 
- var attackList = greenKingdom.findNeighbourCells();
- var target = Math.floor((Math.random() * attackList.length));
+function initCell(cell)
+{
+	Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+	var typeIndex =  Math.floor(Math.random() * g.m.cellTypeList.length);
+	var type = g.m.cellTypeList[typeIndex];
 
- greenKingdom.claimTerritory(attackList[target]);
- greenKingdom.drawTerritory();
+	cell.attr("type", type);
+
+	newCell = new Cell($(cell).attr("id"),type);
+	g.m.listOfCells.push(newCell);
+
+}
+
+function Cell(id, type)
+{
+	this.id = id;
+
+	switch (type) {
+		// Farm
+		case g.m.cellTypeList[0]:
+			this.wealth = 5;
+		  this.industry = 0;
+		  this.food = 100;
+		  this.population = 10;
+			break;
+		// Settlement
+		case g.m.cellTypeList[1]:
+			this.wealth = 50;
+			this.industry = 25;
+			this.food = 0;
+			this.population = 100;
+			break;
+			// Forest
+		case g.m.cellTypeList[2]:
+			this.wealth = 20;
+			this.industry = 25;
+			this.food = 20;
+			this.population = 0;
+			break;
+			// Mountain
+		case g.m.cellTypeList[3]:
+			this.wealth = 50;
+			this.industry = 100;
+			this.food = 0;
+			this.population = 0;
+			break;
+		default:
+		  console.warn("Cell type not defined!");
+
+	}
 }

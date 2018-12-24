@@ -4,6 +4,12 @@ function Kingdom(name, color, cells) {
   this.color = color;
   this.cells = [];
 
+  this.econ = {};
+  this.econ.wealth = 0;
+  this.econ.industry = 0;
+  this.econ.food = 0;
+  this.econ.population = 0;
+
   for (i = 0; i < cells.length; i++)
   {
     this.cells.push(cells[i]);
@@ -58,7 +64,24 @@ function Kingdom(name, color, cells) {
     this.setTerritoryStatus();
     this.drawTerritory();
     this.updateCellsList();
+    this.calculateEconomy();
   }
+
+  this.calculateEconomy = function(){
+    var tempEcon = this.econ;
+
+    $.each(this.cells, function(i,entry){
+      var currentCell = g.m.listOfCells.find( function(element){
+        return element.id === entry});
+
+      tempEcon.wealth += currentCell.wealth;
+      tempEcon.industry += currentCell.industry;
+      tempEcon.food += currentCell.food;
+      tempEcon.population += currentCell.population;
+    });
+    this.econ = tempEcon;
+  }
+
 
 }
 
@@ -126,6 +149,6 @@ function clearPreviousOwnership(inputCell){
   var checkedStatus = $("#" + inputCell).attr("status");
   if (checkedStatus != "unclaimed")
   {
-    listOfKingdoms[kingdomNames.indexOf(checkedStatus)].loseTerritory(inputCell);
+    listOfKingdoms[g.kingdomNames.indexOf(checkedStatus)].loseTerritory(inputCell);
   }
 }
