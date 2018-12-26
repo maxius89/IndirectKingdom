@@ -1,29 +1,23 @@
-var kingdomNames = ["Red Kingdom", "Blue Kingdom"];
-
-var redKingdom = new Kingdom(kingdomNames[0],"red", ["r0c0", "r0c1", "r1c0","r2c0"]);
-var blueKingdom = new Kingdom(kingdomNames[1],"blue", ["r4c2", "r3c2","r4c3","r3c3"]);
-
-var listOfKingdoms = [redKingdom, blueKingdom];
-
-var started = 0;
-var runner = null;
-
 $( document ).ready(function() {
+
+// Initializations
 	setConsts();
 	initLayout();
+	initKingdoms();
 
-	setTimeout(later,1800);
+	started = 0;
+	runner = null;
+	alreadyHighlighted = 0;
+	highlightedKindom = null;
+
+// Event Listeners
 	$(".cell").click(clicked);
-	$(".cell").attr("clicked",0);
-
+	$(".cell").attr("highlighted",0);
 
 	resizeTimeout = null;
 	$( window ).resize(function() {
 		if (resizeTimeout != null) clearTimeout(resizeTimeout);
 		resizeTimeout = setTimeout( function() {
-			g.w.width= $(window).width();
-			g.w.height = $(window).height();
-
 			rethinkPanels();
 			resizeTimeout = null;
 		}, 200);
@@ -31,44 +25,34 @@ $( document ).ready(function() {
 
 	document.getElementById("mapDiv").addEventListener("wheel", zoom);
 
+// Initialize kingdoms on map
+	for (var i = 0; i < listOfKingdoms.length; i++)
+	{
+		listOfKingdoms[i].init();
+	}
+
 	//setTimeout(test,500);
-	redKingdom.setTerritoryStatus();
-	redKingdom.drawTerritory();
-	redKingdom.updateCellsList();
-
-	blueKingdom.setTerritoryStatus();
-	blueKingdom.drawTerritory();
-	blueKingdom.updateCellsList();
-
 });
 
-function zoom(event)
-{
-  if (event.ctrlKey == true)
-	{
-		event.preventDefault();
 
-		if (event.deltaY < 0)
-		{
-			g.m.actualCellSize += g.m.stepCellSize;
-		}
-		else
-		{
-			g.m.actualCellSize -= g.m.stepCellSize;
-		}
+function initKingdoms() {
+  redKingdom   = new Kingdom(g.kingdomNames[0],"red",     ["r0c0", "r0c1", "r1c0", "r2c0"]);
+  blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",    ["r4c2", "r3c2", "r4c3", "r3c3"]);
+  greenKingdom = new Kingdom(g.kingdomNames[2],"green",   ["r9c7", "r9c6", "r9c5", "r8c6"]);
+	unclaimed    = new Kingdom(g.kingdomNames[3],"#7777cc", []);
 
-		resizeCells();
-		$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
-		$("#map").css("height", g.m.actualCellSize * g.sceneRows +"px");
-	}
+  listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
 }
 
-function setConsts()
-{
+function setConsts() {
 	g = {};                              // Global variables
 	g.w = {};                            // Window variables
 	g.d = {};                            // Dashboard variables
 	g.m = {};                            // Map variables
+
+	g.randomSeed = "0001";               // Seed for random number generation
+
+	g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom","unclaimed"];  // Name of the kingdoms
 
 	g.sceneRows = 25;                    // Number of the rows of the Map
 	g.sceneCols = 25;                    // Number of the coloumns of the Map
@@ -79,6 +63,8 @@ function setConsts()
 	g.m.maxCellSize = 100; 		// px      // Maximum size of the drawn cells
 	g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
 	g.m.minDrawnCells = 3;               // Minimum number of drawn cells
+	g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
+	g.m.listOfCells = [];                // List of map cells for data storage
 
 	g.d.thicknessRatio = 0.2;
 	g.d.minThickness = 200;   // px      // Dashboard thickness minimum
@@ -87,239 +73,47 @@ function setConsts()
 
 }
 
-function initLayout()
-{
-	g.w.width= $(window).width();
-	g.w.height = $(window).height();
+function clicked() {
+	if (alreadyHighlighted == 0) {
+		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 1;
 
-	drawLayout();
-	$("#mapDiv").append(createMap(g.sceneCols , g.sceneRows));
-
-	$("#mapDiv").css("background-color","#00ff00");  // Test color
-	$("#dashDiv").css("background-color","#ff00ff"); // Test color
-
-	$("#mapDiv").css("position", "absolute");
-	$("#mapDiv").css("top", "0px");
-	$("#mapDiv").css("left", "0px");
-	$("#dashDiv").css("position", "absolute");
-
-	rethinkPanels();
-	addButtons();
-}
-
-function updateLayout()
-{
-	$("#mapDiv").css("width", g.m.width + "px");
-	$("#mapDiv").css("height", g.m.height + "px");
-	$("#map").css("width", g.m.actualCellSize * g.sceneCols +"px");
-
-	if (g.w.orientation == "L")
-	{
-		$("#dashDiv").css("width", g.d.thickness + "px");
-		$("#dashDiv").css("height", g.d.length + "px");
-
-		$("#dashDiv").css("top", "0px");
-		$("#dashDiv").css("left", g.m.width + "px");
+		alreadyHighlighted = 1;
+		highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
 	}
-	else
-	{
-		$("#dashDiv").css("width", g.d.length + "px");
-		$("#dashDiv").css("height", g.d.thickness + "px");
+	else if (listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))] == highlightedKindom) {
+		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 0;
 
-		$("#dashDiv").css("top", g.m.height + "px");
-		$("#dashDiv").css("left", "0px");
-	}
-}
-
-function later()
-{
-	$("#r2c2").css("background-color","#abcdef");
-}
-
-function clicked()
-{
-	if ($(this).attr("clicked") == 1)
-	{
-		$(this).css("background-color","#fafafa");
-		$(this).attr("clicked",0);
-	}
-	else
-	{
-		$(this).css("background-color","#fedcba");
-		$(this).attr("clicked",1);
-	}
-}
-
-function createMap(width, height)
-{
-	var table = $(document.createElement('table'));
-	table.attr("id","map");
-	var tbody = $(document.createElement('tbody'));
-	table.append(tbody);
-
-	for (var i = 0; i < height; ++i)
-	{
-		var newRow = $(document.createElement("tr"));
-		table.append(newRow);
-
-		for (var j = 0; j < width ; ++j)
-		{
-			var newCol = $(document.createElement("td"));
-			newRow.append(newCol);
-			newCol.addClass("cell");
-			newCol.attr("id", "r" + i + "c" + j);
-			newCol.attr("status","unclaimed");
-			newCol.html("&nbsp;");
-		}
+		alreadyHighlighted = 0;
+		highlightedKindom = null;
 	}
 
-	return table;
+	setHighlightedCells();
 }
 
-function drawLayout()
-{
-	var mapDiv = $(document.createElement('div'));
-	var dashDiv = $(document.createElement('div'));
-
-	$("body").append(mapDiv);
-	$("body").append(dashDiv);
-
-	mapDiv.attr("id","mapDiv");
-	dashDiv.attr("id","dashDiv");
-
-	$("#mapDiv").css("overflow-x", "scroll");
-	$("#mapDiv").css("overflow-y", "scroll");
-
-}
-
-function rethinkPanels()
-{
-	decideWindowOrientation();
-	calcDashboardSize();
-	calcMapSize();
-	calcCellSize();
-	updateLayout();
-
-	console.log(g);
-}
-
-function decideWindowOrientation()
-{
-	g.w.orientation = ( g.w.width> g.w.height ? "L" : "P");
-	if (g.w.orientation == "P")
+function setHighlightedCells() {
+	for (var i = 0; i < listOfKingdoms.length; i++)
 	{
-		g.w.short = g.w.width;
-		g.w.long = g.w.height;
+		$(".cell[status = '"+g.kingdomNames[i]+"']").attr("highlighted",listOfKingdoms[i].highlighted);
 	}
-	else
-	{
-		g.w.short = g.w.height;
-		g.w.long = g.w.width;
-	}
+
+  var clickedCells = $(".cell[highlighted = '0']");
+	var nonClickedCells = $(".cell[highlighted = '1']");
+
+	var clickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
+  var nonClickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio)*2;
+
+	clickedCells.css("box-shadow", "inset " + clickedBorderSize +"px "  + clickedBorderSize +"px #ffffff," +
+																 "inset -"+ clickedBorderSize +"px -" + clickedBorderSize +"px #ffffff");
+
+	nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize +"px "  + nonClickedBorderSize +"px #dddd55," +
+													 					"inset -"+ nonClickedBorderSize +"px -" + nonClickedBorderSize +"px #dddd55");
 }
 
-function calcDashboardSize()
-{
-	if (g.w.long < g.d.minThickness * g.d.minDashboardThickessRatio)
-	{
-		g.d.length = 0;
-		g.d.thickness = 0;
-		g.d.disabled = true;
-	}
-	else
-	{
-		g.d.length = g.w.short;
-		g.d.thickness = Math.floor(g.d.length * g.d.thicknessRatio);
-		g.d.thickness = Math.max(g.d.thickness, g.d.minThickness);
-		g.d.thickness = Math.min(g.d.thickness, g.d.maxThickness);
-		g.d.disabled = false;
-	}
-}
-
-function calcMapSize()
-{
-	g.m.width = g.w.width;
-	g.m.height = g.w.height;
-
-	if (g.w.orientation == "L")
-	{
-		g.m.width -= g.d.thickness;
-	}
-	else
-	{
-		g.m.height -= g.d.thickness;
-	}
-}
-
-function calcCellNum()
-{
-	g.m.upscaled = upscaleCells();
-	if (g.m.upscaled) return;
-
-	g.m.downscaled = makeCellsFit();
-}
-
-function calcCellSize()
-{
-	calcCellNum();
-	resizeCells();
-}
-
-function upscaleCells()
-{
-	var verticalMapSize = g.sceneRows * g.m.actualCellSize;
-	if (g.m.width < verticalMapSize ) return false;
-
-	var horizontalMapSize = g.sceneCols * g.m.actualCellSize;
-	if (g.m.height < horizontalMapSize ) return false;
-
-	var verticalScale = g.m.width / verticalMapSize;
-	var horizontalScale = g.m.height / horizontalMapSize;
-	var scale = Math.min(verticalScale, horizontalScale);
-	g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
-
-	return true;
-}
-
-function makeCellsFit()
-{
-	var minMapSize = g.m.minDrawnCells * g.m.actualCellSize;
-	if (g.m.width >= minMapSize && g.m.height >= minMapSize) return false;
-
-	var verticalScale = g.m.width / minMapSize;
-	var horizontalScale = g.m.height / minMapSize;
-	var scale = Math.min(verticalScale, horizontalScale);
-	g.m.actualCellSize = Math.floor(g.m.actualCellSize * scale);
-
-	return true;
-}
-
-function resizeCells()
-{
-	g.m.actualCellSize = Math.max(g.m.actualCellSize, g.m.minCellSize);
-	g.m.actualCellSize = Math.min(g.m.actualCellSize, g.m.maxCellSize);
-
-	$(".cell").css("height", g.m.actualCellSize + "px")
-	$(".cell").css("width", g.m.actualCellSize + "px");
-
-	var bordersize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
-	$(".cell").css("box-shadow", "inset " + bordersize +"px "  + bordersize +"px #ffffff," +
-															 "inset -"+ bordersize +"px -" + bordersize +"px #ffffff");
-}
-
-function addButtons()
-{
-	var button = $("<button>").text("Start / Stop");
-	button.click(runGame);
-	$("#dashDiv").append(button);
-}
-
-function runGame()
-{
+function runGame() {
 	if (started == 0)
 	{
 		runner = setInterval(function() {
-		  nextRound();
+			nextRound();
 		}, 100);
 		started = 1;
   }
@@ -330,17 +124,86 @@ function runGame()
 	}
 }
 
-function nextRound()
+function nextRound() {
+	Math.seedrandom();
+
+	for (var i = 0; i < listOfKingdoms.length-1; i++)
+	{
+		var attackList = listOfKingdoms[i].findNeighbourCells();
+		var target = Math.floor(Math.random() * attackList.length);
+
+		listOfKingdoms[i].claimTerritory(attackList[target]);
+		listOfKingdoms[i].drawTerritory();
+		listOfKingdoms[i].calculateEconomy();
+	}
+
+	writeToInfoPanel();
+	setHighlightedCells();
+
+	listOfKingdoms[listOfKingdoms.length-1].drawTerritory();
+	listOfKingdoms[listOfKingdoms.length-1].calculateEconomy();
+}
+
+function initCell(cell) {
+	Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+	var typeIndex =  Math.floor(Math.random() * g.m.cellTypeList.length);
+	var type = g.m.cellTypeList[typeIndex];
+
+	cell.attr("type", type);
+
+	newCell = new Cell($(cell).attr("id"),type);
+	g.m.listOfCells.push(newCell);
+}
+
+function Cell(id, type) {
+	this.id = id;
+
+	switch (type) {
+		// Farm
+		case g.m.cellTypeList[0]:
+			this.wealth = 5;
+		  this.industry = 0;
+		  this.food = 100;
+		  this.population = 10;
+			break;
+		// Settlement
+		case g.m.cellTypeList[1]:
+			this.wealth = 50;
+			this.industry = 25;
+			this.food = 0;
+			this.population = 100;
+			break;
+			// Forest
+		case g.m.cellTypeList[2]:
+			this.wealth = 20;
+			this.industry = 25;
+			this.food = 20;
+			this.population = 0;
+			break;
+			// Mountain
+		case g.m.cellTypeList[3]:
+			this.wealth = 50;
+			this.industry = 100;
+			this.food = 0;
+			this.population = 0;
+			break;
+		default:
+		  console.warn("Cell type not defined!");
+	}
+}
+
+function writeToInfoPanel()
 {
- var attackList = redKingdom.findNeighbourCells();
- var target = Math.floor((Math.random() * attackList.length));
+	var text1 = text2 = text3 = text4 = "&nbsp;";
+	if (highlightedKindom != null) {
+	text1 = highlightedKindom.name + " wealth: " + highlightedKindom.econ.wealth;
+	text2 = highlightedKindom.name + " industry: " + highlightedKindom.econ.industry;
+	text3 = highlightedKindom.name + " food: " + highlightedKindom.econ.food;
+	text4 = highlightedKindom.name + " population: " + highlightedKindom.econ.population;
+	}
 
- redKingdom.claimTerritory(attackList[target]);
- redKingdom.drawTerritory();
-
- var attackList = blueKingdom.findNeighbourCells();
- var target = Math.floor((Math.random() * attackList.length));
-
- blueKingdom.claimTerritory(attackList[target]);
- blueKingdom.drawTerritory();
+	$("#infoWealth").html(text1);
+	$("#infoIndustry").html(text2);
+	$("#infoFood").html(text3);
+	$("#infoPopulation").html(text4);
 }
