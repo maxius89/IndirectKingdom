@@ -15,6 +15,7 @@ function initLayout() {
 
 	rethinkPanels();
 	addButtons();
+	addInfoPanel();
 }
 
 function drawLayout() {
@@ -35,6 +36,33 @@ function addButtons() {
 	var button = $("<button>").text("Start / Stop");
 	button.click(runGame);
 	$("#dashDiv").append(button);
+}
+
+function addInfoPanel() {
+  var infoPanel = $(document.createElement('div'));
+  $("#dashDiv").append(infoPanel);
+  infoPanel.attr("id","infoPanel");
+  infoPanel.css("width", g.d.thickness + "px");
+  infoPanel.css("height", g.d.length/2 + "px");
+  infoPanel.css("background-color","#ffffff");
+  //infoPanel.html("infoPanel initialized.");
+
+  var infoWealth = $(document.createElement("div"));
+  infoWealth.attr("id","infoWealth");
+  infoPanel.append(infoWealth);
+
+	var infoIndustry = $(document.createElement("div"));
+  infoIndustry.attr("id","infoIndustry");
+  infoPanel.append(infoIndustry);
+
+	var infoFood = $(document.createElement("div"));
+	infoFood.attr("id","infoFood");
+	infoPanel.append(infoFood);
+
+	var infoPopulation = $(document.createElement("div"));
+	infoPopulation.attr("id","infoPopulation");
+	infoPanel.append(infoPopulation);
+
 }
 
 function createMap(width, height) {
@@ -66,7 +94,7 @@ function createMap(width, height) {
 }
 
 function rethinkPanels() {
-	g.w.width= $(window).width();
+	g.w.width = $(window).width();
 	g.w.height = $(window).height();
 
 	decideWindowOrientation();

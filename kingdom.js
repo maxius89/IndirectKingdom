@@ -3,6 +3,7 @@ function Kingdom(name, color, cells) {
   this.name = name;
   this.color = color;
   this.cells = [];
+  this.highlighted = 0;
 
   this.econ = {
     wealth: 0,
@@ -153,8 +154,5 @@ function analizeNeighbours(inputID, kingdomName) {
 
 function clearPreviousOwnership(inputCell) {
   var checkedStatus = $("#" + inputCell).attr("status");
-  if (checkedStatus != "unclaimed")
-  {
-    listOfKingdoms[g.kingdomNames.indexOf(checkedStatus)].loseTerritory(inputCell);
-  }
+  listOfKingdoms[g.kingdomNames.indexOf(checkedStatus)].loseTerritory(inputCell);
 }

@@ -7,12 +7,13 @@ $( document ).ready(function() {
 
 	started = 0;
 	runner = null;
-
-// Temporary test function
-	$(".cell").click(clicked);
-	$(".cell").attr("clicked",0);
+	alreadyHighlighted = 0;
+	highlightedKindom = null;
 
 // Event Listeners
+	$(".cell").click(clicked);
+	$(".cell").attr("highlighted",0);
+
 	resizeTimeout = null;
 	$( window ).resize(function() {
 		if (resizeTimeout != null) clearTimeout(resizeTimeout);
@@ -35,11 +36,12 @@ $( document ).ready(function() {
 
 
 function initKingdoms() {
-  redKingdom   = new Kingdom(g.kingdomNames[0],"red",   ["r0c0", "r0c1", "r1c0", "r2c0"]);
-  blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",  ["r4c2", "r3c2", "r4c3", "r3c3"]);
-  greenKingdom = new Kingdom(g.kingdomNames[2],"green", ["r9c7", "r9c6", "r9c5", "r8c6"]);
+  redKingdom   = new Kingdom(g.kingdomNames[0],"red",     ["r0c0", "r0c1", "r1c0", "r2c0"]);
+  blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",    ["r4c2", "r3c2", "r4c3", "r3c3"]);
+  greenKingdom = new Kingdom(g.kingdomNames[2],"green",   ["r9c7", "r9c6", "r9c5", "r8c6"]);
+	unclaimed    = new Kingdom(g.kingdomNames[3],"#7777cc", []);
 
-  listOfKingdoms = [redKingdom, blueKingdom, greenKingdom];
+  listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
 }
 
 function setConsts() {
@@ -50,7 +52,7 @@ function setConsts() {
 
 	g.randomSeed = "0001";               // Seed for random number generation
 
-	g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom"];  // Name of the kingdoms
+	g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom","unclaimed"];  // Name of the kingdoms
 
 	g.sceneRows = 25;                    // Number of the rows of the Map
 	g.sceneCols = 25;                    // Number of the coloumns of the Map
@@ -72,16 +74,39 @@ function setConsts() {
 }
 
 function clicked() {
-	if ($(this).attr("clicked") == 1)
-	{
-		$(this).css("background-color","#fafafa");
-		$(this).attr("clicked",0);
+	if (alreadyHighlighted == 0) {
+		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 1;
+
+		alreadyHighlighted = 1;
+		highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
 	}
-	else
-	{
-		$(this).css("background-color","#fedcba");
-		$(this).attr("clicked",1);
+	else if (listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))] == highlightedKindom) {
+		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 0;
+
+		alreadyHighlighted = 0;
+		highlightedKindom = null;
 	}
+
+	setHighlightedCells();
+}
+
+function setHighlightedCells() {
+	for (var i = 0; i < listOfKingdoms.length; i++)
+	{
+		$(".cell[status = '"+g.kingdomNames[i]+"']").attr("highlighted",listOfKingdoms[i].highlighted);
+	}
+
+  var clickedCells = $(".cell[highlighted = '0']");
+	var nonClickedCells = $(".cell[highlighted = '1']");
+
+	var clickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
+  var nonClickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio)*2;
+
+	clickedCells.css("box-shadow", "inset " + clickedBorderSize +"px "  + clickedBorderSize +"px #ffffff," +
+																 "inset -"+ clickedBorderSize +"px -" + clickedBorderSize +"px #ffffff");
+
+	nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize +"px "  + nonClickedBorderSize +"px #dddd55," +
+													 					"inset -"+ nonClickedBorderSize +"px -" + nonClickedBorderSize +"px #dddd55");
 }
 
 function runGame() {
@@ -102,7 +127,7 @@ function runGame() {
 function nextRound() {
 	Math.seedrandom();
 
-	for (var i = 0; i < listOfKingdoms.length; i++)
+	for (var i = 0; i < listOfKingdoms.length-1; i++)
 	{
 		var attackList = listOfKingdoms[i].findNeighbourCells();
 		var target = Math.floor(Math.random() * attackList.length);
@@ -111,6 +136,12 @@ function nextRound() {
 		listOfKingdoms[i].drawTerritory();
 		listOfKingdoms[i].calculateEconomy();
 	}
+
+	writeToInfoPanel();
+	setHighlightedCells();
+
+	listOfKingdoms[listOfKingdoms.length-1].drawTerritory();
+	listOfKingdoms[listOfKingdoms.length-1].calculateEconomy();
 }
 
 function initCell(cell) {
@@ -159,4 +190,20 @@ function Cell(id, type) {
 		default:
 		  console.warn("Cell type not defined!");
 	}
+}
+
+function writeToInfoPanel()
+{
+	var text1 = text2 = text3 = text4 = "&nbsp;";
+	if (highlightedKindom != null) {
+	text1 = highlightedKindom.name + " wealth: " + highlightedKindom.econ.wealth;
+	text2 = highlightedKindom.name + " industry: " + highlightedKindom.econ.industry;
+	text3 = highlightedKindom.name + " food: " + highlightedKindom.econ.food;
+	text4 = highlightedKindom.name + " population: " + highlightedKindom.econ.population;
+	}
+
+	$("#infoWealth").html(text1);
+	$("#infoIndustry").html(text2);
+	$("#infoFood").html(text3);
+	$("#infoPopulation").html(text4);
 }
