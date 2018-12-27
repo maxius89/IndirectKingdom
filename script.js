@@ -153,6 +153,35 @@ function initCell(cell) {
 
 	newCell = new Cell($(cell).attr("id"),type);
 	g.m.listOfCells.push(newCell);
+
+	var img = $(document.createElement("img"));
+	cell.append(img);
+
+	img.addClass("cellImg");
+	img.css("height", g.m.actualCellSize/2 + "px");
+	img.css("width", g.m.actualCellSize/2 + "px");
+	img.css("top",  g.m.actualCellSize/8 + "px");
+	img.css("left",  g.m.actualCellSize/8 + "px");
+
+	switch (type) {
+		// Farm
+		case g.m.cellTypeList[0]:
+			img.attr("src", "img/farm.svg");
+			break;
+		// Settlement
+		case g.m.cellTypeList[1]:
+			img.attr("src", "img/settlement.svg");
+			break;
+			// Forest
+		case g.m.cellTypeList[2]:
+			img.attr("src", "img/forest.svg");
+			break;
+			// Mountain
+		case g.m.cellTypeList[3]:
+			img.attr("src", "img/mountain.svg");
+			break;
+		default:
+	}
 }
 
 function Cell(id, type) {

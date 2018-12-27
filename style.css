@@ -19,3 +19,11 @@ body {
 	margin: 0px;
 	border: none;
 }
+
+.cellImg {
+  border: 0px;
+  padding: 0px;
+	position: relative;
+	left: 5px;
+	top: 5px;
+}

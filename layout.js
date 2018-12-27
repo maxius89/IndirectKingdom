@@ -219,12 +219,17 @@ function resizeCells() {
 	g.m.actualCellSize = Math.max(g.m.actualCellSize, g.m.minCellSize);
 	g.m.actualCellSize = Math.min(g.m.actualCellSize, g.m.maxCellSize);
 
-	$(".cell").css("height", g.m.actualCellSize + "px")
+	$(".cell").css("height", g.m.actualCellSize + "px");
 	$(".cell").css("width", g.m.actualCellSize + "px");
 
 	var bordersize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
 	$(".cell").css("box-shadow", "inset " + bordersize +"px "  + bordersize +"px #ffffff," +
 															 "inset -"+ bordersize +"px -" + bordersize +"px #ffffff");
+
+  $(".cellImg").css("height", g.m.actualCellSize/2 + "px");
+	$(".cellImg").css("width", g.m.actualCellSize/2 + "px");
+	$(".cellImg").css("top",  g.m.actualCellSize/8 + "px");
+	$(".cellImg").css("left",  g.m.actualCellSize/8 + "px");
 }
 
 function zoom(event) {
