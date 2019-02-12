@@ -54,6 +54,8 @@ function setConsts() {
 
 	g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom","unclaimed"];  // Name of the kingdoms
 
+	g.turnLength = 100;				// ms			 // Length of a turn
+
 	g.sceneRows = 25;                    // Number of the rows of the Map
 	g.sceneCols = 25;                    // Number of the coloumns of the Map
 
@@ -71,23 +73,32 @@ function setConsts() {
 	g.d.maxThickness = 400;   // px      // Dashboard thickness maximum
 	g.d.minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 
+	g.LandType = {
+	  Farm : 0,
+		Settlement : 1,
+		Forest : 2,
+		Mountain: 3,
+ };
 }
 
 function clicked() {
-	if (alreadyHighlighted == 0) {
-		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 1;
-
-		alreadyHighlighted = 1;
-		highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
+	for (var i = 0; i < listOfKingdoms.length; i++)
+	{
+		listOfKingdoms[i].highlighted = 0;
 	}
-	else if (listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))] == highlightedKindom) {
-		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 0;
 
-		alreadyHighlighted = 0;
+	if ( highlightedKindom === listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))])
+	{
 		highlightedKindom = null;
+	}
+	else
+	{
+		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 1;
+		highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
 	}
 
 	setHighlightedCells();
+	writeToInfoPanel();
 }
 
 function setHighlightedCells() {
@@ -106,15 +117,15 @@ function setHighlightedCells() {
 																 "inset -"+ clickedBorderSize +"px -" + clickedBorderSize +"px #ffffff");
 
 	nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize +"px "  + nonClickedBorderSize +"px #dddd55," +
-													 					"inset -"+ nonClickedBorderSize +"px -" + nonClickedBorderSize +"px #dddd55");
+																		"inset -"+ nonClickedBorderSize +"px -" + nonClickedBorderSize +"px #dddd55");
 }
 
 function runGame() {
-	if (started == 0)
+	if (started === 0)
 	{
 		runner = setInterval(function() {
 			nextRound();
-		}, 100);
+		}, g.turnLength);
 		started = 1;
   }
 	else
@@ -126,8 +137,9 @@ function runGame() {
 
 function nextRound() {
 	Math.seedrandom();
+	var numOfActiveKingdoms = listOfKingdoms.length - 1;
 
-	for (var i = 0; i < listOfKingdoms.length-1; i++)
+	for (var i = 0; i < numOfActiveKingdoms; i++)
 	{
 		var attackList = listOfKingdoms[i].findNeighbourCells();
 		var target = Math.floor(Math.random() * attackList.length);
@@ -140,8 +152,8 @@ function nextRound() {
 	writeToInfoPanel();
 	setHighlightedCells();
 
-	listOfKingdoms[listOfKingdoms.length-1].drawTerritory();
-	listOfKingdoms[listOfKingdoms.length-1].calculateEconomy();
+	listOfKingdoms[numOfActiveKingdoms].drawTerritory();
+	listOfKingdoms[numOfActiveKingdoms].calculateEconomy();
 }
 
 function initCell(cell) {
@@ -164,20 +176,16 @@ function initCell(cell) {
 	img.css("left",  g.m.actualCellSize/8 + "px");
 
 	switch (type) {
-		// Farm
-		case g.m.cellTypeList[0]:
+		case g.m.cellTypeList[g.LandType.Farm]:
 			img.attr("src", "img/farm.svg");
 			break;
-		// Settlement
-		case g.m.cellTypeList[1]:
+		case g.m.cellTypeList[g.LandType.Settlement]:
 			img.attr("src", "img/settlement.svg");
 			break;
-			// Forest
-		case g.m.cellTypeList[2]:
+		case g.m.cellTypeList[g.LandType.Forest]:
 			img.attr("src", "img/forest.svg");
 			break;
-			// Mountain
-		case g.m.cellTypeList[3]:
+		case g.m.cellTypeList[g.LandType.Mountain]:
 			img.attr("src", "img/mountain.svg");
 			break;
 		default:
@@ -188,29 +196,25 @@ function Cell(id, type) {
 	this.id = id;
 
 	switch (type) {
-		// Farm
-		case g.m.cellTypeList[0]:
+		case g.m.cellTypeList[g.LandType.Farm]:
 			this.wealth = 5;
 		  this.industry = 0;
 		  this.food = 100;
 		  this.population = 10;
 			break;
-		// Settlement
-		case g.m.cellTypeList[1]:
+		case g.m.cellTypeList[g.LandType.Settlement]:
 			this.wealth = 50;
 			this.industry = 25;
 			this.food = 0;
 			this.population = 100;
 			break;
-			// Forest
-		case g.m.cellTypeList[2]:
+		case g.m.cellTypeList[g.LandType.Forest]:
 			this.wealth = 20;
 			this.industry = 25;
 			this.food = 20;
 			this.population = 0;
 			break;
-			// Mountain
-		case g.m.cellTypeList[3]:
+		case g.m.cellTypeList[g.LandType.Mountain]:
 			this.wealth = 50;
 			this.industry = 100;
 			this.food = 0;
@@ -229,6 +233,9 @@ function writeToInfoPanel()
 	text2 = highlightedKindom.name + " industry: " + highlightedKindom.econ.industry;
 	text3 = highlightedKindom.name + " food: " + highlightedKindom.econ.food;
 	text4 = highlightedKindom.name + " population: " + highlightedKindom.econ.population;
+	}
+	else {
+		text1 = text2 = text3 = text4 = "&nbsp;"
 	}
 
 	$("#infoWealth").html(text1);
