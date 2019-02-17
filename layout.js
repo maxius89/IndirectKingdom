@@ -93,6 +93,13 @@ function createMap(width, height) {
 	return table;
 }
 
+function updateMap() {
+	g.m.listOfCells.forEach(function(cell) {
+		$("#" + cell.id).attr("status",cell.owner.name);
+		$("#" + cell.id).css("background-color",cell.owner.color);
+	});
+}
+
 function rethinkPanels() {
 	g.w.width = $(window).width();
 	g.w.height = $(window).height();
@@ -105,7 +112,6 @@ function rethinkPanels() {
 
 	console.log(g);
 }
-
 
 function decideWindowOrientation() {
 	g.w.orientation = ( g.w.width> g.w.height ? "L" : "P");

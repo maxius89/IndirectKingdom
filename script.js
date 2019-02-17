@@ -39,9 +39,12 @@ function initKingdoms() {
   redKingdom   = new Kingdom(g.kingdomNames[0],"red",     ["r0c0", "r0c1", "r1c0", "r2c0"]);
   blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",    ["r4c2", "r3c2", "r4c3", "r3c3"]);
   greenKingdom = new Kingdom(g.kingdomNames[2],"green",   ["r9c7", "r9c6", "r9c5", "r8c6"]);
-	unclaimed    = new Kingdom(g.kingdomNames[3],"#7777cc", []);
+  unclaimed    = new Kingdom(g.kingdomNames[3],"#7777cc", []);
+	unclaimed.updateCellsList();
 
   listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
+
+	updateMap();
 }
 
 function setConsts() {
@@ -102,10 +105,9 @@ function clicked() {
 }
 
 function setHighlightedCells() {
-	for (var i = 0; i < listOfKingdoms.length; i++)
-	{
-		$(".cell[status = '"+g.kingdomNames[i]+"']").attr("highlighted",listOfKingdoms[i].highlighted);
-	}
+	listOfKingdoms.forEach(function(kingdom,i) {
+		$(".cell[status = '"+kingdom.name+"']").attr("highlighted",kingdom.highlighted);
+	});
 
   var clickedCells = $(".cell[highlighted = '0']");
 	var nonClickedCells = $(".cell[highlighted = '1']");
@@ -145,15 +147,15 @@ function nextRound() {
 		var target = Math.floor(Math.random() * attackList.length);
 
 		listOfKingdoms[i].claimTerritory(attackList[target]);
-		listOfKingdoms[i].drawTerritory();
 		listOfKingdoms[i].calculateEconomy();
 	}
+
+	unclaimed.calculateEconomy();
 
 	writeToInfoPanel();
 	setHighlightedCells();
 
-	listOfKingdoms[numOfActiveKingdoms].drawTerritory();
-	listOfKingdoms[numOfActiveKingdoms].calculateEconomy();
+	updateMap();
 }
 
 function initCell(cell) {
@@ -163,7 +165,8 @@ function initCell(cell) {
 
 	cell.attr("type", type);
 
-	newCell = new Cell($(cell).attr("id"),type);
+	var unclaimedOwner = new Kingdom("unclaimed","#7777cc", []);
+	newCell = new Cell($(cell).attr("id"),type, unclaimedOwner);
 	g.m.listOfCells.push(newCell);
 
 	var img = $(document.createElement("img"));
@@ -189,39 +192,6 @@ function initCell(cell) {
 			img.attr("src", "img/mountain.svg");
 			break;
 		default:
-	}
-}
-
-function Cell(id, type) {
-	this.id = id;
-
-	switch (type) {
-		case g.m.cellTypeList[g.LandType.Farm]:
-			this.wealth = 5;
-		  this.industry = 0;
-		  this.food = 100;
-		  this.population = 10;
-			break;
-		case g.m.cellTypeList[g.LandType.Settlement]:
-			this.wealth = 50;
-			this.industry = 25;
-			this.food = 0;
-			this.population = 100;
-			break;
-		case g.m.cellTypeList[g.LandType.Forest]:
-			this.wealth = 20;
-			this.industry = 25;
-			this.food = 20;
-			this.population = 0;
-			break;
-		case g.m.cellTypeList[g.LandType.Mountain]:
-			this.wealth = 50;
-			this.industry = 100;
-			this.food = 0;
-			this.population = 0;
-			break;
-		default:
-		  console.warn("Cell type not defined!");
 	}
 }
 

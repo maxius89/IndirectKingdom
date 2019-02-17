@@ -1,158 +1,138 @@
-function Kingdom(name, color, cells) {
+class Kingdom {
 
-  this.name = name;
-  this.color = color;
-  this.cells = [];
-  this.highlighted = 0;
+  constructor(name, color, cells) {
+    this.name = name;
+    this.color = color;
+    this.cells = [];
+    this.highlighted = 0;
 
-  this.econ = {
-    wealth: 0,
-    industry: 0,
-    food: 0,
-    population: 0
-  };
-
-  for (i = 0; i < cells.length; i++)
-  {
-    this.cells.push(cells[i]);
-  }
-
-  this.updateCellsList = function() {
-    var tempList = [];
-    var listOfCells = $( ".cell[status = '"+this.name+"']" );
-
-    $.each(listOfCells, function(i,entry){
-      tempList.push($(entry).attr("id"));
-    });
-
-    this.cells = tempList;
-  }
-
-  this.drawTerritory = function() {
-    for (i = 0; i < this.cells.length; i++)
-    {
-      $("#" + this.cells[i]).css("background-color",this.color);
-    }
-  }
-
-  this.setTerritoryStatus = function() {
-    for (i = 0; i < this.cells.length; i++)
-    {
-      $("#" + this.cells[i]).attr("status",this.name);
-    }
-  }
-
-  this.claimTerritory = function(cell) {
-    this.cells.push(cell);
-    clearPreviousOwnership(cell);
-    this.setTerritoryStatus();
-  }
-
-  this.loseTerritory = function(cell) {
-    this.cells.splice( this.cells.indexOf(cell), 1 );
-    $("#" + cell).attr("status","unclaimed");
-  }
-
-  this.findNeighbourCells = function() {
-    var neighbours =[];
-    for (i = 0; i < this.cells.length; i++)
-    {
-      neighbours = neighbours.concat(analizeNeighbours(this.cells[i], this.name));
-    }
-    return neighbours;
-  }
-
-  this.init = function() {
-    this.setTerritoryStatus();
-    this.drawTerritory();
-    this.updateCellsList();
-    this.calculateEconomy();
-  }
-
-  this.calculateEconomy = function() {
-    var tempEcon = {
+    this.econ = {
       wealth: 0,
       industry: 0,
       food: 0,
       population: 0
     };
 
-    $.each(this.cells, function(i,entry){
-      var currentCell = g.m.listOfCells.find( function(element) {
-        return element.id === entry});
+    cells.forEach(function(cell) {
+      var currentCell = g.m.listOfCells.find(function(element) {
+        return element.id === cell});
 
-      tempEcon.wealth += currentCell.wealth;
-      tempEcon.industry += currentCell.industry;
-      tempEcon.food += currentCell.food;
-      tempEcon.population += currentCell.population;
+        this.cells.push(currentCell);
+        currentCell.owner = this;
+    },this);
+  }
+
+  updateCellsList = function() {
+    this.cells = g.m.listOfCells.filter(cell => cell.owner.name === this.name);
+  }
+
+  setTerritoryStatus = function() {
+    this.cells.forEach(function(cell) {
+      cell.owner = this;
+    },this);
+  }
+
+  claimTerritory = function(inputCell) {
+    if (!this.cells.includes(inputCell)) {
+      this.cells.push(inputCell);
+      inputCell.clearPreviousOwnership();
+      this.setTerritoryStatus();
+    }
+  }
+
+  loseTerritory = function(cell) {
+    this.cells.splice( this.cells.indexOf(cell), 1 );
+    cell.owner = listOfKingdoms[listOfKingdoms.length-1]; // unclaimed
+  }
+
+  findNeighbourCells = function() {
+    var neighbours =[];
+
+    this.cells.forEach(function(cell) {
+      neighbours = neighbours.concat(this.analizeNeighbours(cell));
+    },this);
+    return neighbours;
+  }
+
+  analizeNeighbours= function(inputCell) {
+    var outputList = [];
+    var posRow = inputCell.id.indexOf("r");
+    var posCol = inputCell.id.indexOf("c");
+
+    var rowNum = Number(inputCell.id.slice(posRow+1, posCol));
+    var colNum = Number(inputCell.id.slice(posCol+1))
+
+    var checkedID;
+    var targetCell;
+    var checkedStatus;
+
+    if (rowNum > 0) {
+      checkedID = "r" + (rowNum-1) + "c"+ colNum;
+
+      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+      if (targetCell != null) {
+        outputList.push(targetCell);
+      }
+    }
+
+    if (rowNum < g.sceneRows-1) {
+      checkedID = "r" + (rowNum+1) + "c"+ colNum;
+
+      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+      if (targetCell != null) {
+        outputList.push(targetCell);
+      }
+    }
+
+    if (colNum > 0) {
+      checkedID = "r" + rowNum + "c"+ (colNum-1);
+
+      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+      if (targetCell != null) {
+        outputList.push(targetCell);
+      }
+    }
+
+    if (colNum < g.sceneCols-1) {
+      checkedID = "r" + rowNum + "c"+ (colNum+1);
+
+      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+      if (targetCell != null) {
+       outputList.push(targetCell);
+      }
+    }
+
+    return outputList;
+  }
+
+  checkTargetCellOwner = function(checkedId, inputCell) {
+    var targetCell = g.m.listOfCells.find(function(cell) {
+      return cell.id === checkedId;
     });
-    this.econ = tempEcon;
+
+    if (targetCell.owner.name != inputCell.owner.name) {
+      return targetCell;
+    }
+    else {
+      return null;
+    }
   }
 
-
-}
-
-
-function analizeNeighbours(inputID, kingdomName) {
-
-  var outputList = [];
-  var posRow = inputID.indexOf("r");
-  var posCol = inputID.indexOf("c");
-
-  var rowNum = Number(inputID.slice(posRow+1, posCol));
-  var colNum = Number(inputID.slice(posCol+1))
-
-  var checkedID;
-  var checkedStatus;
-
-  if (rowNum > 0)
-  {
-   checkedID = "r" + (rowNum-1) + "c"+ colNum;
-   checkedStatus = $("#" + checkedID).attr("status");
-
-   if (checkedStatus != kingdomName)
-   {
-     outputList.push(checkedID);
-   }
+  init = function() {
+    this.setTerritoryStatus();
+    this.updateCellsList();
+    this.calculateEconomy();
   }
 
-  if (rowNum < g.sceneRows-1)
-  {
-   checkedID = "r" + (rowNum+1) + "c"+ colNum;
-   checkedStatus = $("#" + checkedID).attr("status");
+  calculateEconomy = function() {
+    Object.keys(this.econ).forEach(i => this.econ[i] = 0);
 
-   if (checkedStatus != kingdomName)
-   {
-     outputList.push(checkedID);
-   }
+      this.cells.forEach(function(currentCell) {
+        this.econ.wealth += currentCell.wealth;
+        this.econ.industry += currentCell.industry;
+        this.econ.food += currentCell.food;
+        this.econ.population += currentCell.population;
+      },this);
   }
 
-  if (colNum > 0)
-  {
-   checkedID = "r" + rowNum + "c"+ (colNum-1);
-   checkedStatus = $("#" + checkedID).attr("status");
-
-   if(checkedStatus != kingdomName)
-   {
-     outputList.push(checkedID);
-   }
-  }
-
-  if (colNum < g.sceneCols-1)
-  {
-   checkedID = "r" + rowNum + "c"+ (colNum+1);
-   checkedStatus = $("#" + checkedID).attr("status");
-
-   if(checkedStatus != kingdomName)
-   {
-     outputList.push(checkedID);
-   }
-  }
-
-  return outputList;
-}
-
-function clearPreviousOwnership(inputCell) {
-  var checkedStatus = $("#" + inputCell).attr("status");
-  listOfKingdoms[g.kingdomNames.indexOf(checkedStatus)].loseTerritory(inputCell);
 }
