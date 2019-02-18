@@ -9,8 +9,14 @@ class Kingdom {
     this.econ = {
       wealth: 0,
       industry: 0,
-      food: 0,
+      agriculture: 0,
       population: 0
+    };
+
+    this.income = {
+      money: 0,
+      goods: 0,
+      food: 0  
     };
 
     cells.forEach(function(cell) {
@@ -130,7 +136,7 @@ class Kingdom {
       this.cells.forEach(function(currentCell) {
         this.econ.wealth += currentCell.wealth;
         this.econ.industry += currentCell.industry;
-        this.econ.food += currentCell.food;
+        this.econ.agriculture += currentCell.agriculture;
         this.econ.population += currentCell.population;
       },this);
   }

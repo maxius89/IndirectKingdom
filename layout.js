@@ -33,9 +33,13 @@ function drawLayout() {
 }
 
 function addButtons() {
-	var button = $("<button>").text("Start / Stop");
-	button.click(runGame);
-	$("#dashDiv").append(button);
+	var startButton = $("<button>").text("Start / Stop");
+	startButton.click(runGame);
+	$("#dashDiv").append(startButton);
+
+	var populationButton = $("<button>").text("Show Population");
+	populationButton.click(showPopulation);
+	$("#dashDiv").append(populationButton);
 }
 
 function addInfoPanel() {
@@ -55,9 +59,9 @@ function addInfoPanel() {
   infoIndustry.attr("id","infoIndustry");
   infoPanel.append(infoIndustry);
 
-	var infoFood = $(document.createElement("div"));
-	infoFood.attr("id","infoFood");
-	infoPanel.append(infoFood);
+	var infoAgriculture = $(document.createElement("div"));
+	infoAgriculture.attr("id","infoAgriculture");
+	infoPanel.append(infoAgriculture);
 
 	var infoPopulation = $(document.createElement("div"));
 	infoPopulation.attr("id","infoPopulation");

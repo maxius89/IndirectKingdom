@@ -9,6 +9,7 @@ $( document ).ready(function() {
 	runner = null;
 	alreadyHighlighted = 0;
 	highlightedKindom = null;
+	showPopulation = false;
 
 // Event Listeners
 	$(".cell").click(clicked);
@@ -138,6 +139,10 @@ function runGame() {
 }
 
 function nextRound() {
+	g.m.listOfCells.forEach(function(cell) {
+		cell.tick();
+	});
+
 	Math.seedrandom();
 	var numOfActiveKingdoms = listOfKingdoms.length - 1;
 
@@ -156,6 +161,13 @@ function nextRound() {
 	setHighlightedCells();
 
 	updateMap();
+
+console.log(showPopulation);
+	if (showPopulation){  // TODO: Temporary solution
+		g.m.listOfCells.forEach(function(cell) {
+			$(".cell[id='"+cell.id+"']").html(Math.round(cell.population));
+		});
+	}
 }
 
 function initCell(cell) {
@@ -201,7 +213,7 @@ function writeToInfoPanel()
 	if (highlightedKindom != null) {
 	text1 = highlightedKindom.name + " wealth: " + highlightedKindom.econ.wealth;
 	text2 = highlightedKindom.name + " industry: " + highlightedKindom.econ.industry;
-	text3 = highlightedKindom.name + " food: " + highlightedKindom.econ.food;
+	text3 = highlightedKindom.name + " agriculture: " + highlightedKindom.econ.agriculture;
 	text4 = highlightedKindom.name + " population: " + highlightedKindom.econ.population;
 	}
 	else {
@@ -210,6 +222,11 @@ function writeToInfoPanel()
 
 	$("#infoWealth").html(text1);
 	$("#infoIndustry").html(text2);
-	$("#infoFood").html(text3);
+	$("#infoAgriculture").html(text3);
 	$("#infoPopulation").html(text4);
+}
+
+function showPopulation()
+{
+	showPopulation = true;
 }
