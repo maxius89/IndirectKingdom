@@ -5,15 +5,22 @@ $( document ).ready(function() {
 	initLayout();
 	initKingdoms();
 
+	started = 0;
+	runner = null;
+	alreadyHighlighted = 0;
+	highlightedKindom = null;
+	showPopulation = false;
+
 // Event Listeners
 	$(".cell").click(clicked);
-	$(".cell").attr("highlighted","false");
+	$(".cell").attr("highlighted",0);
 
+	resizeTimeout = null;
 	$( window ).resize(function() {
-		if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
-		g.resizeTimeout = setTimeout( function() {
+		if (resizeTimeout != null) clearTimeout(resizeTimeout);
+		resizeTimeout = setTimeout( function() {
 			rethinkPanels();
-			g.resizeTimeout = null;
+			resizeTimeout = null;
 		}, 200);
 	});
 
@@ -46,13 +53,6 @@ function setConsts() {
 	g.w = {};                            // Window variables
 	g.d = {};                            // Dashboard variables
 	g.m = {};                            // Map variables
-
- // System variables
-	g.started = false;
-  g.runner = null;
-	g.highlightedKindom = null;
-	g.showPopulation = false;
-	g.resizeTimeout = null;
 
 	g.randomSeed = "0001";               // Seed for random number generation
 
@@ -88,17 +88,17 @@ function setConsts() {
 function clicked() {
 	for (var i = 0; i < listOfKingdoms.length; i++)
 	{
-		listOfKingdoms[i].highlighted = false;
+		listOfKingdoms[i].highlighted = 0;
 	}
 
-	if ( g.highlightedKindom === listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))])
+	if ( highlightedKindom === listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))])
 	{
-		g.highlightedKindom = null;
+		highlightedKindom = null;
 	}
 	else
 	{
-		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
-		g.highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
+		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = 1;
+		highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
 	}
 
 	setHighlightedCells();
@@ -110,8 +110,8 @@ function setHighlightedCells() {
 		$(".cell[status = '"+kingdom.name+"']").attr("highlighted",kingdom.highlighted);
 	});
 
-  var clickedCells = $(".cell[highlighted = false]");
-	var nonClickedCells = $(".cell[highlighted = true]");
+  var clickedCells = $(".cell[highlighted = '0']");
+	var nonClickedCells = $(".cell[highlighted = '1']");
 
 	var clickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
   var nonClickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio)*2;
@@ -124,17 +124,17 @@ function setHighlightedCells() {
 }
 
 function runGame() {
-	if (g.started === false)
+	if (started === 0)
 	{
-		g.runner = setInterval(function() {
+		runner = setInterval(function() {
 			nextRound();
 		}, g.turnLength);
-		g.started = true;
+		started = 1;
   }
 	else
 	{
-		clearInterval(g.runner);
-		g.started = false;
+		clearInterval(runner);
+		started = 0;
 	}
 }
 
@@ -162,8 +162,8 @@ function nextRound() {
 
 	updateMap();
 
-console.log(g.showPopulation);
-	if (g.showPopulation){  // TODO: Temporary solution
+console.log(showPopulation);
+	if (showPopulation){  // TODO: Temporary solution
 		g.m.listOfCells.forEach(function(cell) {
 			$(".cell[id='"+cell.id+"']").html(Math.round(cell.population));
 		});
@@ -210,11 +210,11 @@ function initCell(cell) {
 function writeToInfoPanel()
 {
 	var text1 = text2 = text3 = text4 = "&nbsp;";
-	if (g.highlightedKindom != null) {
-	text1 = g.highlightedKindom.name + " wealth: " + g.highlightedKindom.econ.wealth;
-	text2 = g.highlightedKindom.name + " industry: " + g.highlightedKindom.econ.industry;
-	text3 = g.highlightedKindom.name + " agriculture: " + g.highlightedKindom.econ.agriculture;
-	text4 = g.highlightedKindom.name + " population: " + g.highlightedKindom.econ.population;
+	if (highlightedKindom != null) {
+	text1 = highlightedKindom.name + " wealth: " + highlightedKindom.econ.wealth;
+	text2 = highlightedKindom.name + " industry: " + highlightedKindom.econ.industry;
+	text3 = highlightedKindom.name + " agriculture: " + highlightedKindom.econ.agriculture;
+	text4 = highlightedKindom.name + " population: " + highlightedKindom.econ.population;
 	}
 	else {
 		text1 = text2 = text3 = text4 = "&nbsp;"
@@ -228,5 +228,5 @@ function writeToInfoPanel()
 
 function showPopulation()
 {
-	g.showPopulation = true;
+	showPopulation = true;
 }

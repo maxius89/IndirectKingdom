@@ -69,7 +69,7 @@ function addInfoPanel() {
 
 }
 
-function createMap(width:number, height:number) {
+function createMap(width, height) {
 	var table = $(document.createElement('table'));
 	table.attr("id","map");
 	var tbody = $(document.createElement('tbody'));
@@ -169,7 +169,8 @@ function calcCellNum() {
 	g.m.downscaled = makeCellsFit();
 }
 
-function calcCellSize() {
+function calcCellSize()
+{
 	calcCellNum();
 	resizeCells();
 }
@@ -241,7 +242,7 @@ function resizeCells() {
 	$(".cellImg").css("left",  g.m.actualCellSize/8 + "px");
 }
 
-function zoom(event:Event) {
+function zoom(event) {
   if (event.ctrlKey == true)
 	{
 		event.preventDefault();
