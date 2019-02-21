@@ -1,10 +1,16 @@
 class Kingdom {
+  name: string;
+  color: string;
+  cells: Cell[] = [];
+  highlighted: boolean;
+  econ: {};
+  income: {};
 
-  constructor(name, color, cells) {
+  constructor(name: string, color: string, cells: string[]) {
     this.name = name;
     this.color = color;
     this.cells = [];
-    this.highlighted = 0;
+    this.highlighted = false;
 
     this.econ = {
       wealth: 0,
@@ -16,7 +22,7 @@ class Kingdom {
     this.income = {
       money: 0,
       goods: 0,
-      food: 0  
+      food: 0
     };
 
     cells.forEach(function(cell) {
@@ -38,7 +44,7 @@ class Kingdom {
     },this);
   }
 
-  claimTerritory = function(inputCell) {
+  claimTerritory = function(inputCell: Cell) {
     if (!this.cells.includes(inputCell)) {
       this.cells.push(inputCell);
       inputCell.clearPreviousOwnership();
