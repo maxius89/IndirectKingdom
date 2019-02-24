@@ -86,53 +86,54 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var global_1 = __webpack_require__(2);
-var g = new global_1.default;
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _global__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+
+
+
+
+var g = new _global__WEBPACK_IMPORTED_MODULE_0__["default"];
+/* harmony default export */ __webpack_exports__["default"] = (g);
+var layout = new _layout__WEBPACK_IMPORTED_MODULE_3__["default"];
 $(document).ready(function () {
     // Initializations
     setConsts();
-    //	initLayout();
-    //	initKingdoms();
+    layout.initLayout();
+    //initKingdoms();
     // Event Listeners
-    /*
-        $(".cell").click(clicked);
-        $(".cell").attr("highlighted","false");
-    
-        $( window ).resize(function() {
-            if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
-            g.resizeTimeout = setTimeout( function() {
-                rethinkPanels();
-                g.resizeTimeout = null;
-            }, 200);
-        });
-    
-        document.getElementById("mapDiv").addEventListener("wheel", zoom);
-    
+    //	$(".cell").click(clicked);
+    $(".cell").attr("highlighted", "false");
+    $(window).resize(function () {
+        if (g.resizeTimeout != null)
+            clearTimeout(g.resizeTimeout);
+        g.resizeTimeout = setTimeout(function () {
+            layout.rethinkPanels();
+            g.resizeTimeout = null;
+        }, 200);
+    });
+    $("#mapDiv")[0].addEventListener("wheel", layout.zoom.bind(layout));
     // Initialize kingdoms on map
-        for (var i = 0; i < listOfKingdoms.length; i++)
-        {
-            listOfKingdoms[i].init();
-        }*/
+    /*for (var i = 0; i < g.listOfKingdoms.length; i++)
+    {
+        g.listOfKingdoms[i].init();
+    }*/
     //setTimeout(test,500);
 });
-/*
 function initKingdoms() {
-  redKingdom   = new Kingdom(g.kingdomNames[0],"red",     ["r0c0", "r0c1", "r1c0", "r2c0"]);
-  blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",    ["r4c2", "r3c2", "r4c3", "r3c3"]);
-  greenKingdom = new Kingdom(g.kingdomNames[2],"green",   ["r9c7", "r9c6", "r9c5", "r8c6"]);
-  unclaimed    = new Kingdom(g.kingdomNames[3],"#7777cc", []);
+    let redKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](g.kingdomNames[0], "red", ["r0c0", "r0c1", "r1c0", "r2c0"]);
+    let blueKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](g.kingdomNames[1], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"]);
+    let greenKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](g.kingdomNames[2], "green", ["r9c7", "r9c6", "r9c5", "r8c6"]);
+    let unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](g.kingdomNames[3], "#7777cc", []);
     unclaimed.updateCellsList();
-
-  listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
-
-    updateMap();
+    g.listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
+    //updateMap();
 }
-*/
 function setConsts() {
     // System variables
     g.started = false;
@@ -146,27 +147,14 @@ function setConsts() {
     g.sceneRows = 25; // Number of the rows of the Map
     g.sceneCols = 25; // Number of the coloumns of the Map
     console.log(g);
-    /*
-        g.m.actualCellSize = 40; 	// px      // Actual size of the drawn cells
-        g.m.borderRatio = 0.02;              // Cell-size/border thickness ratio
-        g.m.minCellSize = 20; 		// px      // Minimum size of the drawn cells
-        g.m.maxCellSize = 100; 		// px      // Maximum size of the drawn cells
-        g.m.stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
-        g.m.minDrawnCells = 3;               // Minimum number of drawn cells
-        g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
-        g.m.listOfCells = [];                // List of map cells for data storage
-    
-        g.d.thicknessRatio = 0.2;
-        g.d.minThickness = 200;   // px      // Dashboard thickness minimum
-        g.d.maxThickness = 400;   // px      // Dashboard thickness maximum
-        g.d.minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
-    
-        g.LandType = {
-          Farm : 0,
-            Settlement : 1,
-            Forest : 2,
-            Mountain: 3,
-     };*/
+    //g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
+    //g.m.listOfCells = [];                // List of map cells for data storage
+    g.LandType = {
+        Farm: 0,
+        Settlement: 1,
+        Forest: 2,
+        Mountain: 3,
+    };
 }
 /*
 function clicked() {
@@ -253,27 +241,22 @@ console.log(g.showPopulation);
         });
     }
 }
-
+*/
 function initCell(cell) {
-    Math.seedrandom(g.randomSeed + $(cell).attr("id") );
-    var typeIndex =  Math.floor(Math.random() * g.m.cellTypeList.length);
+    //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+    var typeIndex = Math.floor(Math.random() * g.m.cellTypeList.length);
     var type = g.m.cellTypeList[typeIndex];
-
     cell.attr("type", type);
-
-    var unclaimedOwner = new Kingdom("unclaimed","#7777cc", []);
-    newCell = new Cell($(cell).attr("id"),type, unclaimedOwner);
+    var unclaimedOwner = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"]("unclaimed", "#7777cc", []);
+    let newCell = new _cell__WEBPACK_IMPORTED_MODULE_2__["default"]($(cell).attr("id"), type, unclaimedOwner);
     g.m.listOfCells.push(newCell);
-
     var img = $(document.createElement("img"));
     cell.append(img);
-
     img.addClass("cellImg");
-    img.css("height", g.m.actualCellSize/2 + "px");
-    img.css("width", g.m.actualCellSize/2 + "px");
-    img.css("top",  g.m.actualCellSize/8 + "px");
-    img.css("left",  g.m.actualCellSize/8 + "px");
-
+    //	img.css("height", g.m.actualCellSize/2 + "px");
+    //	img.css("width", g.m.actualCellSize/2 + "px");
+    //	img.css("top",  g.m.actualCellSize/8 + "px");
+    //	img.css("left",  g.m.actualCellSize/8 + "px");
     switch (type) {
         case g.m.cellTypeList[g.LandType.Farm]:
             img.attr("src", "img/farm.svg");
@@ -290,7 +273,7 @@ function initCell(cell) {
         default:
     }
 }
-
+/*
 function writeToInfoPanel()
 {
     var text1 = text2 = text3 = text4 = "&nbsp;";
@@ -10691,18 +10674,473 @@ return jQuery;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Globals = /** @class */ (function () {
-    function Globals() {
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Globals; });
+class Globals {
+    constructor() {
+        this.sceneRows = 25; // Number of the rows of the Map
+        this.sceneCols = 25; // Number of the coloumns of the Map
+        this.randomSeed = "fasz";
     }
-    return Globals;
-}());
-exports.default = Globals;
+}
+;
+;
 
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Kingdom; });
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+
+class Kingdom {
+    constructor(name, color, cells) {
+        this.cells = [];
+        this.updateCellsList = function () {
+            this.cells = _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.listOfCells.filter(cell => cell.owner.name === this.name);
+        };
+        this.setTerritoryStatus = function () {
+            this.cells.forEach(function (cell) {
+                cell.owner = this;
+            }, this);
+        };
+        this.claimTerritory = function (inputCell) {
+            if (!this.cells.includes(inputCell)) {
+                this.cells.push(inputCell);
+                inputCell.clearPreviousOwnership();
+                this.setTerritoryStatus();
+            }
+        };
+        this.loseTerritory = function (cell) {
+            this.cells.splice(this.cells.indexOf(cell), 1);
+            //cell.owner = listOfKingdoms[listOfKingdoms.length-1]; // unclaimed
+        };
+        this.findNeighbourCells = function () {
+            var neighbours;
+            this.cells.forEach(function (cell) {
+                neighbours = neighbours.concat(this.analizeNeighbours(cell));
+            }, this);
+            return neighbours;
+        };
+        this.analizeNeighbours = function (inputCell) {
+            var outputList;
+            var posRow = inputCell.id.indexOf("r");
+            var posCol = inputCell.id.indexOf("c");
+            var rowNum = Number(inputCell.id.slice(posRow + 1, posCol));
+            var colNum = Number(inputCell.id.slice(posCol + 1));
+            var checkedID;
+            var targetCell;
+            if (rowNum > 0) {
+                checkedID = "r" + (rowNum - 1) + "c" + colNum;
+                targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+                if (targetCell != null) {
+                    outputList.push(targetCell);
+                }
+            }
+            if (rowNum < _script__WEBPACK_IMPORTED_MODULE_0__["default"].sceneRows - 1) {
+                checkedID = "r" + (rowNum + 1) + "c" + colNum;
+                targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+                if (targetCell != null) {
+                    outputList.push(targetCell);
+                }
+            }
+            if (colNum > 0) {
+                checkedID = "r" + rowNum + "c" + (colNum - 1);
+                targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+                if (targetCell != null) {
+                    outputList.push(targetCell);
+                }
+            }
+            if (colNum < _script__WEBPACK_IMPORTED_MODULE_0__["default"].sceneCols - 1) {
+                checkedID = "r" + rowNum + "c" + (colNum + 1);
+                targetCell = this.checkTargetCellOwner(checkedID, inputCell);
+                if (targetCell != null) {
+                    outputList.push(targetCell);
+                }
+            }
+            return outputList;
+        };
+        this.checkTargetCellOwner = function (checkedId, inputCell) {
+            var targetCell = _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.listOfCells.find(function (cell) {
+                return cell.id === checkedId;
+            });
+            if (targetCell.owner.name != inputCell.owner.name) {
+                return targetCell;
+            }
+            else {
+                return null;
+            }
+        };
+        this.init = function () {
+            this.setTerritoryStatus();
+            this.updateCellsList();
+            this.calculateEconomy();
+        };
+        this.calculateEconomy = function () {
+            Object.keys(this.econ).forEach(i => this.econ[i] = 0);
+            this.cells.forEach(function (currentCell) {
+                this.econ.wealth += currentCell.wealth;
+                this.econ.industry += currentCell.industry;
+                this.econ.agriculture += currentCell.agriculture;
+                this.econ.population += currentCell.population;
+            }, this);
+        };
+        this.name = name;
+        this.color = color;
+        this.cells = [];
+        this.highlighted = false;
+        this.econ = {
+            wealth: 0,
+            industry: 0,
+            agriculture: 0,
+            population: 0
+        };
+        this.income = {
+            money: 0,
+            goods: 0,
+            food: 0
+        };
+        cells.forEach(function (cell) {
+            var currentCell = _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.listOfCells.find(function (element) {
+                return element.id === cell;
+            });
+            this.cells.push(currentCell);
+            currentCell.owner = this;
+        }, this);
+    }
+}
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+
+class Cell {
+    constructor(id, type, owner) {
+        this.clearPreviousOwnership = function () {
+            this.owner.loseTerritory(this);
+        };
+        this.updateCell = function () {
+            var populationPower = this.population; // TODO: Get a function with diminishing return;
+            var excessFood = this.agriculture - this.population;
+            this.moneyEfficiency = this.baseEfficiency.money * populationPower;
+            this.industryEfficiency = this.baseEfficiency.goods * populationPower;
+            this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
+            this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
+            this.population += this.populationGrowth;
+        };
+        this.generateOutput = function () {
+            this.output.money = this.wealth * this.moneyEfficiency;
+            this.output.goods = this.industry * this.industryEfficiency;
+            this.output.food = this.agriculture * this.agricultureEfficiency;
+            return this.output;
+        };
+        this.tick = function () {
+            this.updateCell();
+            Object.keys(this.output).map(function (i) {
+                this.owner.income[i] += this.generateOutput()[i];
+            }, this);
+        };
+        this.id = id;
+        this.owner = owner;
+        this.output = {
+            money: 0,
+            goods: 0,
+            food: 0
+        };
+        // Efficiencies calculated from different elements for output calculation
+        this.moneyEfficiency = 0;
+        this.industryEfficiency = 0;
+        this.agricultureEfficiency = 0;
+        this.populationGrowth = 0;
+        this.baseEfficiency = {
+            money: 0.01,
+            goods: 0.01,
+            food: 0.01,
+            people: 0.01
+        };
+        switch (type) {
+            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Farm]:
+                this.wealth = 5;
+                this.industry = 0;
+                this.agriculture = 100;
+                this.population = 10;
+                break;
+            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Settlement]:
+                this.wealth = 50;
+                this.industry = 25;
+                this.agriculture = 0;
+                this.population = 100;
+                break;
+            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Forest]:
+                this.wealth = 20;
+                this.industry = 25;
+                this.agriculture = 20;
+                this.population = 5;
+                break;
+            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Mountain]:
+                this.wealth = 50;
+                this.industry = 100;
+                this.agriculture = 0;
+                this.population = 5;
+                break;
+            default:
+                console.warn("Cell type not defined!");
+        }
+    }
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Layout; });
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+
+class Layout {
+    constructor() {
+        this.mActualCellSize = 30; // Actual Cell size
+        this.borderRatio = 0.02; // Cell-size/border thickness ratio
+        this.minCellSize = 20; // px      // Minimum size of the drawn cells
+        this.maxCellSize = 100; // px      // Maximum size of the drawn cells
+        this.stepCellSize = 5; // px      // Cell-size increment/decrement constant
+        this.minDrawnCells = 3; // Minimum number of drawn cells
+        this.sceneRows = 25; // Number of the rows of the Map
+        this.sceneCols = 25; // Number of the coloumns of the Map
+        this.thicknessRatio = 0.2;
+        this.minThickness = 200; // px      // Dashboard thickness minimum
+        this.maxThickness = 400; // px      // Dashboard thickness maximum
+        this.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
+    }
+    /*constructor(name: string, color: string, cells: string[]) {
+
+    }*/
+    initLayout() {
+        this.wWidth = $(window).width();
+        this.wHeight = $(window).height();
+        this.drawLayout();
+        $("#mapDiv").append(this.createMap(this.sceneCols, this.sceneRows));
+        $("#mapDiv").css("background-color", "#00ff00"); // Test color
+        $("#dashDiv").css("background-color", "#ff00ff"); // Test color
+        $("#mapDiv").css("position", "absolute");
+        $("#mapDiv").css("top", "0px");
+        $("#mapDiv").css("left", "0px");
+        $("#dashDiv").css("position", "absolute");
+        this.rethinkPanels();
+        this.addButtons();
+        this.addInfoPanel();
+    }
+    drawLayout() {
+        var mapDiv = $(document.createElement('div'));
+        var dashDiv = $(document.createElement('div'));
+        $("body").append(mapDiv);
+        $("body").append(dashDiv);
+        mapDiv.attr("id", "mapDiv");
+        dashDiv.attr("id", "dashDiv");
+        $("#mapDiv").css("overflow-x", "scroll");
+        $("#mapDiv").css("overflow-y", "scroll");
+    }
+    addButtons() {
+        var startButton = $("<button>").text("Start / Stop");
+        //		startButton.click(runGame);
+        $("#dashDiv").append(startButton);
+        var populationButton = $("<button>").text("Show Population");
+        //		populationButton.click(showPopulation);
+        $("#dashDiv").append(populationButton);
+    }
+    addInfoPanel() {
+        var infoPanel = $(document.createElement('div'));
+        $("#dashDiv").append(infoPanel);
+        infoPanel.attr("id", "infoPanel");
+        infoPanel.css("width", this.dThickness + "px");
+        infoPanel.css("height", this.dLength / 2 + "px");
+        infoPanel.css("background-color", "#ffffff");
+        //infoPanel.html("infoPanel initialized.");
+        var infoWealth = $(document.createElement("div"));
+        infoWealth.attr("id", "infoWealth");
+        infoPanel.append(infoWealth);
+        var infoIndustry = $(document.createElement("div"));
+        infoIndustry.attr("id", "infoIndustry");
+        infoPanel.append(infoIndustry);
+        var infoAgriculture = $(document.createElement("div"));
+        infoAgriculture.attr("id", "infoAgriculture");
+        infoPanel.append(infoAgriculture);
+        var infoPopulation = $(document.createElement("div"));
+        infoPopulation.attr("id", "infoPopulation");
+        infoPanel.append(infoPopulation);
+    }
+    createMap(width, height) {
+        var table = $(document.createElement('table'));
+        table.attr("id", "map");
+        var tbody = $(document.createElement('tbody'));
+        table.append(tbody);
+        for (var i = 0; i < height; ++i) {
+            var newRow = $(document.createElement("tr"));
+            table.append(newRow);
+            for (var j = 0; j < width; ++j) {
+                var newCol = $(document.createElement("td"));
+                newRow.append(newCol);
+                newCol.addClass("cell");
+                newCol.attr("id", "r" + i + "c" + j);
+                newCol.attr("status", "unclaimed");
+                newCol.attr("type", "none");
+                newCol.html("&nbsp;");
+                //				initCell(newCol);
+            }
+        }
+        return table;
+    }
+    updateMap() {
+        /*	g.m.listOfCells.forEach(function(cell) {
+                $("#" + cell.id).attr("status",cell.owner.name);
+                $("#" + cell.id).css("background-color",cell.owner.color);
+            });*/
+    }
+    rethinkPanels() {
+        this.wWidth = $(window).width();
+        this.wHeight = $(window).height();
+        this.decideWindowOrientation();
+        this.calcDashboardSize();
+        this.calcMapSize();
+        this.calcCellSize();
+        this.updateLayout();
+        console.log(_script__WEBPACK_IMPORTED_MODULE_0__["default"]);
+    }
+    decideWindowOrientation() {
+        this.wOrientation = (this.wWidth > this.wHeight ?
+            Orientation.Landscape : Orientation.Portrait);
+        if (this.wOrientation === Orientation.Portrait) {
+            this.wShort = this.wWidth;
+            this.wLong = this.wHeight;
+        }
+        else {
+            this.wShort = this.wHeight;
+            this.wLong = this.wWidth;
+        }
+    }
+    calcDashboardSize() {
+        if (this.wLong < this.minThickness * this.minDashboardThickessRatio) {
+            this.dLength = 0;
+            this.dThickness = 0;
+            this.dDisabled = true;
+        }
+        else {
+            this.dLength = this.wShort;
+            this.dThickness = Math.floor(this.dLength * this.thicknessRatio);
+            this.dThickness = Math.max(this.dThickness, this.minThickness);
+            this.dThickness = Math.min(this.dThickness, this.maxThickness);
+            this.dDisabled = false;
+        }
+    }
+    calcMapSize() {
+        this.mWidth = this.wWidth;
+        this.mHeight = this.wHeight;
+        if (this.wOrientation == Orientation.Landscape) {
+            this.mWidth -= this.dThickness;
+        }
+        else {
+            this.mHeight -= this.dThickness;
+        }
+    }
+    calcCellNum() {
+        this.mUpscaled = this.upscaleCells();
+        if (this.mUpscaled)
+            return;
+        this.mDownscaled = this.makeCellsFit();
+    }
+    calcCellSize() {
+        this.calcCellNum();
+        this.resizeCells();
+    }
+    updateLayout() {
+        $("#mapDiv").css("width", this.mWidth + "px");
+        $("#mapDiv").css("height", this.mHeight + "px");
+        $("#map").css("width", this.mActualCellSize * this.sceneCols + "px");
+        if (this.wOrientation == Orientation.Landscape) {
+            $("#dashDiv").css("width", this.dThickness + "px");
+            $("#dashDiv").css("height", this.dLength + "px");
+            $("#dashDiv").css("top", "0px");
+            $("#dashDiv").css("left", this.mWidth + "px");
+        }
+        else {
+            $("#dashDiv").css("width", this.dLength + "px");
+            $("#dashDiv").css("height", this.dThickness + "px");
+            $("#dashDiv").css("top", this.mHeight + "px");
+            $("#dashDiv").css("left", "0px");
+        }
+    }
+    upscaleCells() {
+        var verticalMapSize = this.sceneRows * this.mActualCellSize;
+        if (this.mWidth < verticalMapSize)
+            return false;
+        var horizontalMapSize = this.sceneCols * this.mActualCellSize;
+        if (this.mHeight < horizontalMapSize)
+            return false;
+        var verticalScale = this.mWidth / verticalMapSize;
+        var horizontalScale = this.mHeight / horizontalMapSize;
+        var scale = Math.min(verticalScale, horizontalScale);
+        this.mActualCellSize = Math.floor(this.mActualCellSize * scale);
+        return true;
+    }
+    makeCellsFit() {
+        var minMapSize = this.minDrawnCells * this.mActualCellSize;
+        if (this.mWidth >= minMapSize && this.mHeight >= minMapSize)
+            return false;
+        var verticalScale = this.mWidth / minMapSize;
+        var horizontalScale = this.mHeight / minMapSize;
+        var scale = Math.min(verticalScale, horizontalScale);
+        this.mActualCellSize = Math.floor(this.mActualCellSize * scale);
+        return true;
+    }
+    resizeCells() {
+        this.mActualCellSize = Math.max(this.mActualCellSize, this.minCellSize);
+        this.mActualCellSize = Math.min(this.mActualCellSize, this.maxCellSize);
+        $(".cell").css("height", this.mActualCellSize + "px");
+        $(".cell").css("width", this.mActualCellSize + "px");
+        var bordersize = Math.ceil(this.mActualCellSize * this.borderRatio);
+        $(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
+            "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
+        $(".cellImg").css("height", this.mActualCellSize / 2 + "px");
+        $(".cellImg").css("width", this.mActualCellSize / 2 + "px");
+        $(".cellImg").css("top", this.mActualCellSize / 8 + "px");
+        $(".cellImg").css("left", this.mActualCellSize / 8 + "px");
+    }
+    zoom(event) {
+        if (event.ctrlKey === true) {
+            event.preventDefault();
+            if (event.deltaY < 0) {
+                this.mActualCellSize += this.stepCellSize;
+            }
+            else {
+                this.mActualCellSize -= this.stepCellSize;
+            }
+            this.resizeCells();
+            $("#map").css("width", this.mActualCellSize * this.sceneCols + "px");
+            $("#map").css("height", this.mActualCellSize * this.sceneRows + "px");
+        }
+    }
+}
+var Orientation;
+(function (Orientation) {
+    Orientation[Orientation["Portrait"] = 0] = "Portrait";
+    Orientation[Orientation["Landscape"] = 1] = "Landscape";
+})(Orientation || (Orientation = {}));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ })
 /******/ ]);

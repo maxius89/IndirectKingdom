@@ -1,4 +1,7 @@
-class Kingdom {
+import Cell from './cell';
+import g from './script';
+
+export default class Kingdom {
   name: string;
   color: string;
   cells: Cell[] = [];
@@ -39,7 +42,7 @@ class Kingdom {
   }
 
   setTerritoryStatus = function() {
-    this.cells.forEach(function(cell) {
+    this.cells.forEach(function(cell: Cell) {
       cell.owner = this;
     },this);
   }
@@ -52,31 +55,30 @@ class Kingdom {
     }
   }
 
-  loseTerritory = function(cell) {
+  loseTerritory = function(cell: Cell) {
     this.cells.splice( this.cells.indexOf(cell), 1 );
-    cell.owner = listOfKingdoms[listOfKingdoms.length-1]; // unclaimed
+    //cell.owner = listOfKingdoms[listOfKingdoms.length-1]; // unclaimed
   }
 
   findNeighbourCells = function() {
-    var neighbours =[];
+    var neighbours : Cell[];
 
-    this.cells.forEach(function(cell) {
+    this.cells.forEach(function(cell: Cell) {
       neighbours = neighbours.concat(this.analizeNeighbours(cell));
     },this);
     return neighbours;
   }
 
-  analizeNeighbours= function(inputCell) {
-    var outputList = [];
+  analizeNeighbours= function(inputCell: Cell) {
+    var outputList: Cell[];
     var posRow = inputCell.id.indexOf("r");
     var posCol = inputCell.id.indexOf("c");
 
     var rowNum = Number(inputCell.id.slice(posRow+1, posCol));
     var colNum = Number(inputCell.id.slice(posCol+1))
 
-    var checkedID;
-    var targetCell;
-    var checkedStatus;
+    var checkedID: string;
+    var targetCell: Cell;
 
     if (rowNum > 0) {
       checkedID = "r" + (rowNum-1) + "c"+ colNum;
@@ -117,7 +119,7 @@ class Kingdom {
     return outputList;
   }
 
-  checkTargetCellOwner = function(checkedId, inputCell) {
+  checkTargetCellOwner = function(checkedId: string, inputCell: Cell) {
     var targetCell = g.m.listOfCells.find(function(cell) {
       return cell.id === checkedId;
     });
@@ -139,7 +141,7 @@ class Kingdom {
   calculateEconomy = function() {
     Object.keys(this.econ).forEach(i => this.econ[i] = 0);
 
-      this.cells.forEach(function(currentCell) {
+      this.cells.forEach(function(currentCell: Cell) {
         this.econ.wealth += currentCell.wealth;
         this.econ.industry += currentCell.industry;
         this.econ.agriculture += currentCell.agriculture;

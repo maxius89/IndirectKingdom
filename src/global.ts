@@ -1,3 +1,6 @@
+import Cell from './cell';
+import Kingdom from './kingdom';
+
 export default class Globals {
 
     started: boolean;
@@ -9,28 +12,54 @@ export default class Globals {
     randomSeed: string;               // Seed for random number generation
 
   	kingdomNames: string[];  // Name of the kingdoms
+    listOfKingdoms: Kingdom[];
 
   	turnLength: number;				// ms			 // Length of a turn
 
-  	sceneRows: number;                    // Number of the rows of the Map
-    sceneCols: number;                    // Number of the coloumns of the Map
+  	sceneRows: number = 25;                    // Number of the rows of the Map
+    sceneCols: number = 25;                    // Number of the coloumns of the Map
 
+     w: {};                            // Window variables
+     d: DashboardVariables;                           // Dashboard variables
+      /*  thicknessRatio: number;
+    	  minThickness: number;   // px      // Dashboard thickness minimum
+    	  maxThickness: number;   // px      // Dashboard thickness maximum
+    	  minDashboardThickessRatio: number;   // Dashboard thickness/window shorter size minimum ratio*/
 
-    //export namespace w{}                            // Window variables
-  /*  export namespace d {                            // Dashboard variables
-      export var thicknessRatio: number;
-    	export var minThickness: number;   // px      // Dashboard thickness minimum
-    	export var maxThickness: number;   // px      // Dashboard thickness maximum
-    	export var minDashboardThickessRatio: number;   // Dashboard thickness/window shorter size minimum ratio
-      }
-  	export namespace m {                            // Map variables
-      export var borderRatio: number;              // Cell-size/border thickness ratio
-      export var actualCellSize: number; 	// px      // Actual size of the drawn cells
-      export var minCellSize: number; 		// px      // Minimum size of the drawn cells
-      export var maxCellSize: number; 		// px      // Maximum size of the drawn cells
-      export var stepCellSize: number; 		// px      // Cell-size increment/decrement constant
-      export var minDrawnCells: number;               // Minimum number of drawn cells
-      export var cellTypeList: string[]; // Cell types on the map
-      //export var listOfCells: Cell[];                // List of map cells for data storage
-    }*/
+  	 m: MapVariables;                            // Map variables
+      /*  borderRatio: number;              // Cell-size/border thickness ratio
+        minCellSize: number; 		// px      // Minimum size of the drawn cells
+        maxCellSize: number; 		// px      // Maximum size of the drawn cells
+        stepCellSize: number; 		// px      // Cell-size increment/decrement constant
+        minDrawnCells: number;               // Minimum number of drawn cells
+        cellTypeList: string[]; // Cell types on the map
+        listOfCells: Cell[];                // List of map cells for data storage*/
+
+  LandType : { Farm,
+               Settlement,
+               Forest,
+              Mountain
+  };
+
+  constructor() {
+    this.randomSeed = "fasz";
+	}
+
 }
+
+interface MapVariables {
+  borderRatio: number;              // Cell-size/border thickness ratio
+  minCellSize: number; 		// px      // Minimum size of the drawn cells
+  maxCellSize: number; 		// px      // Maximum size of the drawn cells
+  stepCellSize: number; 		// px      // Cell-size increment/decrement constant
+  minDrawnCells: number;               // Minimum number of drawn cells
+  cellTypeList: string[]; // Cell types on the map
+  listOfCells: Cell[];                // List of map cells for data storage
+};
+
+interface DashboardVariables {
+  thicknessRatio: number;
+  minThickness: number;   // px      // Dashboard thickness minimum
+  maxThickness: number;   // px      // Dashboard thickness maximum
+  minDashboardThickessRatio: number;   // Dashboard thickness/window shorter size minimum ratio
+};

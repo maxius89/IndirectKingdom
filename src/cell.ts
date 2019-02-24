@@ -1,7 +1,25 @@
+import Kingdom from './kingdom';
+import g from './script';
 
-class Cell {
+export default class Cell {
 
-  constructor(id, type, owner) {
+  id : string;
+  owner: Kingdom;
+  output: any;
+
+  moneyEfficiency: number;
+  industryEfficiency: number;
+  agricultureEfficiency: number;
+  populationGrowth: number;
+
+  wealth: number;
+  industry: number;
+  agriculture: number;
+  population: number;
+
+  baseEfficiency: {};
+
+  constructor(id: string, type: string, owner: Kingdom) {
     this.id = id;
     this.owner = owner;
 
