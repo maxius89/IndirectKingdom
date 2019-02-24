@@ -1,51 +1,16 @@
-/* namespace g {
-
-    let started: boolean;
-    let runner: any;
-    let highlightedKindom: any;
-    let showPopulation: boolean;
-    let resizeTimeout: any;
-
-    let randomSeed: string;               // Seed for random number generation
-
-  	let kingdomNames: string[];  // Name of the kingdoms
-
-  	let turnLength: number;				// ms			 // Length of a turn
-
-  	let sceneRows: number;                    // Number of the rows of the Map
-    let sceneCols: number;                    // Number of the coloumns of the Map
-
-
-
-    namespace w{}                            // Window variables
-    namespace d {                            // Dashboard variables
-      let thicknessRatio: number;
-    	let minThickness: number;   // px      // Dashboard thickness minimum
-    	let maxThickness: number;   // px      // Dashboard thickness maximum
-    	let minDashboardThickessRatio: number;   // Dashboard thickness/window shorter size minimum ratio
-      }
-  	namespace m {                            // Map variables
-      var actualCellSize: number; 	// px      // Actual size of the drawn cells
-      var borderRatio: number;              // Cell-size/border thickness ratio
-      var minCellSize: number; 		// px      // Minimum size of the drawn cells
-      var maxCellSize: number; 		// px      // Maximum size of the drawn cells
-      var stepCellSize: number; 		// px      // Cell-size increment/decrement constant
-      var minDrawnCells: number;               // Minimum number of drawn cells
-      var cellTypeList: string[]; // Cell types on the map
-      var listOfCells: Cell[];                // List of map cells for data storage
-      }
-}*/
-
-import g = globals.G;
+import Globals from './global';
+var g = new Globals;
 
 $( document ).ready(function() {
 
+
 // Initializations
 	setConsts();
-	/*initLayout();
-	initKingdoms();
+//	initLayout();
+//	initKingdoms();
 
 // Event Listeners
+/*
 	$(".cell").click(clicked);
 	$(".cell").attr("highlighted","false");
 
@@ -63,12 +28,12 @@ $( document ).ready(function() {
 	for (var i = 0; i < listOfKingdoms.length; i++)
 	{
 		listOfKingdoms[i].init();
-	}
-*/
+	}*/
+
 	//setTimeout(test,500);
 });
 
-
+/*
 function initKingdoms() {
   redKingdom   = new Kingdom(g.kingdomNames[0],"red",     ["r0c0", "r0c1", "r1c0", "r2c0"]);
   blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",    ["r4c2", "r3c2", "r4c3", "r3c3"]);
@@ -80,7 +45,7 @@ function initKingdoms() {
 
 	updateMap();
 }
-
+*/
 function setConsts() {
 
  // System variables
@@ -98,7 +63,8 @@ function setConsts() {
 
 	g.sceneRows = 25;                    // Number of the rows of the Map
 	g.sceneCols = 25;                    // Number of the coloumns of the Map
-
+	console.log(g);
+/*
 	g.m.actualCellSize = 40; 	// px      // Actual size of the drawn cells
 	g.m.borderRatio = 0.02;              // Cell-size/border thickness ratio
 	g.m.minCellSize = 20; 		// px      // Minimum size of the drawn cells
@@ -113,14 +79,14 @@ function setConsts() {
 	g.d.maxThickness = 400;   // px      // Dashboard thickness maximum
 	g.d.minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 
-/*	g.LandType = {
+	g.LandType = {
 	  Farm : 0,
 		Settlement : 1,
 		Forest : 2,
-		Mountain: 3,*/
- };
+		Mountain: 3,
+ };*/
 }
-
+/*
 function clicked() {
 	for (var i = 0; i < listOfKingdoms.length; i++)
 	{
@@ -266,3 +232,4 @@ function showPopulation()
 {
 	g.showPopulation = true;
 }
+*/

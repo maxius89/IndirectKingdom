@@ -1,3 +1,7 @@
+import {g} from "./scipt.js";
+
+console.log(g.randomSeed);
+
 function initLayout() {
 	g.w.width = $(window).width();
 	g.w.height = $(window).height();
