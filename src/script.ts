@@ -7,78 +7,78 @@ export default g;
 
 var layout = new Layout;
 
-$( document ).ready(function() {
+$(document).ready(function() {
 
-// Initializations
-	setConsts();
-	layout.initLayout();
-	//initKingdoms();
+  // Initializations
+  setConsts();
+  layout.initLayout();
+  //initKingdoms();
 
-// Event Listeners
+  // Event Listeners
 
-//	$(".cell").click(clicked);
-	$(".cell").attr("highlighted","false");
+  //	$(".cell").click(clicked);
+  $(".cell").attr("highlighted", "false");
 
-	$( window ).resize(function() {
-		if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
-		g.resizeTimeout = setTimeout( function() {
-			layout.rethinkPanels();
-			g.resizeTimeout = null;
-		}, 200);
-	});
+  $(window).resize(function() {
+    if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
+    g.resizeTimeout = setTimeout(function() {
+      layout.rethinkPanels();
+      g.resizeTimeout = null;
+    }, 200);
+  });
 
-	$("#mapDiv")[0].addEventListener("wheel", layout.zoom.bind(layout));
+  $("#mapDiv")[0].addEventListener("wheel", layout.zoom.bind(layout));
 
-// Initialize kingdoms on map
+  // Initialize kingdoms on map
 	/*for (var i = 0; i < g.listOfKingdoms.length; i++)
 	{
 		g.listOfKingdoms[i].init();
 	}*/
 
-	//setTimeout(test,500);
+  //setTimeout(test,500);
 });
 
 
 function initKingdoms() {
-  let redKingdom   = new Kingdom(g.kingdomNames[0],"red",     ["r0c0", "r0c1", "r1c0", "r2c0"]);
-  let blueKingdom  = new Kingdom(g.kingdomNames[1],"blue",    ["r4c2", "r3c2", "r4c3", "r3c3"]);
-  let greenKingdom = new Kingdom(g.kingdomNames[2],"green",   ["r9c7", "r9c6", "r9c5", "r8c6"]);
-  let unclaimed    = new Kingdom(g.kingdomNames[3],"#7777cc", []);
-	unclaimed.updateCellsList();
+  let redKingdom = new Kingdom(g.kingdomNames[0], "red", ["r0c0", "r0c1", "r1c0", "r2c0"]);
+  let blueKingdom = new Kingdom(g.kingdomNames[1], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"]);
+  let greenKingdom = new Kingdom(g.kingdomNames[2], "green", ["r9c7", "r9c6", "r9c5", "r8c6"]);
+  let unclaimed = new Kingdom(g.kingdomNames[3], "#7777cc", []);
+  unclaimed.updateCellsList();
 
   g.listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
 
-	//updateMap();
+  //updateMap();
 }
 
 function setConsts() {
 
- // System variables
-	g.started = false;
+  // System variables
+  g.started = false;
   g.runner = null;
-	g.highlightedKindom = null;
-	g.showPopulation = false;
-	g.resizeTimeout = null;
+  g.highlightedKindom = null;
+  g.showPopulation = false;
+  g.resizeTimeout = null;
 
-	g.randomSeed = "0001";               // Seed for random number generation
+  g.randomSeed = "0001";               // Seed for random number generation
 
-	g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom","unclaimed"];  // Name of the kingdoms
+  g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom", "unclaimed"];  // Name of the kingdoms
 
-	g.turnLength = 100;				// ms			 // Length of a turn
+  g.turnLength = 100;				// ms			 // Length of a turn
 
-	g.sceneRows = 25;                    // Number of the rows of the Map
-	g.sceneCols = 25;                    // Number of the coloumns of the Map
-	console.log(g);
+  g.sceneRows = 25;                    // Number of the rows of the Map
+  g.sceneCols = 25;                    // Number of the coloumns of the Map
+  console.log(g);
 
-	//g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
-	//g.m.listOfCells = [];                // List of map cells for data storage
+  //g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
+  //g.m.listOfCells = [];                // List of map cells for data storage
 
-	g.LandType = {
-	  Farm : 0,
-		Settlement : 1,
-		Forest : 2,
-		Mountain: 3,
- };
+  g.LandType = {
+    Farm: 0,
+    Settlement: 1,
+    Forest: 2,
+    Mountain: 3,
+  };
 }
 /*
 function clicked() {
@@ -166,41 +166,41 @@ console.log(g.showPopulation);
 	}
 }
 */
-function initCell(cell):void {
-	//Math.seedrandom(g.randomSeed + $(cell).attr("id") );
-	var typeIndex =  Math.floor(Math.random() * g.m.cellTypeList.length);
-	var type = g.m.cellTypeList[typeIndex];
+function initCell(cell): void {
+  //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+  var typeIndex = Math.floor(Math.random() * g.m.cellTypeList.length);
+  var type = g.m.cellTypeList[typeIndex];
 
-	cell.attr("type", type);
+  cell.attr("type", type);
 
-	var unclaimedOwner = new Kingdom("unclaimed","#7777cc", []);
-	let newCell = new Cell($(cell).attr("id"),type, unclaimedOwner);
-	g.m.listOfCells.push(newCell);
+  var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", []);
+  let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
+  g.m.listOfCells.push(newCell);
 
-	var img = $(document.createElement("img"));
-	cell.append(img);
+  var img = $(document.createElement("img"));
+  cell.append(img);
 
-	img.addClass("cellImg");
-//	img.css("height", g.m.actualCellSize/2 + "px");
-//	img.css("width", g.m.actualCellSize/2 + "px");
-//	img.css("top",  g.m.actualCellSize/8 + "px");
-//	img.css("left",  g.m.actualCellSize/8 + "px");
+  img.addClass("cellImg");
+  //	img.css("height", g.m.actualCellSize/2 + "px");
+  //	img.css("width", g.m.actualCellSize/2 + "px");
+  //	img.css("top",  g.m.actualCellSize/8 + "px");
+  //	img.css("left",  g.m.actualCellSize/8 + "px");
 
-	switch (type) {
-		case g.m.cellTypeList[g.LandType.Farm]:
-			img.attr("src", "img/farm.svg");
-			break;
-		case g.m.cellTypeList[g.LandType.Settlement]:
-			img.attr("src", "img/settlement.svg");
-			break;
-		case g.m.cellTypeList[g.LandType.Forest]:
-			img.attr("src", "img/forest.svg");
-			break;
-		case g.m.cellTypeList[g.LandType.Mountain]:
-			img.attr("src", "img/mountain.svg");
-			break;
-		default:
-	}
+  switch (type) {
+    case g.m.cellTypeList[g.LandType.Farm]:
+      img.attr("src", "img/farm.svg");
+      break;
+    case g.m.cellTypeList[g.LandType.Settlement]:
+      img.attr("src", "img/settlement.svg");
+      break;
+    case g.m.cellTypeList[g.LandType.Forest]:
+      img.attr("src", "img/forest.svg");
+      break;
+    case g.m.cellTypeList[g.LandType.Mountain]:
+      img.attr("src", "img/mountain.svg");
+      break;
+    default:
+  }
 }
 /*
 function writeToInfoPanel()

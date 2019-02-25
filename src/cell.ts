@@ -3,7 +3,7 @@ import g from './script';
 
 export default class Cell {
 
-  id : string;
+  id: string;
   owner: Kingdom;
   output: any;
 
@@ -43,34 +43,34 @@ export default class Cell {
     };
 
     switch (type) {
-  		case g.m.cellTypeList[g.LandType.Farm]:
-  			this.wealth = 5;
-  		  this.industry = 0;
-  		  this.agriculture = 100;
-  		  this.population = 10;
-  			break;
-  		case g.m.cellTypeList[g.LandType.Settlement]:
-  			this.wealth = 50;
-  			this.industry = 25;
-  			this.agriculture = 0;
-  			this.population = 100;
-  			break;
-  		case g.m.cellTypeList[g.LandType.Forest]:
-  			this.wealth = 20;
-  			this.industry = 25;
-  			this.agriculture = 20;
-  			this.population = 5;
-  			break;
-  		case g.m.cellTypeList[g.LandType.Mountain]:
-  			this.wealth = 50;
-  			this.industry = 100;
-  			this.agriculture = 0;
-  			this.population = 5;
+      case g.m.cellTypeList[g.LandType.Farm]:
+        this.wealth = 5;
+        this.industry = 0;
+        this.agriculture = 100;
+        this.population = 10;
+        break;
+      case g.m.cellTypeList[g.LandType.Settlement]:
+        this.wealth = 50;
+        this.industry = 25;
+        this.agriculture = 0;
+        this.population = 100;
+        break;
+      case g.m.cellTypeList[g.LandType.Forest]:
+        this.wealth = 20;
+        this.industry = 25;
+        this.agriculture = 20;
+        this.population = 5;
+        break;
+      case g.m.cellTypeList[g.LandType.Mountain]:
+        this.wealth = 50;
+        this.industry = 100;
+        this.agriculture = 0;
+        this.population = 5;
         break;
       default:
         console.warn("Cell type not defined!");
-      }
-   }
+    }
+  }
 
   clearPreviousOwnership = function() {
     this.owner.loseTerritory(this);
@@ -100,9 +100,9 @@ export default class Cell {
   tick = function() {
     this.updateCell();
 
-    Object.keys(this.output).map(function(i){
-     this.owner.income[i] += this.generateOutput()[i];
-   },this);
+    Object.keys(this.output).map(function(i) {
+      this.owner.income[i] += this.generateOutput()[i];
+    }, this);
 
   }
 

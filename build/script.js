@@ -11006,9 +11006,9 @@ class Layout {
     }
     updateMap() {
         /*	g.m.listOfCells.forEach(function(cell) {
-                $("#" + cell.id).attr("status",cell.owner.name);
-                $("#" + cell.id).css("background-color",cell.owner.color);
-            });*/
+            $("#" + cell.id).attr("status",cell.owner.name);
+            $("#" + cell.id).css("background-color",cell.owner.color);
+          });*/
     }
     rethinkPanels() {
         this.wWidth = $(window).width();

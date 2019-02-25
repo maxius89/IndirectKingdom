@@ -30,11 +30,12 @@ export default class Kingdom {
 
     cells.forEach(function(cell) {
       var currentCell = g.m.listOfCells.find(function(element) {
-        return element.id === cell});
+        return element.id === cell
+      });
 
-        this.cells.push(currentCell);
-        currentCell.owner = this;
-    },this);
+      this.cells.push(currentCell);
+      currentCell.owner = this;
+    }, this);
   }
 
   updateCellsList = function() {
@@ -44,7 +45,7 @@ export default class Kingdom {
   setTerritoryStatus = function() {
     this.cells.forEach(function(cell: Cell) {
       cell.owner = this;
-    },this);
+    }, this);
   }
 
   claimTerritory = function(inputCell: Cell) {
@@ -56,32 +57,32 @@ export default class Kingdom {
   }
 
   loseTerritory = function(cell: Cell) {
-    this.cells.splice( this.cells.indexOf(cell), 1 );
+    this.cells.splice(this.cells.indexOf(cell), 1);
     //cell.owner = listOfKingdoms[listOfKingdoms.length-1]; // unclaimed
   }
 
   findNeighbourCells = function() {
-    var neighbours : Cell[];
+    var neighbours: Cell[];
 
     this.cells.forEach(function(cell: Cell) {
       neighbours = neighbours.concat(this.analizeNeighbours(cell));
-    },this);
+    }, this);
     return neighbours;
   }
 
-  analizeNeighbours= function(inputCell: Cell) {
+  analizeNeighbours = function(inputCell: Cell) {
     var outputList: Cell[];
     var posRow = inputCell.id.indexOf("r");
     var posCol = inputCell.id.indexOf("c");
 
-    var rowNum = Number(inputCell.id.slice(posRow+1, posCol));
-    var colNum = Number(inputCell.id.slice(posCol+1))
+    var rowNum = Number(inputCell.id.slice(posRow + 1, posCol));
+    var colNum = Number(inputCell.id.slice(posCol + 1))
 
     var checkedID: string;
     var targetCell: Cell;
 
     if (rowNum > 0) {
-      checkedID = "r" + (rowNum-1) + "c"+ colNum;
+      checkedID = "r" + (rowNum - 1) + "c" + colNum;
 
       targetCell = this.checkTargetCellOwner(checkedID, inputCell);
       if (targetCell != null) {
@@ -89,8 +90,8 @@ export default class Kingdom {
       }
     }
 
-    if (rowNum < g.sceneRows-1) {
-      checkedID = "r" + (rowNum+1) + "c"+ colNum;
+    if (rowNum < g.sceneRows - 1) {
+      checkedID = "r" + (rowNum + 1) + "c" + colNum;
 
       targetCell = this.checkTargetCellOwner(checkedID, inputCell);
       if (targetCell != null) {
@@ -99,7 +100,7 @@ export default class Kingdom {
     }
 
     if (colNum > 0) {
-      checkedID = "r" + rowNum + "c"+ (colNum-1);
+      checkedID = "r" + rowNum + "c" + (colNum - 1);
 
       targetCell = this.checkTargetCellOwner(checkedID, inputCell);
       if (targetCell != null) {
@@ -107,12 +108,12 @@ export default class Kingdom {
       }
     }
 
-    if (colNum < g.sceneCols-1) {
-      checkedID = "r" + rowNum + "c"+ (colNum+1);
+    if (colNum < g.sceneCols - 1) {
+      checkedID = "r" + rowNum + "c" + (colNum + 1);
 
       targetCell = this.checkTargetCellOwner(checkedID, inputCell);
       if (targetCell != null) {
-       outputList.push(targetCell);
+        outputList.push(targetCell);
       }
     }
 
@@ -141,12 +142,12 @@ export default class Kingdom {
   calculateEconomy = function() {
     Object.keys(this.econ).forEach(i => this.econ[i] = 0);
 
-      this.cells.forEach(function(currentCell: Cell) {
-        this.econ.wealth += currentCell.wealth;
-        this.econ.industry += currentCell.industry;
-        this.econ.agriculture += currentCell.agriculture;
-        this.econ.population += currentCell.population;
-      },this);
+    this.cells.forEach(function(currentCell: Cell) {
+      this.econ.wealth += currentCell.wealth;
+      this.econ.industry += currentCell.industry;
+      this.econ.agriculture += currentCell.agriculture;
+      this.econ.population += currentCell.population;
+    }, this);
   }
 
 }
