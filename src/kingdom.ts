@@ -1,5 +1,5 @@
 import Cell from './cell';
-import g from './script';
+import { g as global } from './script';
 
 export default class Kingdom {
   name: string;
@@ -28,9 +28,9 @@ export default class Kingdom {
       food: 0
     };
 
-    cells.forEach(function(cell) {
-      var currentCell = g.m.listOfCells.find(function(element) {
-        return element.id === cell
+    cells.forEach(function(cell: string) {
+      var currentCell = global.listOfCells.find(function(element) {
+        return element.id === cell;
       });
 
       this.cells.push(currentCell);
@@ -39,7 +39,7 @@ export default class Kingdom {
   }
 
   updateCellsList = function() {
-    this.cells = g.m.listOfCells.filter(cell => cell.owner.name === this.name);
+    this.cells = global.listOfCells.filter(cell => cell.owner.name === this.name);
   }
 
   setTerritoryStatus = function() {
@@ -90,7 +90,7 @@ export default class Kingdom {
       }
     }
 
-    if (rowNum < g.sceneRows - 1) {
+    if (rowNum < global.sceneRows - 1) {
       checkedID = "r" + (rowNum + 1) + "c" + colNum;
 
       targetCell = this.checkTargetCellOwner(checkedID, inputCell);
@@ -108,7 +108,7 @@ export default class Kingdom {
       }
     }
 
-    if (colNum < g.sceneCols - 1) {
+    if (colNum < global.sceneCols - 1) {
       checkedID = "r" + rowNum + "c" + (colNum + 1);
 
       targetCell = this.checkTargetCellOwner(checkedID, inputCell);
@@ -121,7 +121,7 @@ export default class Kingdom {
   }
 
   checkTargetCellOwner = function(checkedId: string, inputCell: Cell) {
-    var targetCell = g.m.listOfCells.find(function(cell) {
+    var targetCell = global.listOfCells.find(function(cell) {
       return cell.id === checkedId;
     });
 

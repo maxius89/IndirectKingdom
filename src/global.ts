@@ -19,6 +19,8 @@ export default class Globals {
   sceneRows: number = 25;                    // Number of the rows of the Map
   sceneCols: number = 25;                    // Number of the coloumns of the Map
 
+  listOfCells: Cell[];                // List of map cells for data storage*/
+
   w: {};                            // Window variables
   d: DashboardVariables;                           // Dashboard variables
   /*  thicknessRatio: number;
@@ -34,18 +36,6 @@ export default class Globals {
     minDrawnCells: number;               // Minimum number of drawn cells
     cellTypeList: string[]; // Cell types on the map
     listOfCells: Cell[];                // List of map cells for data storage*/
-
-  LandType: {
-    Farm,
-    Settlement,
-    Forest,
-    Mountain
-  };
-
-  constructor() {
-    this.randomSeed = "fasz";
-  }
-
 }
 
 interface MapVariables {

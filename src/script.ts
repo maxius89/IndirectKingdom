@@ -2,17 +2,18 @@ import Globals from './global';
 import Kingdom from './kingdom';
 import Cell from './cell';
 import Layout from './layout';
-var g = new Globals;
-export default g;
+export var g = new Globals;
+//export default g;
 
 var layout = new Layout;
+//var listOfCells: Cell[] = [];
 
 $(document).ready(function() {
 
   // Initializations
   setConsts();
-  layout.initLayout();
-  //initKingdoms();
+  g.listOfCells = layout.initLayout();
+  initKingdoms();
 
   // Event Listeners
 
@@ -48,7 +49,7 @@ function initKingdoms() {
 
   g.listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
 
-  //updateMap();
+  layout.updateMap(g.listOfCells);
 }
 
 function setConsts() {
@@ -69,16 +70,6 @@ function setConsts() {
   g.sceneRows = 25;                    // Number of the rows of the Map
   g.sceneCols = 25;                    // Number of the coloumns of the Map
   console.log(g);
-
-  //g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
-  //g.m.listOfCells = [];                // List of map cells for data storage
-
-  g.LandType = {
-    Farm: 0,
-    Settlement: 1,
-    Forest: 2,
-    Mountain: 3,
-  };
 }
 /*
 function clicked() {
@@ -166,42 +157,7 @@ console.log(g.showPopulation);
 	}
 }
 */
-function initCell(cell): void {
-  //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
-  var typeIndex = Math.floor(Math.random() * g.m.cellTypeList.length);
-  var type = g.m.cellTypeList[typeIndex];
 
-  cell.attr("type", type);
-
-  var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", []);
-  let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
-  g.m.listOfCells.push(newCell);
-
-  var img = $(document.createElement("img"));
-  cell.append(img);
-
-  img.addClass("cellImg");
-  //	img.css("height", g.m.actualCellSize/2 + "px");
-  //	img.css("width", g.m.actualCellSize/2 + "px");
-  //	img.css("top",  g.m.actualCellSize/8 + "px");
-  //	img.css("left",  g.m.actualCellSize/8 + "px");
-
-  switch (type) {
-    case g.m.cellTypeList[g.LandType.Farm]:
-      img.attr("src", "img/farm.svg");
-      break;
-    case g.m.cellTypeList[g.LandType.Settlement]:
-      img.attr("src", "img/settlement.svg");
-      break;
-    case g.m.cellTypeList[g.LandType.Forest]:
-      img.attr("src", "img/forest.svg");
-      break;
-    case g.m.cellTypeList[g.LandType.Mountain]:
-      img.attr("src", "img/mountain.svg");
-      break;
-    default:
-  }
-}
 /*
 function writeToInfoPanel()
 {

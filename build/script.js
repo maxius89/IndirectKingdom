@@ -90,22 +90,22 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _global__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return g; });
+/* harmony import */ var _global__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
-/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-
+/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 
 
 
 var g = new _global__WEBPACK_IMPORTED_MODULE_0__["default"];
-/* harmony default export */ __webpack_exports__["default"] = (g);
-var layout = new _layout__WEBPACK_IMPORTED_MODULE_3__["default"];
+//export default g;
+var layout = new _layout__WEBPACK_IMPORTED_MODULE_2__["default"];
+//var listOfCells: Cell[] = [];
 $(document).ready(function () {
     // Initializations
     setConsts();
-    layout.initLayout();
-    //initKingdoms();
+    g.listOfCells = layout.initLayout();
+    initKingdoms();
     // Event Listeners
     //	$(".cell").click(clicked);
     $(".cell").attr("highlighted", "false");
@@ -132,7 +132,7 @@ function initKingdoms() {
     let unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](g.kingdomNames[3], "#7777cc", []);
     unclaimed.updateCellsList();
     g.listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
-    //updateMap();
+    layout.updateMap(g.listOfCells);
 }
 function setConsts() {
     // System variables
@@ -147,14 +147,6 @@ function setConsts() {
     g.sceneRows = 25; // Number of the rows of the Map
     g.sceneCols = 25; // Number of the coloumns of the Map
     console.log(g);
-    //g.m.cellTypeList = ["Farm", "Settlement", "Forest", "Mountain"]; // Cell types on the map
-    //g.m.listOfCells = [];                // List of map cells for data storage
-    g.LandType = {
-        Farm: 0,
-        Settlement: 1,
-        Forest: 2,
-        Mountain: 3,
-    };
 }
 /*
 function clicked() {
@@ -242,37 +234,6 @@ console.log(g.showPopulation);
     }
 }
 */
-function initCell(cell) {
-    //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
-    var typeIndex = Math.floor(Math.random() * g.m.cellTypeList.length);
-    var type = g.m.cellTypeList[typeIndex];
-    cell.attr("type", type);
-    var unclaimedOwner = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"]("unclaimed", "#7777cc", []);
-    let newCell = new _cell__WEBPACK_IMPORTED_MODULE_2__["default"]($(cell).attr("id"), type, unclaimedOwner);
-    g.m.listOfCells.push(newCell);
-    var img = $(document.createElement("img"));
-    cell.append(img);
-    img.addClass("cellImg");
-    //	img.css("height", g.m.actualCellSize/2 + "px");
-    //	img.css("width", g.m.actualCellSize/2 + "px");
-    //	img.css("top",  g.m.actualCellSize/8 + "px");
-    //	img.css("left",  g.m.actualCellSize/8 + "px");
-    switch (type) {
-        case g.m.cellTypeList[g.LandType.Farm]:
-            img.attr("src", "img/farm.svg");
-            break;
-        case g.m.cellTypeList[g.LandType.Settlement]:
-            img.attr("src", "img/settlement.svg");
-            break;
-        case g.m.cellTypeList[g.LandType.Forest]:
-            img.attr("src", "img/forest.svg");
-            break;
-        case g.m.cellTypeList[g.LandType.Mountain]:
-            img.attr("src", "img/mountain.svg");
-            break;
-        default:
-    }
-}
 /*
 function writeToInfoPanel()
 {
@@ -10683,7 +10644,13 @@ class Globals {
     constructor() {
         this.sceneRows = 25; // Number of the rows of the Map
         this.sceneCols = 25; // Number of the coloumns of the Map
-        this.randomSeed = "fasz";
+        /*  borderRatio: number;              // Cell-size/border thickness ratio
+          minCellSize: number; 		// px      // Minimum size of the drawn cells
+          maxCellSize: number; 		// px      // Maximum size of the drawn cells
+          stepCellSize: number; 		// px      // Cell-size increment/decrement constant
+          minDrawnCells: number;               // Minimum number of drawn cells
+          cellTypeList: string[]; // Cell types on the map
+          listOfCells: Cell[];                // List of map cells for data storage*/
     }
 }
 ;
@@ -10703,7 +10670,7 @@ class Kingdom {
     constructor(name, color, cells) {
         this.cells = [];
         this.updateCellsList = function () {
-            this.cells = _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.listOfCells.filter(cell => cell.owner.name === this.name);
+            this.cells = _script__WEBPACK_IMPORTED_MODULE_0__["g"].listOfCells.filter(cell => cell.owner.name === this.name);
         };
         this.setTerritoryStatus = function () {
             this.cells.forEach(function (cell) {
@@ -10743,7 +10710,7 @@ class Kingdom {
                     outputList.push(targetCell);
                 }
             }
-            if (rowNum < _script__WEBPACK_IMPORTED_MODULE_0__["default"].sceneRows - 1) {
+            if (rowNum < _script__WEBPACK_IMPORTED_MODULE_0__["g"].sceneRows - 1) {
                 checkedID = "r" + (rowNum + 1) + "c" + colNum;
                 targetCell = this.checkTargetCellOwner(checkedID, inputCell);
                 if (targetCell != null) {
@@ -10757,7 +10724,7 @@ class Kingdom {
                     outputList.push(targetCell);
                 }
             }
-            if (colNum < _script__WEBPACK_IMPORTED_MODULE_0__["default"].sceneCols - 1) {
+            if (colNum < _script__WEBPACK_IMPORTED_MODULE_0__["g"].sceneCols - 1) {
                 checkedID = "r" + rowNum + "c" + (colNum + 1);
                 targetCell = this.checkTargetCellOwner(checkedID, inputCell);
                 if (targetCell != null) {
@@ -10767,7 +10734,7 @@ class Kingdom {
             return outputList;
         };
         this.checkTargetCellOwner = function (checkedId, inputCell) {
-            var targetCell = _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.listOfCells.find(function (cell) {
+            var targetCell = _script__WEBPACK_IMPORTED_MODULE_0__["g"].listOfCells.find(function (cell) {
                 return cell.id === checkedId;
             });
             if (targetCell.owner.name != inputCell.owner.name) {
@@ -10807,7 +10774,7 @@ class Kingdom {
             food: 0
         };
         cells.forEach(function (cell) {
-            var currentCell = _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.listOfCells.find(function (element) {
+            var currentCell = _script__WEBPACK_IMPORTED_MODULE_0__["g"].listOfCells.find(function (element) {
                 return element.id === cell;
             });
             this.cells.push(currentCell);
@@ -10823,93 +10790,9 @@ class Kingdom {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-
-class Cell {
-    constructor(id, type, owner) {
-        this.clearPreviousOwnership = function () {
-            this.owner.loseTerritory(this);
-        };
-        this.updateCell = function () {
-            var populationPower = this.population; // TODO: Get a function with diminishing return;
-            var excessFood = this.agriculture - this.population;
-            this.moneyEfficiency = this.baseEfficiency.money * populationPower;
-            this.industryEfficiency = this.baseEfficiency.goods * populationPower;
-            this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
-            this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
-            this.population += this.populationGrowth;
-        };
-        this.generateOutput = function () {
-            this.output.money = this.wealth * this.moneyEfficiency;
-            this.output.goods = this.industry * this.industryEfficiency;
-            this.output.food = this.agriculture * this.agricultureEfficiency;
-            return this.output;
-        };
-        this.tick = function () {
-            this.updateCell();
-            Object.keys(this.output).map(function (i) {
-                this.owner.income[i] += this.generateOutput()[i];
-            }, this);
-        };
-        this.id = id;
-        this.owner = owner;
-        this.output = {
-            money: 0,
-            goods: 0,
-            food: 0
-        };
-        // Efficiencies calculated from different elements for output calculation
-        this.moneyEfficiency = 0;
-        this.industryEfficiency = 0;
-        this.agricultureEfficiency = 0;
-        this.populationGrowth = 0;
-        this.baseEfficiency = {
-            money: 0.01,
-            goods: 0.01,
-            food: 0.01,
-            people: 0.01
-        };
-        switch (type) {
-            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Farm]:
-                this.wealth = 5;
-                this.industry = 0;
-                this.agriculture = 100;
-                this.population = 10;
-                break;
-            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Settlement]:
-                this.wealth = 50;
-                this.industry = 25;
-                this.agriculture = 0;
-                this.population = 100;
-                break;
-            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Forest]:
-                this.wealth = 20;
-                this.industry = 25;
-                this.agriculture = 20;
-                this.population = 5;
-                break;
-            case _script__WEBPACK_IMPORTED_MODULE_0__["default"].m.cellTypeList[_script__WEBPACK_IMPORTED_MODULE_0__["default"].LandType.Mountain]:
-                this.wealth = 50;
-                this.industry = 100;
-                this.agriculture = 0;
-                this.population = 5;
-                break;
-            default:
-                console.warn("Cell type not defined!");
-        }
-    }
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Layout; });
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+//import g from "./script";
 
 class Layout {
     constructor() {
@@ -10926,14 +10809,12 @@ class Layout {
         this.maxThickness = 400; // px      // Dashboard thickness maximum
         this.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
     }
-    /*constructor(name: string, color: string, cells: string[]) {
-
-    }*/
     initLayout() {
         this.wWidth = $(window).width();
         this.wHeight = $(window).height();
         this.drawLayout();
-        $("#mapDiv").append(this.createMap(this.sceneCols, this.sceneRows));
+        let newMap = this.createMap(this.sceneCols, this.sceneRows);
+        $("#mapDiv").append(newMap.map);
         $("#mapDiv").css("background-color", "#00ff00"); // Test color
         $("#dashDiv").css("background-color", "#ff00ff"); // Test color
         $("#mapDiv").css("position", "absolute");
@@ -10943,6 +10824,7 @@ class Layout {
         this.rethinkPanels();
         this.addButtons();
         this.addInfoPanel();
+        return newMap.cells;
     }
     drawLayout() {
         var mapDiv = $(document.createElement('div'));
@@ -10988,6 +10870,7 @@ class Layout {
         table.attr("id", "map");
         var tbody = $(document.createElement('tbody'));
         table.append(tbody);
+        var newListOfCells = [];
         for (var i = 0; i < height; ++i) {
             var newRow = $(document.createElement("tr"));
             table.append(newRow);
@@ -10999,16 +10882,17 @@ class Layout {
                 newCol.attr("status", "unclaimed");
                 newCol.attr("type", "none");
                 newCol.html("&nbsp;");
-                //				initCell(newCol);
+                var newCell = _cell__WEBPACK_IMPORTED_MODULE_0__["default"].initCell(newCol, this.mActualCellSize);
+                newListOfCells.push(newCell);
             }
         }
-        return table;
+        return { map: table, cells: newListOfCells };
     }
-    updateMap() {
-        /*	g.m.listOfCells.forEach(function(cell) {
-            $("#" + cell.id).attr("status",cell.owner.name);
-            $("#" + cell.id).css("background-color",cell.owner.color);
-          });*/
+    updateMap(map) {
+        map.forEach(function (cell) {
+            $("#" + cell.id).attr("status", cell.owner.name);
+            $("#" + cell.id).css("background-color", cell.owner.color);
+        });
     }
     rethinkPanels() {
         this.wWidth = $(window).width();
@@ -11018,7 +10902,6 @@ class Layout {
         this.calcMapSize();
         this.calcCellSize();
         this.updateLayout();
-        console.log(_script__WEBPACK_IMPORTED_MODULE_0__["default"]);
     }
     decideWindowOrientation() {
         this.wOrientation = (this.wWidth > this.wHeight ?
@@ -11139,6 +11022,132 @@ var Orientation;
     Orientation[Orientation["Portrait"] = 0] = "Portrait";
     Orientation[Orientation["Landscape"] = 1] = "Landscape";
 })(Orientation || (Orientation = {}));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
+/* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+
+class Cell {
+    constructor(id, type, owner) {
+        this.clearPreviousOwnership = function () {
+            this.owner.loseTerritory(this);
+        };
+        this.updateCell = function () {
+            var populationPower = this.population; // TODO: Get a function with diminishing return;
+            var excessFood = this.agriculture - this.population;
+            this.moneyEfficiency = this.baseEfficiency.money * populationPower;
+            this.industryEfficiency = this.baseEfficiency.goods * populationPower;
+            this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
+            this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
+            this.population += this.populationGrowth;
+        };
+        this.generateOutput = function () {
+            this.output.money = this.wealth * this.moneyEfficiency;
+            this.output.goods = this.industry * this.industryEfficiency;
+            this.output.food = this.agriculture * this.agricultureEfficiency;
+            return this.output;
+        };
+        this.tick = function () {
+            this.updateCell();
+            Object.keys(this.output).map(function (i) {
+                this.owner.income[i] += this.generateOutput()[i];
+            }, this);
+        };
+        this.id = id;
+        this.owner = owner;
+        this.output = {
+            money: 0,
+            goods: 0,
+            food: 0
+        };
+        // Efficiencies calculated from different elements for output calculation
+        this.moneyEfficiency = 0;
+        this.industryEfficiency = 0;
+        this.agricultureEfficiency = 0;
+        this.populationGrowth = 0;
+        this.baseEfficiency = {
+            money: 0.01,
+            goods: 0.01,
+            food: 0.01,
+            people: 0.01
+        };
+        switch (LandType[type]) {
+            case LandType.Farm:
+                this.wealth = 5;
+                this.industry = 0;
+                this.agriculture = 100;
+                this.population = 10;
+                break;
+            case LandType.Settlement:
+                this.wealth = 50;
+                this.industry = 25;
+                this.agriculture = 0;
+                this.population = 100;
+                break;
+            case LandType.Forest:
+                this.wealth = 20;
+                this.industry = 25;
+                this.agriculture = 20;
+                this.population = 5;
+                break;
+            case LandType.Mountain:
+                this.wealth = 50;
+                this.industry = 100;
+                this.agriculture = 0;
+                this.population = 5;
+                break;
+            default:
+                console.warn("Cell type not defined!");
+        }
+    }
+    static initCell(cell, cellSize) {
+        //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+        var numberOfLandTypes = Object.keys(LandType).length / 2;
+        var typeIndex = Math.floor(Math.random() * numberOfLandTypes);
+        var type = LandType[typeIndex];
+        cell.attr("type", type);
+        var unclaimedOwner = new _kingdom__WEBPACK_IMPORTED_MODULE_0__["default"]("unclaimed", "#7777cc", []);
+        let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
+        //g.m.listOfCells.push(newCell);
+        var img = $(document.createElement("img"));
+        cell.append(img);
+        img.addClass("cellImg");
+        img.css("height", cellSize / 2 + "px");
+        img.css("width", cellSize / 2 + "px");
+        img.css("top", cellSize / 8 + "px");
+        img.css("left", cellSize / 8 + "px");
+        switch (LandType[type]) {
+            case LandType.Farm:
+                img.attr("src", "img/farm.svg");
+                break;
+            case LandType.Settlement:
+                img.attr("src", "img/settlement.svg");
+                break;
+            case LandType.Forest:
+                img.attr("src", "img/forest.svg");
+                break;
+            case LandType.Mountain:
+                img.attr("src", "img/mountain.svg");
+                break;
+            default:
+        }
+        return newCell;
+    }
+}
+var LandType;
+(function (LandType) {
+    LandType[LandType["Farm"] = 0] = "Farm";
+    LandType[LandType["Settlement"] = 1] = "Settlement";
+    LandType[LandType["Forest"] = 2] = "Forest";
+    LandType[LandType["Mountain"] = 3] = "Mountain";
+})(LandType || (LandType = {}));
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 

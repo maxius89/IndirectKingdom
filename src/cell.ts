@@ -1,5 +1,5 @@
 import Kingdom from './kingdom';
-import g from './script';
+import { g as global } from './script';
 
 export default class Cell {
 
@@ -42,26 +42,26 @@ export default class Cell {
       people: 0.01
     };
 
-    switch (type) {
-      case g.m.cellTypeList[g.LandType.Farm]:
+    switch (LandType[type]) {
+      case LandType.Farm:
         this.wealth = 5;
         this.industry = 0;
         this.agriculture = 100;
         this.population = 10;
         break;
-      case g.m.cellTypeList[g.LandType.Settlement]:
+      case LandType.Settlement:
         this.wealth = 50;
         this.industry = 25;
         this.agriculture = 0;
         this.population = 100;
         break;
-      case g.m.cellTypeList[g.LandType.Forest]:
+      case LandType.Forest:
         this.wealth = 20;
         this.industry = 25;
         this.agriculture = 20;
         this.population = 5;
         break;
-      case g.m.cellTypeList[g.LandType.Mountain]:
+      case LandType.Mountain:
         this.wealth = 50;
         this.industry = 100;
         this.agriculture = 0;
@@ -70,6 +70,46 @@ export default class Cell {
       default:
         console.warn("Cell type not defined!");
     }
+  }
+
+  static initCell(cell: JQuery, cellSize: number): Cell {
+    //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+    var numberOfLandTypes = Object.keys(LandType).length / 2;
+    var typeIndex = Math.floor(Math.random() * numberOfLandTypes);
+    var type = LandType[typeIndex];
+
+    cell.attr("type", type);
+
+    var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", []);
+    let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
+    //g.m.listOfCells.push(newCell);
+
+    var img = $(document.createElement("img"));
+    cell.append(img);
+
+    img.addClass("cellImg");
+    img.css("height", cellSize / 2 + "px");
+    img.css("width", cellSize / 2 + "px");
+    img.css("top", cellSize / 8 + "px");
+    img.css("left", cellSize / 8 + "px");
+
+    switch (LandType[type]) {
+      case LandType.Farm:
+        img.attr("src", "img/farm.svg");
+        break;
+      case LandType.Settlement:
+        img.attr("src", "img/settlement.svg");
+        break;
+      case LandType.Forest:
+        img.attr("src", "img/forest.svg");
+        break;
+      case LandType.Mountain:
+        img.attr("src", "img/mountain.svg");
+        break;
+      default:
+    }
+
+    return newCell;
   }
 
   clearPreviousOwnership = function() {
@@ -106,4 +146,11 @@ export default class Cell {
 
   }
 
+}
+
+enum LandType {
+  Farm,
+  Settlement,
+  Forest,
+  Mountain
 }

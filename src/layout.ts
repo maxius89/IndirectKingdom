@@ -1,4 +1,5 @@
-import g from "./script";
+//import g from "./script";
+import Cell from "./cell";
 
 export default class Layout {
 
@@ -18,30 +19,27 @@ export default class Layout {
   dLength: number;  // Dashboard Length
   dDisabled: boolean; // Dashboard Disabled
 
-  borderRatio = 0.02;              // Cell-size/border thickness ratio
-  minCellSize = 20; 		// px      // Minimum size of the drawn cells
-  maxCellSize = 100; 		// px      // Maximum size of the drawn cells
-  stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
-  minDrawnCells = 3;               // Minimum number of drawn cells
+  readonly borderRatio = 0.02;              // Cell-size/border thickness ratio
+  readonly minCellSize = 20; 		// px      // Minimum size of the drawn cells
+  readonly maxCellSize = 100; 		// px      // Maximum size of the drawn cells
+  readonly stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
+  readonly minDrawnCells = 3;               // Minimum number of drawn cells
 
-  sceneRows = 25;                    // Number of the rows of the Map
-  sceneCols = 25;                    // Number of the coloumns of the Map
+  readonly sceneRows = 25;                    // Number of the rows of the Map
+  readonly sceneCols = 25;                    // Number of the coloumns of the Map
 
-  thicknessRatio = 0.2;
-  minThickness = 200;   // px      // Dashboard thickness minimum
-  maxThickness = 400;   // px      // Dashboard thickness maximum
-  minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
+  readonly thicknessRatio = 0.2;
+  readonly minThickness = 200;   // px      // Dashboard thickness minimum
+  readonly maxThickness = 400;   // px      // Dashboard thickness maximum
+  readonly minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 
-	/*constructor(name: string, color: string, cells: string[]) {
-
-	}*/
-
-  initLayout() {
+  initLayout(): Cell[] {
     this.wWidth = $(window).width();
     this.wHeight = $(window).height();
 
     this.drawLayout();
-    $("#mapDiv").append(this.createMap(this.sceneCols, this.sceneRows));
+    let newMap = this.createMap(this.sceneCols, this.sceneRows);
+    $("#mapDiv").append(newMap.map);
 
     $("#mapDiv").css("background-color", "#00ff00");  // Test color
     $("#dashDiv").css("background-color", "#ff00ff"); // Test color
@@ -54,6 +52,8 @@ export default class Layout {
     this.rethinkPanels();
     this.addButtons();
     this.addInfoPanel();
+
+    return newMap.cells;
   }
 
   drawLayout() {
@@ -104,14 +104,15 @@ export default class Layout {
     var infoPopulation = $(document.createElement("div"));
     infoPopulation.attr("id", "infoPopulation");
     infoPanel.append(infoPopulation);
-
   }
 
-  createMap(width: number, height: number) {
+  createMap(width: number, height: number): NewMap {
     var table = $(document.createElement('table'));
     table.attr("id", "map");
     var tbody = $(document.createElement('tbody'));
     table.append(tbody);
+
+    var newListOfCells: Cell[] = [];
 
     for (var i = 0; i < height; ++i) {
       var newRow = $(document.createElement("tr"));
@@ -126,18 +127,19 @@ export default class Layout {
         newCol.attr("type", "none");
         newCol.html("&nbsp;");
 
-        //				initCell(newCol);
+        var newCell = Cell.initCell(newCol, this.mActualCellSize);
+        newListOfCells.push(newCell);
       }
     }
 
-    return table;
+    return { map: table, cells: newListOfCells };
   }
 
-  updateMap() {
-    /*	g.m.listOfCells.forEach(function(cell) {
-        $("#" + cell.id).attr("status",cell.owner.name);
-        $("#" + cell.id).css("background-color",cell.owner.color);
-      });*/
+  updateMap(map: Cell[]) {
+    map.forEach(function(cell) {
+      $("#" + cell.id).attr("status", cell.owner.name);
+      $("#" + cell.id).css("background-color", cell.owner.color);
+    });
   }
 
   rethinkPanels() {
@@ -149,8 +151,6 @@ export default class Layout {
     this.calcMapSize();
     this.calcCellSize();
     this.updateLayout();
-
-    console.log(g);
   }
 
   decideWindowOrientation() {
@@ -270,7 +270,7 @@ export default class Layout {
     $(".cellImg").css("left", this.mActualCellSize / 8 + "px");
   }
 
-  zoom(event) {
+  zoom(event: MouseWheelEvent) {
     if (event.ctrlKey === true) {
       event.preventDefault();
 
@@ -292,4 +292,9 @@ export default class Layout {
 enum Orientation {
   Portrait,
   Landscape
+}
+
+interface NewMap {
+  map: JQuery;
+  cells: Cell[];
 }
