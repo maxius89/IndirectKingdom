@@ -1,3 +1,4 @@
+import * as seedrandom from 'seedrandom';
 import Kingdom from './kingdom';
 import { g as global } from './script';
 
@@ -73,9 +74,9 @@ export default class Cell {
   }
 
   static initCell(cell: JQuery, cellSize: number): Cell {
-    //Math.seedrandom(g.randomSeed + $(cell).attr("id") );
+    var newRnd = seedrandom.alea(global.randomSeed + $(cell).attr("id"));
     var numberOfLandTypes = Object.keys(LandType).length / 2;
-    var typeIndex = Math.floor(Math.random() * numberOfLandTypes);
+    var typeIndex = Math.floor(newRnd() * numberOfLandTypes);
     var type = LandType[typeIndex];
 
     cell.attr("type", type);

@@ -23,5 +23,9 @@
     "ts-loader": "^5.3.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.5"
+  },
+  "dependencies": {
+    "@types/seedrandom": "^2.4.27",
+    "seedrandom": "^2.4.4"
   }
 }

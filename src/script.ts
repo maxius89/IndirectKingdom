@@ -1,12 +1,9 @@
 import Globals from './global';
 import Kingdom from './kingdom';
-import Cell from './cell';
 import Layout from './layout';
 export var g = new Globals;
-//export default g;
 
 var layout = new Layout;
-//var listOfCells: Cell[] = [];
 
 $(document).ready(function() {
 
@@ -16,8 +13,7 @@ $(document).ready(function() {
   initKingdoms();
 
   // Event Listeners
-
-  //	$(".cell").click(clicked);
+  $(".cell").click(clicked);
   $(".cell").attr("highlighted", "false");
 
   $(window).resize(function() {
@@ -31,10 +27,9 @@ $(document).ready(function() {
   $("#mapDiv")[0].addEventListener("wheel", layout.zoom.bind(layout));
 
   // Initialize kingdoms on map
-	/*for (var i = 0; i < g.listOfKingdoms.length; i++)
-	{
-		g.listOfKingdoms[i].init();
-	}*/
+  for (var i = 0; i < g.listOfKingdoms.length; i++) {
+    g.listOfKingdoms[i].init();
+  }
 
   //setTimeout(test,500);
 });
@@ -61,7 +56,7 @@ function setConsts() {
   g.showPopulation = false;
   g.resizeTimeout = null;
 
-  g.randomSeed = "0001";               // Seed for random number generation
+  g.randomSeed = "Indirect";               // Seed for random number generation
 
   g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom", "unclaimed"];  // Name of the kingdoms
 
@@ -71,115 +66,107 @@ function setConsts() {
   g.sceneCols = 25;                    // Number of the coloumns of the Map
   console.log(g);
 }
-/*
+
 function clicked() {
-	for (var i = 0; i < listOfKingdoms.length; i++)
-	{
-		listOfKingdoms[i].highlighted = false;
-	}
+  for (var i = 0; i < g.listOfKingdoms.length; i++) {
+    g.listOfKingdoms[i].highlighted = false;
+  }
 
-	if ( g.highlightedKindom === listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))])
-	{
-		g.highlightedKindom = null;
-	}
-	else
-	{
-		listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
-		g.highlightedKindom = listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
-	}
+  if (g.highlightedKindom === g.listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))]) {
+    g.highlightedKindom = null;
+  }
+  else {
+    g.listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
+    g.highlightedKindom = g.listOfKingdoms[g.kingdomNames.indexOf($(this).attr("status"))];
+  }
 
-	setHighlightedCells();
-	writeToInfoPanel();
+  setHighlightedCells();
+  writeToInfoPanel();
 }
 
 function setHighlightedCells() {
-	listOfKingdoms.forEach(function(kingdom,i) {
-		$(".cell[status = '"+kingdom.name+"']").attr("highlighted",kingdom.highlighted);
-	});
+  g.listOfKingdoms.forEach(function(kingdom) {
+    $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
+    console.log(String(kingdom.highlighted));
+  });
 
   var clickedCells = $(".cell[highlighted = false]");
-	var nonClickedCells = $(".cell[highlighted = true]");
+  var nonClickedCells = $(".cell[highlighted = true]");
 
-	var clickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio);
-  var nonClickedBorderSize = Math.ceil(g.m.actualCellSize * g.m.borderRatio)*2;
+  var clickedBorderSize = Math.ceil(layout.mActualCellSize * layout.borderRatio);
+  var nonClickedBorderSize = Math.ceil(layout.mActualCellSize * layout.borderRatio) * 2;
 
-	clickedCells.css("box-shadow", "inset " + clickedBorderSize +"px "  + clickedBorderSize +"px #ffffff," +
-																 "inset -"+ clickedBorderSize +"px -" + clickedBorderSize +"px #ffffff");
+  clickedCells.css("box-shadow", "inset " + clickedBorderSize + "px " + clickedBorderSize + "px #ffffff," +
+    "inset -" + clickedBorderSize + "px -" + clickedBorderSize + "px #ffffff");
 
-	nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize +"px "  + nonClickedBorderSize +"px #dddd55," +
-																		"inset -"+ nonClickedBorderSize +"px -" + nonClickedBorderSize +"px #dddd55");
+  nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize + "px " + nonClickedBorderSize + "px #dddd55," +
+    "inset -" + nonClickedBorderSize + "px -" + nonClickedBorderSize + "px #dddd55");
 }
 
-function runGame() {
-	if (g.started === false)
-	{
-		g.runner = setInterval(function() {
-			nextRound();
-		}, g.turnLength);
-		g.started = true;
+export function runGame() {
+  if (g.started === false) {
+    g.runner = setInterval(function() {
+      nextRound();
+    }, g.turnLength);
+    g.started = true;
   }
-	else
-	{
-		clearInterval(g.runner);
-		g.started = false;
-	}
+  else {
+    clearInterval(g.runner);
+    g.started = false;
+  }
 }
 
 function nextRound() {
-	g.m.listOfCells.forEach(function(cell) {
-		cell.tick();
-	});
+  g.listOfCells.forEach(function(cell) {
+    cell.tick();
+  });
 
-	Math.seedrandom();
-	var numOfActiveKingdoms = listOfKingdoms.length - 1;
+  var numOfActiveKingdoms = g.listOfKingdoms.length - 1;
 
-	for (var i = 0; i < numOfActiveKingdoms; i++)
-	{
-		var attackList = listOfKingdoms[i].findNeighbourCells();
-		var target = Math.floor(Math.random() * attackList.length);
+  for (var i = 0; i < numOfActiveKingdoms; i++) {
+    var attackList = g.listOfKingdoms[i].findNeighbourCells();
+    var target = Math.floor(Math.random() * attackList.length);
 
-		listOfKingdoms[i].claimTerritory(attackList[target]);
-		listOfKingdoms[i].calculateEconomy();
-	}
+    g.listOfKingdoms[i].claimTerritory(attackList[target]);
+    g.listOfKingdoms[i].calculateEconomy();
+  }
 
-	unclaimed.calculateEconomy();
+  g.listOfKingdoms[numOfActiveKingdoms].calculateEconomy();
 
-	writeToInfoPanel();
-	setHighlightedCells();
+  writeToInfoPanel();
+  setHighlightedCells();
 
-	updateMap();
+  layout.updateMap(g.listOfCells);
 
-console.log(g.showPopulation);
-	if (g.showPopulation){  // TODO: Temporary solution
-		g.m.listOfCells.forEach(function(cell) {
-			$(".cell[id='"+cell.id+"']").html(Math.round(cell.population));
-		});
-	}
-}
-*/
-
-/*
-function writeToInfoPanel()
-{
-	var text1 = text2 = text3 = text4 = "&nbsp;";
-	if (g.highlightedKindom != null) {
-	text1 = g.highlightedKindom.name + " wealth: " + g.highlightedKindom.econ.wealth;
-	text2 = g.highlightedKindom.name + " industry: " + g.highlightedKindom.econ.industry;
-	text3 = g.highlightedKindom.name + " agriculture: " + g.highlightedKindom.econ.agriculture;
-	text4 = g.highlightedKindom.name + " population: " + g.highlightedKindom.econ.population;
-	}
-	else {
-		text1 = text2 = text3 = text4 = "&nbsp;"
-	}
-
-	$("#infoWealth").html(text1);
-	$("#infoIndustry").html(text2);
-	$("#infoAgriculture").html(text3);
-	$("#infoPopulation").html(text4);
+  console.log(g.showPopulation);
+  if (g.showPopulation) {  // TODO: Temporary solution
+    g.listOfCells.forEach(function(cell) {
+      $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population)));
+    });
+  }
 }
 
-function showPopulation()
-{
-	g.showPopulation = true;
+function writeToInfoPanel() {
+  var text1 = "&nbsp;";
+  var text2 = "&nbsp;";
+  var text3 = "&nbsp;";
+  var text4 = "&nbsp;";
+  if (g.highlightedKindom != null) {
+    text1 = g.highlightedKindom.name + " wealth: " + g.highlightedKindom.econ.wealth;
+    text2 = g.highlightedKindom.name + " industry: " + g.highlightedKindom.econ.industry;
+    text3 = g.highlightedKindom.name + " agriculture: " + g.highlightedKindom.econ.agriculture;
+    text4 = g.highlightedKindom.name + " population: " + g.highlightedKindom.econ.population;
+  }
+  else {
+    text1 = text2 = text3 = text4 = "&nbsp;"
+  }
+
+  $("#infoWealth").html(text1);
+  $("#infoIndustry").html(text2);
+  $("#infoAgriculture").html(text3);
+  $("#infoPopulation").html(text4);
 }
-*/
+
+export function showPopulation() {
+  g.showPopulation = true;
+}

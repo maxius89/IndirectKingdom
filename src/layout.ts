@@ -1,5 +1,6 @@
 //import g from "./script";
 import Cell from "./cell";
+import { runGame, showPopulation } from "./script";
 
 export default class Layout {
 
@@ -50,7 +51,8 @@ export default class Layout {
     $("#dashDiv").css("position", "absolute");
 
     this.rethinkPanels();
-    this.addButtons();
+    this.addButton(runGame, 'Start / Stop');
+    this.addButton(showPopulation, 'Show Population');
     this.addInfoPanel();
 
     return newMap.cells;
@@ -70,14 +72,10 @@ export default class Layout {
     $("#mapDiv").css("overflow-y", "scroll");
   }
 
-  addButtons() {
-    var startButton = $("<button>").text("Start / Stop");
-    //		startButton.click(runGame);
-    $("#dashDiv").append(startButton);
-
-    var populationButton = $("<button>").text("Show Population");
-    //		populationButton.click(showPopulation);
-    $("#dashDiv").append(populationButton);
+  addButton(buttonFunction: Function, buttonText: string) {
+    var button = $("<button>").text(buttonText);
+    button.click((evt) => buttonFunction(evt));
+    $("#dashDiv").append(button);
   }
 
   addInfoPanel() {

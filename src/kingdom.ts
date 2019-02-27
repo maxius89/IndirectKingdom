@@ -62,7 +62,7 @@ export default class Kingdom {
   }
 
   findNeighbourCells = function() {
-    var neighbours: Cell[];
+    var neighbours: Cell[] = [];
 
     this.cells.forEach(function(cell: Cell) {
       neighbours = neighbours.concat(this.analizeNeighbours(cell));
@@ -71,7 +71,7 @@ export default class Kingdom {
   }
 
   analizeNeighbours = function(inputCell: Cell) {
-    var outputList: Cell[];
+    var outputList: Cell[] = [];
     var posRow = inputCell.id.indexOf("r");
     var posCol = inputCell.id.indexOf("c");
 
