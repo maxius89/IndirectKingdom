@@ -10763,6 +10763,7 @@ __webpack_require__.r(__webpack_exports__);
 //import g from "./script";
 
 
+
 class Layout {
     constructor() {
         this.mActualCellSize = 30; // Actual Cell size
@@ -10849,7 +10850,30 @@ class Layout {
                 newCol.attr("status", "unclaimed");
                 newCol.attr("type", "none");
                 newCol.html("&nbsp;");
-                var newCell = _cell__WEBPACK_IMPORTED_MODULE_0__["default"].initCell(newCol, this.mActualCellSize);
+                var newCell = _cell__WEBPACK_IMPORTED_MODULE_0__["default"].initCell({ row: i, col: j });
+                newCol.attr("type", _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"][newCell.type]);
+                var img = $(document.createElement("img"));
+                newCol.append(img);
+                img.addClass("cellImg");
+                img.css("height", this.mActualCellSize / 2 + "px");
+                img.css("width", this.mActualCellSize / 2 + "px");
+                img.css("top", this.mActualCellSize / 8 + "px");
+                img.css("left", this.mActualCellSize / 8 + "px");
+                switch (newCell.type) {
+                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Farm:
+                        img.attr("src", "img/farm.svg");
+                        break;
+                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Settlement:
+                        img.attr("src", "img/settlement.svg");
+                        break;
+                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Forest:
+                        img.attr("src", "img/forest.svg");
+                        break;
+                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Mountain:
+                        img.attr("src", "img/mountain.svg");
+                        break;
+                    default:
+                }
                 newListOfCells.push(newCell);
             }
         }
@@ -10998,7 +11022,8 @@ var Orientation;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LandType", function() { return LandType; });
 /* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
 /* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
@@ -11007,7 +11032,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Cell {
-    constructor(id, type, owner) {
+    constructor(coordinates, type, owner) {
         this.clearPreviousOwnership = function () {
             this.owner.loseTerritory(this);
         };
@@ -11032,8 +11057,10 @@ class Cell {
                 this.owner.income[i] += this.generateOutput()[i];
             }, this);
         };
-        this.id = id;
+        this.pos = coordinates;
+        this.id = "r" + coordinates.row + "c" + coordinates.col;
         this.owner = owner;
+        this.type = type;
         this.output = {
             money: 0,
             goods: 0,
@@ -11050,7 +11077,7 @@ class Cell {
             food: 0.01,
             people: 0.01
         };
-        switch (LandType[type]) {
+        switch (this.type) {
             case LandType.Farm:
                 this.wealth = 5;
                 this.industry = 0;
@@ -11079,36 +11106,12 @@ class Cell {
                 console.warn("Cell type not defined!");
         }
     }
-    static initCell(cell, cellSize) {
-        var newRnd = seedrandom__WEBPACK_IMPORTED_MODULE_0__(_script__WEBPACK_IMPORTED_MODULE_2__["g"].randomSeed + $(cell).attr("id"));
+    static initCell(coordinates) {
+        var newRnd = seedrandom__WEBPACK_IMPORTED_MODULE_0__(_script__WEBPACK_IMPORTED_MODULE_2__["g"].randomSeed + coordinates.row + coordinates.col);
         var numberOfLandTypes = Object.keys(LandType).length / 2;
-        var typeIndex = Math.floor(newRnd() * numberOfLandTypes);
-        var type = LandType[typeIndex];
-        cell.attr("type", type);
+        var type = Math.floor(newRnd() * numberOfLandTypes);
         var unclaimedOwner = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"]("unclaimed", "#7777cc", []);
-        let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
-        var img = $(document.createElement("img"));
-        cell.append(img);
-        img.addClass("cellImg");
-        img.css("height", cellSize / 2 + "px");
-        img.css("width", cellSize / 2 + "px");
-        img.css("top", cellSize / 8 + "px");
-        img.css("left", cellSize / 8 + "px");
-        switch (LandType[type]) {
-            case LandType.Farm:
-                img.attr("src", "img/farm.svg");
-                break;
-            case LandType.Settlement:
-                img.attr("src", "img/settlement.svg");
-                break;
-            case LandType.Forest:
-                img.attr("src", "img/forest.svg");
-                break;
-            case LandType.Mountain:
-                img.attr("src", "img/mountain.svg");
-                break;
-            default:
-        }
+        let newCell = new Cell(coordinates, type, unclaimedOwner); // TODO: Remove unclaimedOwner dependency
         return newCell;
     }
 }
@@ -11120,7 +11123,6 @@ var LandType;
     LandType[LandType["Mountain"] = 3] = "Mountain";
 })(LandType || (LandType = {}));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
 /* 6 */

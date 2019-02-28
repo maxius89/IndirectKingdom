@@ -1,5 +1,6 @@
 //import g from "./script";
 import Cell from "./cell";
+import { LandType } from './cell';
 import { runGame, showPopulation } from "./script";
 
 export default class Layout {
@@ -125,7 +126,35 @@ export default class Layout {
         newCol.attr("type", "none");
         newCol.html("&nbsp;");
 
-        var newCell = Cell.initCell(newCol, this.mActualCellSize);
+        var newCell = Cell.initCell({ row: i, col: j });
+
+        newCol.attr("type", LandType[newCell.type]);
+        var img = $(document.createElement("img"));
+
+        newCol.append(img);
+
+        img.addClass("cellImg");
+        img.css("height", this.mActualCellSize / 2 + "px");
+        img.css("width", this.mActualCellSize / 2 + "px");
+        img.css("top", this.mActualCellSize / 8 + "px");
+        img.css("left", this.mActualCellSize / 8 + "px");
+
+        switch (newCell.type) {
+          case LandType.Farm:
+            img.attr("src", "img/farm.svg");
+            break;
+          case LandType.Settlement:
+            img.attr("src", "img/settlement.svg");
+            break;
+          case LandType.Forest:
+            img.attr("src", "img/forest.svg");
+            break;
+          case LandType.Mountain:
+            img.attr("src", "img/mountain.svg");
+            break;
+          default:
+        }
+
         newListOfCells.push(newCell);
       }
     }

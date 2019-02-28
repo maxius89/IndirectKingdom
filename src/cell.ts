@@ -7,6 +7,8 @@ export default class Cell {
   id: string;
   owner: Kingdom;
   output: any;
+  type: LandType;
+  pos: CellCoordinates;
 
   moneyEfficiency: number;
   industryEfficiency: number;
@@ -20,9 +22,11 @@ export default class Cell {
 
   baseEfficiency: {};
 
-  constructor(id: string, type: string, owner: Kingdom) {
-    this.id = id;
+  constructor(coordinates: CellCoordinates, type: LandType, owner: Kingdom) {
+    this.pos = coordinates;
+    this.id = "r" + coordinates.row + "c" + coordinates.col;
     this.owner = owner;
+    this.type = type;
 
     this.output = {    // Object for cell output per turn
       money: 0,
@@ -43,7 +47,7 @@ export default class Cell {
       people: 0.01
     };
 
-    switch (LandType[type]) {
+    switch (this.type) {
       case LandType.Farm:
         this.wealth = 5;
         this.industry = 0;
@@ -73,46 +77,18 @@ export default class Cell {
     }
   }
 
-  static initCell(cell: JQuery, cellSize: number): Cell {
-    var newRnd = seedrandom(global.randomSeed + $(cell).attr("id"));
+  static initCell(coordinates: CellCoordinates): Cell {
+    var newRnd = seedrandom(global.randomSeed + coordinates.row + coordinates.col);
     var numberOfLandTypes = Object.keys(LandType).length / 2;
-    var typeIndex = Math.floor(newRnd() * numberOfLandTypes);
-    var type = LandType[typeIndex];
-
-    cell.attr("type", type);
+    var type: LandType = Math.floor(newRnd() * numberOfLandTypes);
 
     var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", []);
-    let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
-
-    var img = $(document.createElement("img"));
-    cell.append(img);
-
-    img.addClass("cellImg");
-    img.css("height", cellSize / 2 + "px");
-    img.css("width", cellSize / 2 + "px");
-    img.css("top", cellSize / 8 + "px");
-    img.css("left", cellSize / 8 + "px");
-
-    switch (LandType[type]) {
-      case LandType.Farm:
-        img.attr("src", "img/farm.svg");
-        break;
-      case LandType.Settlement:
-        img.attr("src", "img/settlement.svg");
-        break;
-      case LandType.Forest:
-        img.attr("src", "img/forest.svg");
-        break;
-      case LandType.Mountain:
-        img.attr("src", "img/mountain.svg");
-        break;
-      default:
-    }
+    let newCell = new Cell(coordinates, type, unclaimedOwner); // TODO: Remove unclaimedOwner dependency
 
     return newCell;
   }
 
-  clearPreviousOwnership = function() {
+  clearPreviousOwnership = function(): void {
     this.owner.loseTerritory(this);
   }
 
@@ -143,14 +119,18 @@ export default class Cell {
     Object.keys(this.output).map(function(i) {
       this.owner.income[i] += this.generateOutput()[i];
     }, this);
-
   }
 
 }
 
-enum LandType {
+export enum LandType {
   Farm,
   Settlement,
   Forest,
   Mountain
+}
+
+export interface CellCoordinates {
+  row: number;
+  col: number;
 }
