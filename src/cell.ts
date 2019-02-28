@@ -74,7 +74,7 @@ export default class Cell {
   }
 
   static initCell(cell: JQuery, cellSize: number): Cell {
-    var newRnd = seedrandom.alea(global.randomSeed + $(cell).attr("id"));
+    var newRnd = seedrandom(global.randomSeed + $(cell).attr("id"));
     var numberOfLandTypes = Object.keys(LandType).length / 2;
     var typeIndex = Math.floor(newRnd() * numberOfLandTypes);
     var type = LandType[typeIndex];
@@ -83,7 +83,6 @@ export default class Cell {
 
     var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", []);
     let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
-    //g.m.listOfCells.push(newCell);
 
     var img = $(document.createElement("img"));
     cell.append(img);

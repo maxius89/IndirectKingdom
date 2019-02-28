@@ -96,6 +96,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _global__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -140,7 +143,7 @@ function setConsts() {
     g.highlightedKindom = null;
     g.showPopulation = false;
     g.resizeTimeout = null;
-    g.randomSeed = "Indirect"; // Seed for random number generation
+    g.randomSeed = "0001"; // Seed for random number generation
     g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom", "unclaimed"]; // Name of the kingdoms
     g.turnLength = 100; // ms			 // Length of a turn
     g.sceneRows = 25; // Number of the rows of the Map
@@ -188,13 +191,14 @@ function runGame() {
     }
 }
 function nextRound() {
+    var rng = seedrandom__WEBPACK_IMPORTED_MODULE_3__();
     g.listOfCells.forEach(function (cell) {
         cell.tick();
     });
     var numOfActiveKingdoms = g.listOfKingdoms.length - 1;
     for (var i = 0; i < numOfActiveKingdoms; i++) {
         var attackList = g.listOfKingdoms[i].findNeighbourCells();
-        var target = Math.floor(Math.random() * attackList.length);
+        var target = Math.floor(rng() * attackList.length);
         g.listOfKingdoms[i].claimTerritory(attackList[target]);
         g.listOfKingdoms[i].calculateEconomy();
     }
@@ -10618,8 +10622,6 @@ class Globals {
         this.sceneCols = 25; // Number of the coloumns of the Map
     }
 }
-;
-;
 
 
 /***/ }),
@@ -10808,9 +10810,6 @@ class Layout {
         var button = $("<button>").text(buttonText);
         button.click((evt) => buttonFunction(evt));
         $("#dashDiv").append(button);
-        /*var populationButton = $("<button>").text("Show Population");
-        //		populationButton.click(showPopulation);
-        $("#dashDiv").append(populationButton);*/
     }
     addInfoPanel() {
         var infoPanel = $(document.createElement('div'));
@@ -11081,14 +11080,13 @@ class Cell {
         }
     }
     static initCell(cell, cellSize) {
-        var newRnd = seedrandom__WEBPACK_IMPORTED_MODULE_0__["alea"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].randomSeed + $(cell).attr("id"));
+        var newRnd = seedrandom__WEBPACK_IMPORTED_MODULE_0__(_script__WEBPACK_IMPORTED_MODULE_2__["g"].randomSeed + $(cell).attr("id"));
         var numberOfLandTypes = Object.keys(LandType).length / 2;
         var typeIndex = Math.floor(newRnd() * numberOfLandTypes);
         var type = LandType[typeIndex];
         cell.attr("type", type);
         var unclaimedOwner = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"]("unclaimed", "#7777cc", []);
         let newCell = new Cell($(cell).attr("id"), type, unclaimedOwner);
-        //g.m.listOfCells.push(newCell);
         var img = $(document.createElement("img"));
         cell.append(img);
         img.addClass("cellImg");

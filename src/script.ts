@@ -1,6 +1,7 @@
 import Globals from './global';
 import Kingdom from './kingdom';
 import Layout from './layout';
+import * as seedrandom from 'seedrandom';
 export var g = new Globals;
 
 var layout = new Layout;
@@ -56,7 +57,7 @@ function setConsts() {
   g.showPopulation = false;
   g.resizeTimeout = null;
 
-  g.randomSeed = "Indirect";               // Seed for random number generation
+  g.randomSeed = "0001";               // Seed for random number generation
 
   g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom", "unclaimed"];  // Name of the kingdoms
 
@@ -117,6 +118,7 @@ export function runGame() {
 }
 
 function nextRound() {
+  var rng = seedrandom();
   g.listOfCells.forEach(function(cell) {
     cell.tick();
   });
@@ -125,7 +127,7 @@ function nextRound() {
 
   for (var i = 0; i < numOfActiveKingdoms; i++) {
     var attackList = g.listOfKingdoms[i].findNeighbourCells();
-    var target = Math.floor(Math.random() * attackList.length);
+    var target = Math.floor(rng() * attackList.length);
 
     g.listOfKingdoms[i].claimTerritory(attackList[target]);
     g.listOfKingdoms[i].calculateEconomy();
