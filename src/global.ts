@@ -5,7 +5,7 @@ export default class Globals {
 
   started: boolean;
   runner: any;
-  highlightedKindom: any;
+  highlightedKindom: Kingdom;
   showPopulation: boolean;
   resizeTimeout: any;
 

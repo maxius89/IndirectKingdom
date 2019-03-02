@@ -2,7 +2,8 @@
   "compilerOptions": {
     "outDir": "./build",
     "allowJs": true,
-    "target": "es6"
+    "target": "es6",
+     "lib": ["es6", "dom", "es2017"]
   },
   "files" :[
     "src/script.ts"

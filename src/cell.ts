@@ -1,5 +1,6 @@
 import * as seedrandom from 'seedrandom';
 import Kingdom from './kingdom';
+import World from './world';
 import { g as global } from './script';
 
 export default class Cell {
@@ -20,7 +21,7 @@ export default class Cell {
   agriculture: number;
   population: number;
 
-  baseEfficiency: {};
+  baseEfficiency: BaseEfficiency;
 
   constructor(coordinates: CellCoordinates, type: LandType, owner: Kingdom) {
     this.pos = coordinates;
@@ -82,17 +83,18 @@ export default class Cell {
     var numberOfLandTypes = Object.keys(LandType).length / 2;
     var type: LandType = Math.floor(newRnd() * numberOfLandTypes);
 
-    var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", []);
+    var tempWorld = new World([0, 0]);
+    var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", [], tempWorld);
     let newCell = new Cell(coordinates, type, unclaimedOwner); // TODO: Remove unclaimedOwner dependency
 
     return newCell;
   }
 
-  clearPreviousOwnership = function(): void {
+  clearPreviousOwnership = function(this: Cell): void {
     this.owner.loseTerritory(this);
   }
 
-  updateCell = function() {
+  updateCell = function(this: Cell) {
     var populationPower = this.population; // TODO: Get a function with diminishing return;
     var excessFood = this.agriculture - this.population;
 
@@ -105,7 +107,7 @@ export default class Cell {
 
   }
 
-  generateOutput = function() {
+  generateOutput = function(this: Cell) {
     this.output.money = this.wealth * this.moneyEfficiency;
     this.output.goods = this.industry * this.industryEfficiency;
     this.output.food = this.agriculture * this.agricultureEfficiency;
@@ -113,10 +115,10 @@ export default class Cell {
     return this.output;
   }
 
-  tick = function() {
+  tick = function(this: Cell) {
     this.updateCell();
 
-    Object.keys(this.output).map(function(i) {
+    Object.keys(this.output).map(function(this: Cell, i) {
       this.owner.income[i] += this.generateOutput()[i];
     }, this);
   }
@@ -133,4 +135,11 @@ export enum LandType {
 export interface CellCoordinates {
   row: number;
   col: number;
+}
+
+interface BaseEfficiency {
+  money: number;
+  goods: number;
+  food: number;
+  people: number;
 }

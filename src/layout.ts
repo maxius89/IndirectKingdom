@@ -1,7 +1,8 @@
-//import g from "./script";
-import Cell from "./cell";
+import { g as global } from './script';
+import Cell from './cell';
+import World from './world';
 import { LandType } from './cell';
-import { runGame, showPopulation } from "./script";
+import { runGame, showPopulation } from './script';
 
 export default class Layout {
 
@@ -15,33 +16,34 @@ export default class Layout {
   mHeight: number; // Map Height
   mUpscaled: boolean; // Map Upscaled
   mDownscaled: boolean; // Map Downscaled
-  mActualCellSize = 30; // Actual Cell size
+  static mActualCellSize = 30; // Actual Cell size
 
   dThickness: number; // Dashboard Thickness
   dLength: number;  // Dashboard Length
   dDisabled: boolean; // Dashboard Disabled
 
-  readonly borderRatio = 0.02;              // Cell-size/border thickness ratio
-  readonly minCellSize = 20; 		// px      // Minimum size of the drawn cells
-  readonly maxCellSize = 100; 		// px      // Maximum size of the drawn cells
-  readonly stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
-  readonly minDrawnCells = 3;               // Minimum number of drawn cells
+  static readonly borderRatio = 0.02;              // Cell-size/border thickness ratio
+  static readonly minCellSize = 20; 		// px      // Minimum size of the drawn cells
+  static readonly maxCellSize = 100; 		// px      // Maximum size of the drawn cells
+  static readonly stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
+  static readonly minDrawnCells = 3;               // Minimum number of drawn cells
 
-  readonly sceneRows = 25;                    // Number of the rows of the Map
-  readonly sceneCols = 25;                    // Number of the coloumns of the Map
+  static readonly sceneRows = 25;                  // Number of the rows of the Map
+  static readonly sceneCols = 25;                  // Number of the coloumns of the Map
 
-  readonly thicknessRatio = 0.2;
-  readonly minThickness = 200;   // px      // Dashboard thickness minimum
-  readonly maxThickness = 400;   // px      // Dashboard thickness maximum
-  readonly minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
+  static readonly thicknessRatio = 0.2;
+  static readonly minThickness = 200;   // px      // Dashboard thickness minimum
+  static readonly maxThickness = 400;   // px      // Dashboard thickness maximum
+  static readonly minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 
-  initLayout(): Cell[] {
+  initLayout(): void {
+
     this.wWidth = $(window).width();
     this.wHeight = $(window).height();
 
     this.drawLayout();
-    let newMap = this.createMap(this.sceneCols, this.sceneRows);
-    $("#mapDiv").append(newMap.map);
+    let newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
+    $("#mapDiv").append(newMap);
 
     $("#mapDiv").css("background-color", "#00ff00");  // Test color
     $("#dashDiv").css("background-color", "#ff00ff"); // Test color
@@ -56,7 +58,7 @@ export default class Layout {
     this.addButton(showPopulation, 'Show Population');
     this.addInfoPanel();
 
-    return newMap.cells;
+    this.updateMap(World.listOfCells);
   }
 
   drawLayout() {
@@ -105,7 +107,7 @@ export default class Layout {
     infoPanel.append(infoPopulation);
   }
 
-  createMap(width: number, height: number): NewMap {
+  createMap(width: number, height: number): JQuery {
     var table = $(document.createElement('table'));
     table.attr("id", "map");
     var tbody = $(document.createElement('tbody'));
@@ -123,6 +125,7 @@ export default class Layout {
         newCol.addClass("cell");
         newCol.attr("id", "r" + i + "c" + j);
         newCol.attr("status", "unclaimed");
+        newCol.attr("highlighted", "false");
         newCol.attr("type", "none");
         newCol.html("&nbsp;");
 
@@ -135,7 +138,7 @@ export default class Layout {
       }
     }
 
-    return { map: table, cells: newListOfCells };
+    return table;
   }
 
   showCellIcon(cell: JQuery, type: LandType): void {
@@ -143,10 +146,10 @@ export default class Layout {
     cell.append(img);
 
     img.addClass("cellImg");
-    img.css("height", this.mActualCellSize / 2 + "px");
-    img.css("width", this.mActualCellSize / 2 + "px");
-    img.css("top", this.mActualCellSize / 8 + "px");
-    img.css("left", this.mActualCellSize / 8 + "px");
+    img.css("height", Layout.mActualCellSize / 2 + "px");
+    img.css("width", Layout.mActualCellSize / 2 + "px");
+    img.css("top", Layout.mActualCellSize / 8 + "px");
+    img.css("left", Layout.mActualCellSize / 8 + "px");
 
     switch (type) {
       case LandType.Farm:
@@ -198,16 +201,16 @@ export default class Layout {
   }
 
   calcDashboardSize() {
-    if (this.wLong < this.minThickness * this.minDashboardThickessRatio) {
+    if (this.wLong < Layout.minThickness * Layout.minDashboardThickessRatio) {
       this.dLength = 0;
       this.dThickness = 0;
       this.dDisabled = true;
     }
     else {
       this.dLength = this.wShort;
-      this.dThickness = Math.floor(this.dLength * this.thicknessRatio);
-      this.dThickness = Math.max(this.dThickness, this.minThickness);
-      this.dThickness = Math.min(this.dThickness, this.maxThickness);
+      this.dThickness = Math.floor(this.dLength * Layout.thicknessRatio);
+      this.dThickness = Math.max(this.dThickness, Layout.minThickness);
+      this.dThickness = Math.min(this.dThickness, Layout.maxThickness);
       this.dDisabled = false;
     }
   }
@@ -239,7 +242,7 @@ export default class Layout {
   updateLayout() {
     $("#mapDiv").css("width", this.mWidth + "px");
     $("#mapDiv").css("height", this.mHeight + "px");
-    $("#map").css("width", this.mActualCellSize * this.sceneCols + "px");
+    $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
 
     if (this.wOrientation == Orientation.Landscape) {
       $("#dashDiv").css("width", this.dThickness + "px");
@@ -258,47 +261,47 @@ export default class Layout {
   }
 
   upscaleCells() {
-    var verticalMapSize = this.sceneRows * this.mActualCellSize;
+    var verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
     if (this.mWidth < verticalMapSize) return false;
 
-    var horizontalMapSize = this.sceneCols * this.mActualCellSize;
+    var horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
     if (this.mHeight < horizontalMapSize) return false;
 
     var verticalScale = this.mWidth / verticalMapSize;
     var horizontalScale = this.mHeight / horizontalMapSize;
     var scale = Math.min(verticalScale, horizontalScale);
-    this.mActualCellSize = Math.floor(this.mActualCellSize * scale);
+    Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
     return true;
   }
 
   makeCellsFit() {
-    var minMapSize = this.minDrawnCells * this.mActualCellSize;
+    var minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
     if (this.mWidth >= minMapSize && this.mHeight >= minMapSize) return false;
 
     var verticalScale = this.mWidth / minMapSize;
     var horizontalScale = this.mHeight / minMapSize;
     var scale = Math.min(verticalScale, horizontalScale);
-    this.mActualCellSize = Math.floor(this.mActualCellSize * scale);
+    Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
     return true;
   }
 
   resizeCells() {
-    this.mActualCellSize = Math.max(this.mActualCellSize, this.minCellSize);
-    this.mActualCellSize = Math.min(this.mActualCellSize, this.maxCellSize);
+    Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
+    Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
 
-    $(".cell").css("height", this.mActualCellSize + "px");
-    $(".cell").css("width", this.mActualCellSize + "px");
+    $(".cell").css("height", Layout.mActualCellSize + "px");
+    $(".cell").css("width", Layout.mActualCellSize + "px");
 
-    var bordersize = Math.ceil(this.mActualCellSize * this.borderRatio);
+    var bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
     $(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
       "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
 
-    $(".cellImg").css("height", this.mActualCellSize / 2 + "px");
-    $(".cellImg").css("width", this.mActualCellSize / 2 + "px");
-    $(".cellImg").css("top", this.mActualCellSize / 8 + "px");
-    $(".cellImg").css("left", this.mActualCellSize / 8 + "px");
+    $(".cellImg").css("height", Layout.mActualCellSize / 2 + "px");
+    $(".cellImg").css("width", Layout.mActualCellSize / 2 + "px");
+    $(".cellImg").css("top", Layout.mActualCellSize / 8 + "px");
+    $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
   }
 
   zoom(event: MouseWheelEvent) {
@@ -306,16 +309,76 @@ export default class Layout {
       event.preventDefault();
 
       if (event.deltaY < 0) {
-        this.mActualCellSize += this.stepCellSize;
+        Layout.mActualCellSize += Layout.stepCellSize;
       }
       else {
-        this.mActualCellSize -= this.stepCellSize;
+        Layout.mActualCellSize -= Layout.stepCellSize;
       }
 
       this.resizeCells();
-      $("#map").css("width", this.mActualCellSize * this.sceneCols + "px");
-      $("#map").css("height", this.mActualCellSize * this.sceneRows + "px");
+      $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
+      $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
     }
+  }
+
+
+  clicked(): void {
+    var clickedCellKingdom = World.listOfKingdoms[global.kingdomNames.indexOf($(this).attr("status"))];
+
+    for (var i = 0; i < World.listOfKingdoms.length; i++) {
+      World.listOfKingdoms[i].highlighted = false;
+    }
+
+    if (global.highlightedKindom === clickedCellKingdom) {
+      global.highlightedKindom = null;
+    }
+    else {
+      World.listOfKingdoms[global.kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
+      global.highlightedKindom = clickedCellKingdom;
+    }
+
+    Layout.setHighlightedCells();
+    Layout.writeToInfoPanel();
+  }
+
+  static setHighlightedCells(): void {
+    World.listOfKingdoms.forEach(function(kingdom) {
+      $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
+    });
+
+    var clickedCells = $(".cell[highlighted = false]");
+    var nonClickedCells = $(".cell[highlighted = true]");
+
+    var clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+    var nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
+
+    clickedCells.css("box-shadow", "inset " + clickedBorderSize + "px " + clickedBorderSize + "px #ffffff," +
+      "inset -" + clickedBorderSize + "px -" + clickedBorderSize + "px #ffffff");
+
+    nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize + "px " + nonClickedBorderSize + "px #dddd55," +
+      "inset -" + nonClickedBorderSize + "px -" + nonClickedBorderSize + "px #dddd55");
+  }
+
+
+  static writeToInfoPanel() {
+    var text1 = "&nbsp;";
+    var text2 = "&nbsp;";
+    var text3 = "&nbsp;";
+    var text4 = "&nbsp;";
+    if (global.highlightedKindom != null) {
+      text1 = global.highlightedKindom.name + " wealth: " + global.highlightedKindom.econ.wealth;
+      text2 = global.highlightedKindom.name + " industry: " + global.highlightedKindom.econ.industry;
+      text3 = global.highlightedKindom.name + " agriculture: " + global.highlightedKindom.econ.agriculture;
+      text4 = global.highlightedKindom.name + " population: " + global.highlightedKindom.econ.population;
+    }
+    else {
+      text1 = text2 = text3 = text4 = "&nbsp;"
+    }
+
+    $("#infoWealth").html(text1);
+    $("#infoIndustry").html(text2);
+    $("#infoAgriculture").html(text3);
+    $("#infoPopulation").html(text4);
   }
 
 }
@@ -323,9 +386,4 @@ export default class Layout {
 enum Orientation {
   Portrait,
   Landscape
-}
-
-interface NewMap {
-  map: JQuery;
-  cells: Cell[];
 }
