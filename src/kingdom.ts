@@ -72,14 +72,16 @@ export default class Kingdom {
 
   analizeNeighbours = function(inputCell: Cell) {
     var outputList: Cell[] = [];
-    var posRow = inputCell.id.indexOf("r");
-    var posCol = inputCell.id.indexOf("c");
-
-    var rowNum = Number(inputCell.id.slice(posRow + 1, posCol));
-    var colNum = Number(inputCell.id.slice(posCol + 1))
+    var rowNum = inputCell.pos.row;
+    var colNum = inputCell.pos.col;
 
     var checkedID: string;
     var targetCell: Cell;
+
+    var found = global.listOfCells.find(function(cell) {
+      return cell.pos.row === rowNum && cell.pos.col === colNum;
+    });
+    console.log(found);
 
     if (rowNum > 0) {
       checkedID = "r" + (rowNum - 1) + "c" + colNum;

@@ -10664,12 +10664,14 @@ class Kingdom {
         };
         this.analizeNeighbours = function (inputCell) {
             var outputList = [];
-            var posRow = inputCell.id.indexOf("r");
-            var posCol = inputCell.id.indexOf("c");
-            var rowNum = Number(inputCell.id.slice(posRow + 1, posCol));
-            var colNum = Number(inputCell.id.slice(posCol + 1));
+            var rowNum = inputCell.pos.row;
+            var colNum = inputCell.pos.col;
             var checkedID;
             var targetCell;
+            var found = _script__WEBPACK_IMPORTED_MODULE_0__["g"].listOfCells.find(function (cell) {
+                return cell.pos.row === rowNum && cell.pos.col === colNum;
+            });
+            console.log(found);
             if (rowNum > 0) {
                 checkedID = "r" + (rowNum - 1) + "c" + colNum;
                 targetCell = this.checkTargetCellOwner(checkedID, inputCell);
@@ -10852,32 +10854,36 @@ class Layout {
                 newCol.html("&nbsp;");
                 var newCell = _cell__WEBPACK_IMPORTED_MODULE_0__["default"].initCell({ row: i, col: j });
                 newCol.attr("type", _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"][newCell.type]);
-                var img = $(document.createElement("img"));
-                newCol.append(img);
-                img.addClass("cellImg");
-                img.css("height", this.mActualCellSize / 2 + "px");
-                img.css("width", this.mActualCellSize / 2 + "px");
-                img.css("top", this.mActualCellSize / 8 + "px");
-                img.css("left", this.mActualCellSize / 8 + "px");
-                switch (newCell.type) {
-                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Farm:
-                        img.attr("src", "img/farm.svg");
-                        break;
-                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Settlement:
-                        img.attr("src", "img/settlement.svg");
-                        break;
-                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Forest:
-                        img.attr("src", "img/forest.svg");
-                        break;
-                    case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Mountain:
-                        img.attr("src", "img/mountain.svg");
-                        break;
-                    default:
-                }
                 newListOfCells.push(newCell);
+                this.showCellIcon(newCol, newCell.type);
             }
         }
         return { map: table, cells: newListOfCells };
+    }
+    showCellIcon(cell, type) {
+        var img = $(document.createElement("img"));
+        cell.append(img);
+        img.addClass("cellImg");
+        img.css("height", this.mActualCellSize / 2 + "px");
+        img.css("width", this.mActualCellSize / 2 + "px");
+        img.css("top", this.mActualCellSize / 8 + "px");
+        img.css("left", this.mActualCellSize / 8 + "px");
+        switch (type) {
+            case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Farm:
+                img.attr("src", "img/farm.svg");
+                break;
+            case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Settlement:
+                img.attr("src", "img/settlement.svg");
+                break;
+            case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Forest:
+                img.attr("src", "img/forest.svg");
+                break;
+            case _cell__WEBPACK_IMPORTED_MODULE_0__["LandType"].Mountain:
+                img.attr("src", "img/mountain.svg");
+                break;
+            default:
+            //TODO: create Unknown cell-type svg.
+        }
     }
     updateMap(map) {
         map.forEach(function (cell) {
