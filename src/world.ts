@@ -1,6 +1,7 @@
 import Cell from './cell';
 import Kingdom from './kingdom'
 import { g as global } from './script';
+import * as seedrandom from 'seedrandom';
 
 export default class World {
 
@@ -14,22 +15,21 @@ export default class World {
     this.numRows = dim.rows;
     this.numCols = dim.cols;
 
-    this.initMap();
-
-    if (this.numRows * this.numCols > 0) {
-      this.initKingdoms();
-      console.log(this);
+    if (this.numRows * this.numCols < 1) {
+      console.error("Number of cells less than 1. Increase row or column number!");
     }
 
+    this.initMap();
+    this.initKingdoms();
   }
 
   initKingdoms(): void {
-    let unclaimed = new Kingdom(global.kingdomNames[0], "#7777cc", [], this);
+    let unclaimed = new Kingdom(global.kingdomNames[0], "#7777cc", [], false, this);
     World.listOfCells.forEach(function(cell: Cell) { unclaimed.claimTerritory(cell); });
 
-    let redKingdom = new Kingdom(global.kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], this);
-    let blueKingdom = new Kingdom(global.kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], this);
-    let greenKingdom = new Kingdom(global.kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], this);
+    let redKingdom = new Kingdom(global.kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
+    let blueKingdom = new Kingdom(global.kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
+    let greenKingdom = new Kingdom(global.kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
 
     World.listOfKingdoms = [unclaimed, redKingdom, blueKingdom, greenKingdom];
     World.listOfKingdoms.forEach(function(kingdom: Kingdom) { kingdom.init(); });
@@ -44,6 +44,13 @@ export default class World {
         World.map[i][j] = newCell;
       }
     }
+  }
+
+  static nextRound(): void {
+    var rng = seedrandom();
+
+    World.listOfCells.forEach(function(cell) { cell.nextRound(); });
+    World.listOfKingdoms.forEach(function(kingdom) { kingdom.nextRound(rng()); });
   }
 
 }

@@ -2,19 +2,22 @@ import Cell from './cell';
 import World from './world';
 
 export default class Kingdom {
+
   name: string;
   color: string;
   cells: Cell[] = [];
   world: World;
   highlighted: boolean;
+  active: boolean;
   econ: Economy;
   income: Income;
 
-  constructor(name: string, color: string, cellIDs: string[], world: World) {
+  constructor(name: string, color: string, cellIDs: string[], active: boolean, world: World) {
     this.name = name;
     this.color = color;
     this.cells = [];
     this.world = world;
+    this.active = active;
     this.highlighted = false;
 
     this.econ = {
@@ -39,7 +42,18 @@ export default class Kingdom {
     }, this);
   }
 
-  updateCellsList = function(this: Kingdom): void {
+  nextRound(random: number): void {
+    if (this.active) {
+      var attackList = this.findNeighbourCells();
+      var target = Math.floor(random * attackList.length);
+
+      this.claimTerritory(attackList[target]);
+    }
+    this.calculateEconomy();
+  }
+
+
+  updateCellsList(this: Kingdom): void {
     this.cells = World.listOfCells.filter(cell => cell.owner.name === this.name);
   }
 
@@ -49,7 +63,7 @@ export default class Kingdom {
     }, this);
   }
 
-  claimTerritory = function(this: Kingdom, claimedCell: Cell): void {
+  claimTerritory(this: Kingdom, claimedCell: Cell): void {
     if (!this.cells.includes(claimedCell)) {
       if (claimedCell.owner != undefined) {
         claimedCell.owner.loseTerritory(claimedCell);
@@ -59,12 +73,12 @@ export default class Kingdom {
     }
   }
 
-  loseTerritory = function(this: Kingdom, cell: Cell): void {
+  loseTerritory(this: Kingdom, cell: Cell): void {
     this.cells.splice(this.cells.indexOf(cell), 1);
     cell.owner = World.listOfKingdoms[0]; // unclaimed
   }
 
-  findNeighbourCells = function(this: Kingdom): Cell[] {
+  findNeighbourCells(this: Kingdom): Cell[] {
     var neighbours: Cell[] = [];
 
     this.cells.forEach(function(this: Kingdom, cell: Cell) {
@@ -73,7 +87,7 @@ export default class Kingdom {
     return neighbours;
   }
 
-  analizeNeighbours = function(this: Kingdom, inputCell: Cell): Cell[] {
+  analizeNeighbours(this: Kingdom, inputCell: Cell): Cell[] {
     var outputList: Cell[] = [];
     var rowNum = inputCell.pos.row;
     var colNum = inputCell.pos.col;
@@ -97,13 +111,13 @@ export default class Kingdom {
     return outputList.filter(cell => cell.owner != this);
   }
 
-  init = function(this: Kingdom): void {
+  init(this: Kingdom): void {
     this.updateCellsList();
     this.setTerritoryStatus();
     this.calculateEconomy();
   }
 
-  calculateEconomy = function(this: Kingdom): void {
+  calculateEconomy(this: Kingdom): void {
     Object.keys(this.econ).forEach(i => this.econ[i] = 0);
 
     this.cells.forEach(function(this: Kingdom, currentCell: Cell) {

@@ -96,30 +96,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _global__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_3__);
-
 
 
 
 var g = new _global__WEBPACK_IMPORTED_MODULE_0__["default"];
-var layout = new _layout__WEBPACK_IMPORTED_MODULE_2__["default"];
 $(document).ready(function () {
     // Initializations
     setConsts();
     new _world__WEBPACK_IMPORTED_MODULE_1__["default"]({ cols: g.sceneCols, rows: g.sceneRows });
-    layout.initLayout();
+    _layout__WEBPACK_IMPORTED_MODULE_2__["default"].initLayout();
     // Event Listeners
     $(window).resize(function () {
         if (g.resizeTimeout != null)
             clearTimeout(g.resizeTimeout);
         g.resizeTimeout = setTimeout(function () {
-            layout.rethinkPanels();
+            _layout__WEBPACK_IMPORTED_MODULE_2__["default"].rethinkPanels();
             g.resizeTimeout = null;
         }, 200);
     });
-    $(".cell").click(layout.clicked);
-    $("#mapDiv")[0].addEventListener("wheel", layout.zoom.bind(layout));
+    $(".cell").click(_layout__WEBPACK_IMPORTED_MODULE_2__["default"].clicked);
+    $("#mapDiv")[0].addEventListener("wheel", _layout__WEBPACK_IMPORTED_MODULE_2__["default"].zoom.bind(_layout__WEBPACK_IMPORTED_MODULE_2__["default"]));
     //setTimeout(test,500);
 });
 function setConsts() {
@@ -149,18 +145,10 @@ function runGame() {
     }
 }
 function nextRound() {
-    var rng = seedrandom__WEBPACK_IMPORTED_MODULE_3__();
-    _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells.forEach(function (cell) { cell.tick(); });
-    for (var i = 1; i < _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms.length; i++) {
-        var attackList = _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[i].findNeighbourCells();
-        var target = Math.floor(rng() * attackList.length);
-        _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[i].claimTerritory(attackList[target]);
-        _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[i].calculateEconomy();
-    }
-    _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[0].calculateEconomy();
+    _world__WEBPACK_IMPORTED_MODULE_1__["default"].nextRound();
     _layout__WEBPACK_IMPORTED_MODULE_2__["default"].writeToInfoPanel();
     _layout__WEBPACK_IMPORTED_MODULE_2__["default"].setHighlightedCells();
-    layout.updateMap(_world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells);
+    _layout__WEBPACK_IMPORTED_MODULE_2__["default"].updateMap(_world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells);
     if (g.showPopulation) { // TODO: Temporary solution
         _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells.forEach(function (cell) {
             $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population)));
@@ -10565,6 +10553,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
 /* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(0);
+/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -10572,18 +10563,18 @@ class World {
     constructor(dim) {
         this.numRows = dim.rows;
         this.numCols = dim.cols;
-        this.initMap();
-        if (this.numRows * this.numCols > 0) {
-            this.initKingdoms();
-            console.log(this);
+        if (this.numRows * this.numCols < 1) {
+            console.error("Number of cells less than 1. Increase row or column number!");
         }
+        this.initMap();
+        this.initKingdoms();
     }
     initKingdoms() {
-        let unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[0], "#7777cc", [], this);
+        let unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[0], "#7777cc", [], false, this);
         World.listOfCells.forEach(function (cell) { unclaimed.claimTerritory(cell); });
-        let redKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], this);
-        let blueKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], this);
-        let greenKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], this);
+        let redKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
+        let blueKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
+        let greenKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
         World.listOfKingdoms = [unclaimed, redKingdom, blueKingdom, greenKingdom];
         World.listOfKingdoms.forEach(function (kingdom) { kingdom.init(); });
     }
@@ -10596,6 +10587,11 @@ class World {
                 World.map[i][j] = newCell;
             }
         }
+    }
+    static nextRound() {
+        var rng = seedrandom__WEBPACK_IMPORTED_MODULE_3__();
+        World.listOfCells.forEach(function (cell) { cell.nextRound(); });
+        World.listOfKingdoms.forEach(function (kingdom) { kingdom.nextRound(rng()); });
     }
 }
 World.map = [[]];
@@ -10618,27 +10614,6 @@ __webpack_require__.r(__webpack_exports__);
 
 class Cell {
     constructor(coordinates, type) {
-        this.updateCell = function () {
-            var populationPower = this.population; // TODO: Get a function with diminishing return;
-            var excessFood = this.agriculture - this.population;
-            this.moneyEfficiency = this.baseEfficiency.money * populationPower;
-            this.industryEfficiency = this.baseEfficiency.goods * populationPower;
-            this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
-            this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
-            this.population += this.populationGrowth;
-        };
-        this.generateOutput = function () {
-            this.output.money = this.wealth * this.moneyEfficiency;
-            this.output.goods = this.industry * this.industryEfficiency;
-            this.output.food = this.agriculture * this.agricultureEfficiency;
-            return this.output;
-        };
-        this.tick = function () {
-            this.updateCell();
-            Object.keys(this.output).map(function (i) {
-                this.owner.income[i] += this.generateOutput()[i];
-            }, this);
-        };
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
         this.type = type;
@@ -10692,6 +10667,27 @@ class Cell {
         var numberOfLandTypes = Object.keys(LandType).length / 2;
         var type = Math.floor(rng() * numberOfLandTypes);
         return new Cell(coordinates, type);
+    }
+    updateCell() {
+        var populationPower = this.population; // TODO: Get a function with diminishing return;
+        var excessFood = this.agriculture - this.population;
+        this.moneyEfficiency = this.baseEfficiency.money * populationPower;
+        this.industryEfficiency = this.baseEfficiency.goods * populationPower;
+        this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
+        this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
+        this.population += this.populationGrowth;
+    }
+    generateOutput() {
+        this.output.money = this.wealth * this.moneyEfficiency;
+        this.output.goods = this.industry * this.industryEfficiency;
+        this.output.food = this.agriculture * this.agricultureEfficiency;
+        return this.output;
+    }
+    nextRound() {
+        this.updateCell();
+        Object.keys(this.output).map(function (i) {
+            this.owner.income[i] += this.generateOutput()[i];
+        }, this);
     }
 }
 var LandType;
@@ -11763,72 +11759,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 
 class Kingdom {
-    constructor(name, color, cellIDs, world) {
+    constructor(name, color, cellIDs, active, world) {
         this.cells = [];
-        this.updateCellsList = function () {
-            this.cells = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.filter(cell => cell.owner.name === this.name);
-        };
         this.setTerritoryStatus = function () {
             this.cells.forEach(function (cell) {
                 cell.owner = this;
-            }, this);
-        };
-        this.claimTerritory = function (claimedCell) {
-            if (!this.cells.includes(claimedCell)) {
-                if (claimedCell.owner != undefined) {
-                    claimedCell.owner.loseTerritory(claimedCell);
-                }
-                this.cells.push(claimedCell);
-                this.setTerritoryStatus();
-            }
-        };
-        this.loseTerritory = function (cell) {
-            this.cells.splice(this.cells.indexOf(cell), 1);
-            cell.owner = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[0]; // unclaimed
-        };
-        this.findNeighbourCells = function () {
-            var neighbours = [];
-            this.cells.forEach(function (cell) {
-                neighbours = neighbours.concat(this.analizeNeighbours(cell));
-            }, this);
-            return neighbours;
-        };
-        this.analizeNeighbours = function (inputCell) {
-            var outputList = [];
-            var rowNum = inputCell.pos.row;
-            var colNum = inputCell.pos.col;
-            if (rowNum > 0) {
-                outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum - 1][colNum]);
-            }
-            if (rowNum < this.world.numRows - 1) {
-                outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum + 1][colNum]);
-            }
-            if (colNum > 0) {
-                outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum][colNum - 1]);
-            }
-            if (colNum < this.world.numCols - 1) {
-                outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum][colNum + 1]);
-            }
-            return outputList.filter(cell => cell.owner != this);
-        };
-        this.init = function () {
-            this.updateCellsList();
-            this.setTerritoryStatus();
-            this.calculateEconomy();
-        };
-        this.calculateEconomy = function () {
-            Object.keys(this.econ).forEach(i => this.econ[i] = 0);
-            this.cells.forEach(function (currentCell) {
-                this.econ.wealth += currentCell.wealth;
-                this.econ.industry += currentCell.industry;
-                this.econ.agriculture += currentCell.agriculture;
-                this.econ.population += currentCell.population;
             }, this);
         };
         this.name = name;
         this.color = color;
         this.cells = [];
         this.world = world;
+        this.active = active;
         this.highlighted = false;
         this.econ = {
             wealth: 0,
@@ -11846,6 +11788,69 @@ class Kingdom {
                 return cell.id === cellId;
             });
             this.claimTerritory(currentCell);
+        }, this);
+    }
+    nextRound(random) {
+        if (this.active) {
+            var attackList = this.findNeighbourCells();
+            var target = Math.floor(random * attackList.length);
+            this.claimTerritory(attackList[target]);
+        }
+        this.calculateEconomy();
+    }
+    updateCellsList() {
+        this.cells = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.filter(cell => cell.owner.name === this.name);
+    }
+    claimTerritory(claimedCell) {
+        if (!this.cells.includes(claimedCell)) {
+            if (claimedCell.owner != undefined) {
+                claimedCell.owner.loseTerritory(claimedCell);
+            }
+            this.cells.push(claimedCell);
+            this.setTerritoryStatus();
+        }
+    }
+    loseTerritory(cell) {
+        this.cells.splice(this.cells.indexOf(cell), 1);
+        cell.owner = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[0]; // unclaimed
+    }
+    findNeighbourCells() {
+        var neighbours = [];
+        this.cells.forEach(function (cell) {
+            neighbours = neighbours.concat(this.analizeNeighbours(cell));
+        }, this);
+        return neighbours;
+    }
+    analizeNeighbours(inputCell) {
+        var outputList = [];
+        var rowNum = inputCell.pos.row;
+        var colNum = inputCell.pos.col;
+        if (rowNum > 0) {
+            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum - 1][colNum]);
+        }
+        if (rowNum < this.world.numRows - 1) {
+            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum + 1][colNum]);
+        }
+        if (colNum > 0) {
+            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum][colNum - 1]);
+        }
+        if (colNum < this.world.numCols - 1) {
+            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum][colNum + 1]);
+        }
+        return outputList.filter(cell => cell.owner != this);
+    }
+    init() {
+        this.updateCellsList();
+        this.setTerritoryStatus();
+        this.calculateEconomy();
+    }
+    calculateEconomy() {
+        Object.keys(this.econ).forEach(i => this.econ[i] = 0);
+        this.cells.forEach(function (currentCell) {
+            this.econ.wealth += currentCell.wealth;
+            this.econ.industry += currentCell.industry;
+            this.econ.agriculture += currentCell.agriculture;
+            this.econ.population += currentCell.population;
         }, this);
     }
 }
@@ -11868,7 +11873,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Layout {
-    initLayout() {
+    static initLayout() {
         Layout.wWidth = $(window).width();
         Layout.wHeight = $(window).height();
         this.drawLayout();
@@ -11886,7 +11891,7 @@ class Layout {
         this.addInfoPanel();
         this.updateMap(_world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells);
     }
-    drawLayout() {
+    static drawLayout() {
         var mapDiv = $(document.createElement('div'));
         var dashDiv = $(document.createElement('div'));
         $("body").append(mapDiv);
@@ -11896,12 +11901,12 @@ class Layout {
         $("#mapDiv").css("overflow-x", "scroll");
         $("#mapDiv").css("overflow-y", "scroll");
     }
-    addButton(buttonFunction, buttonText) {
+    static addButton(buttonFunction, buttonText) {
         var button = $("<button>").text(buttonText);
         button.click((evt) => buttonFunction(evt));
         $("#dashDiv").append(button);
     }
-    addInfoPanel() {
+    static addInfoPanel() {
         var infoPanel = $(document.createElement('div'));
         $("#dashDiv").append(infoPanel);
         infoPanel.attr("id", "infoPanel");
@@ -11922,7 +11927,7 @@ class Layout {
         infoPopulation.attr("id", "infoPopulation");
         infoPanel.append(infoPopulation);
     }
-    createMap(width, height) {
+    static createMap(width, height) {
         var table = $(document.createElement('table'));
         table.attr("id", "map");
         var tbody = $(document.createElement('tbody'));
@@ -11946,7 +11951,7 @@ class Layout {
         }
         return table;
     }
-    showCellIcon(cell, type) {
+    static showCellIcon(cell, type) {
         var img = $(document.createElement("img"));
         cell.append(img);
         img.addClass("cellImg");
@@ -11971,13 +11976,13 @@ class Layout {
             //TODO: create Unknown cell-type svg.
         }
     }
-    updateMap(map) {
+    static updateMap(map) {
         map.forEach(function (cell) {
             $("#" + cell.id).attr("status", cell.owner.name);
             $("#" + cell.id).css("background-color", cell.owner.color);
         });
     }
-    rethinkPanels() {
+    static rethinkPanels() {
         Layout.wWidth = $(window).width();
         Layout.wHeight = $(window).height();
         this.decideWindowOrientation();
@@ -11986,7 +11991,7 @@ class Layout {
         this.calcCellSize();
         this.updateLayout();
     }
-    decideWindowOrientation() {
+    static decideWindowOrientation() {
         Layout.wOrientation = (Layout.wWidth > Layout.wHeight ?
             Orientation.Landscape : Orientation.Portrait);
         if (Layout.wOrientation === Orientation.Portrait) {
@@ -11998,7 +12003,7 @@ class Layout {
             Layout.wLong = Layout.wWidth;
         }
     }
-    calcDashboardSize() {
+    static calcDashboardSize() {
         if (Layout.wLong < Layout.minThickness * Layout.minDashboardThickessRatio) {
             Layout.dLength = 0;
             Layout.dThickness = 0;
@@ -12012,7 +12017,7 @@ class Layout {
             Layout.dDisabled = false;
         }
     }
-    calcMapSize() {
+    static calcMapSize() {
         Layout.mWidth = Layout.wWidth;
         Layout.mHeight = Layout.wHeight;
         if (Layout.wOrientation == Orientation.Landscape) {
@@ -12022,17 +12027,17 @@ class Layout {
             Layout.mHeight -= Layout.dThickness;
         }
     }
-    calcCellNum() {
+    static calcCellNum() {
         Layout.mUpscaled = this.upscaleCells();
         if (Layout.mUpscaled)
             return;
         Layout.mDownscaled = this.makeCellsFit();
     }
-    calcCellSize() {
+    static calcCellSize() {
         this.calcCellNum();
         this.resizeCells();
     }
-    updateLayout() {
+    static updateLayout() {
         $("#mapDiv").css("width", Layout.mWidth + "px");
         $("#mapDiv").css("height", Layout.mHeight + "px");
         $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
@@ -12049,7 +12054,7 @@ class Layout {
             $("#dashDiv").css("left", "0px");
         }
     }
-    upscaleCells() {
+    static upscaleCells() {
         var verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
         if (Layout.mWidth < verticalMapSize)
             return false;
@@ -12062,7 +12067,7 @@ class Layout {
         Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
         return true;
     }
-    makeCellsFit() {
+    static makeCellsFit() {
         var minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
         if (Layout.mWidth >= minMapSize && Layout.mHeight >= minMapSize)
             return false;
@@ -12072,7 +12077,7 @@ class Layout {
         Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
         return true;
     }
-    resizeCells() {
+    static resizeCells() {
         Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
         Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
         $(".cell").css("height", Layout.mActualCellSize + "px");
@@ -12085,7 +12090,7 @@ class Layout {
         $(".cellImg").css("top", Layout.mActualCellSize / 8 + "px");
         $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
     }
-    zoom(event) {
+    static zoom(event) {
         if (event.ctrlKey === true) {
             event.preventDefault();
             if (event.deltaY < 0) {
@@ -12094,12 +12099,12 @@ class Layout {
             else {
                 Layout.mActualCellSize -= Layout.stepCellSize;
             }
-            this.resizeCells();
+            Layout.resizeCells();
             $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
             $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
         }
     }
-    clicked() {
+    static clicked() {
         var clickedCellKingdom = _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_0__["g"].kingdomNames.indexOf($(this).attr("status"))];
         for (var i = 0; i < _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms.length; i++) {
             _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[i].highlighted = false;

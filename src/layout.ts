@@ -36,7 +36,7 @@ export default class Layout {
   static readonly maxThickness = 400;   // px      // Dashboard thickness maximum
   static readonly minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 
-  initLayout(): void {
+  static initLayout(): void {
 
     Layout.wWidth = $(window).width();
     Layout.wHeight = $(window).height();
@@ -61,7 +61,7 @@ export default class Layout {
     this.updateMap(World.listOfCells);
   }
 
-  drawLayout(): void {
+  static drawLayout(): void {
     var mapDiv = $(document.createElement('div'));
     var dashDiv = $(document.createElement('div'));
 
@@ -75,13 +75,13 @@ export default class Layout {
     $("#mapDiv").css("overflow-y", "scroll");
   }
 
-  addButton(buttonFunction: Function, buttonText: string): void {
+  static addButton(buttonFunction: Function, buttonText: string): void {
     var button = $("<button>").text(buttonText);
     button.click((evt) => buttonFunction(evt));
     $("#dashDiv").append(button);
   }
 
-  addInfoPanel(): void {
+  static addInfoPanel(): void {
     var infoPanel = $(document.createElement('div'));
     $("#dashDiv").append(infoPanel);
     infoPanel.attr("id", "infoPanel");
@@ -107,7 +107,7 @@ export default class Layout {
     infoPanel.append(infoPopulation);
   }
 
-  createMap(width: number, height: number): JQuery {
+  static createMap(width: number, height: number): JQuery {
     var table = $(document.createElement('table'));
     table.attr("id", "map");
     var tbody = $(document.createElement('tbody'));
@@ -136,7 +136,7 @@ export default class Layout {
     return table;
   }
 
-  showCellIcon(cell: JQuery, type: LandType): void {
+  static showCellIcon(cell: JQuery, type: LandType): void {
     var img = $(document.createElement("img"));
     cell.append(img);
 
@@ -164,14 +164,14 @@ export default class Layout {
     }
   }
 
-  updateMap(map: Cell[]): void {
+  static updateMap(map: Cell[]): void {
     map.forEach(function(cell) {
       $("#" + cell.id).attr("status", cell.owner.name);
       $("#" + cell.id).css("background-color", cell.owner.color);
     });
   }
 
-  rethinkPanels(): void {
+  static rethinkPanels(): void {
     Layout.wWidth = $(window).width();
     Layout.wHeight = $(window).height();
 
@@ -182,7 +182,7 @@ export default class Layout {
     this.updateLayout();
   }
 
-  decideWindowOrientation(): void {
+  static decideWindowOrientation(): void {
     Layout.wOrientation = (Layout.wWidth > Layout.wHeight ?
       Orientation.Landscape : Orientation.Portrait);
     if (Layout.wOrientation === Orientation.Portrait) {
@@ -195,7 +195,7 @@ export default class Layout {
     }
   }
 
-  calcDashboardSize(): void {
+  static calcDashboardSize(): void {
     if (Layout.wLong < Layout.minThickness * Layout.minDashboardThickessRatio) {
       Layout.dLength = 0;
       Layout.dThickness = 0;
@@ -210,7 +210,7 @@ export default class Layout {
     }
   }
 
-  calcMapSize(): void {
+  static calcMapSize(): void {
     Layout.mWidth = Layout.wWidth;
     Layout.mHeight = Layout.wHeight;
 
@@ -222,19 +222,19 @@ export default class Layout {
     }
   }
 
-  calcCellNum(): void {
+  static calcCellNum(): void {
     Layout.mUpscaled = this.upscaleCells();
     if (Layout.mUpscaled) return;
 
     Layout.mDownscaled = this.makeCellsFit();
   }
 
-  calcCellSize(): void {
+  static calcCellSize(): void {
     this.calcCellNum();
     this.resizeCells();
   }
 
-  updateLayout(): void {
+  static updateLayout(): void {
     $("#mapDiv").css("width", Layout.mWidth + "px");
     $("#mapDiv").css("height", Layout.mHeight + "px");
     $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
@@ -255,7 +255,7 @@ export default class Layout {
     }
   }
 
-  upscaleCells(): boolean {
+  static upscaleCells(): boolean {
     var verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
     if (Layout.mWidth < verticalMapSize) return false;
 
@@ -270,7 +270,7 @@ export default class Layout {
     return true;
   }
 
-  makeCellsFit(): boolean {
+  static makeCellsFit(): boolean {
     var minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
     if (Layout.mWidth >= minMapSize && Layout.mHeight >= minMapSize) return false;
 
@@ -282,7 +282,7 @@ export default class Layout {
     return true;
   }
 
-  resizeCells(): void {
+  static resizeCells(): void {
     Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
     Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
 
@@ -299,7 +299,7 @@ export default class Layout {
     $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
   }
 
-  zoom(event: MouseWheelEvent): void {
+  static zoom(event: MouseWheelEvent): void {
     if (event.ctrlKey === true) {
       event.preventDefault();
 
@@ -310,14 +310,14 @@ export default class Layout {
         Layout.mActualCellSize -= Layout.stepCellSize;
       }
 
-      this.resizeCells();
+      Layout.resizeCells();
       $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
       $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
     }
   }
 
 
-  clicked(): void {
+  static clicked(): void {
     var clickedCellKingdom = World.listOfKingdoms[global.kingdomNames.indexOf($(this).attr("status"))];
 
     for (var i = 0; i < World.listOfKingdoms.length; i++) {

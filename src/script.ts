@@ -1,29 +1,26 @@
 import Globals from './global';
 import World from './world';
 import Layout from './layout';
-import * as seedrandom from 'seedrandom';
 export var g = new Globals;
-
-var layout = new Layout;
 
 $(document).ready(function() {
 
   // Initializations
   setConsts();
   new World({ cols: g.sceneCols, rows: g.sceneRows });
-  layout.initLayout();
+  Layout.initLayout();
 
   // Event Listeners
   $(window).resize(function() {
     if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
     g.resizeTimeout = setTimeout(function() {
-      layout.rethinkPanels();
+      Layout.rethinkPanels();
       g.resizeTimeout = null;
     }, 200);
   });
 
-  $(".cell").click(layout.clicked);
-  $("#mapDiv")[0].addEventListener("wheel", layout.zoom.bind(layout));
+  $(".cell").click(Layout.clicked);
+  $("#mapDiv")[0].addEventListener("wheel", Layout.zoom.bind(Layout));
 
   //setTimeout(test,500);
 });
@@ -62,23 +59,12 @@ export function runGame(): void {
 }
 
 function nextRound(): void {
-  var rng = seedrandom();
-  World.listOfCells.forEach(function(cell) { cell.tick(); });
-
-  for (var i = 1; i < World.listOfKingdoms.length; i++) {
-    var attackList = World.listOfKingdoms[i].findNeighbourCells();
-    var target = Math.floor(rng() * attackList.length);
-
-    World.listOfKingdoms[i].claimTerritory(attackList[target]);
-    World.listOfKingdoms[i].calculateEconomy();
-  }
-
-  World.listOfKingdoms[0].calculateEconomy();
+  World.nextRound();
 
   Layout.writeToInfoPanel();
   Layout.setHighlightedCells();
 
-  layout.updateMap(World.listOfCells);
+  Layout.updateMap(World.listOfCells);
 
   if (g.showPopulation) {  // TODO: Temporary solution
     World.listOfCells.forEach(function(cell) {

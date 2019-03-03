@@ -84,7 +84,7 @@ export default class Cell {
     return new Cell(coordinates, type);
   }
 
-  updateCell = function(this: Cell): void {
+  updateCell(this: Cell): void {
     var populationPower = this.population; // TODO: Get a function with diminishing return;
     var excessFood = this.agriculture - this.population;
 
@@ -97,7 +97,7 @@ export default class Cell {
 
   }
 
-  generateOutput = function(this: Cell): Output {
+  generateOutput(this: Cell): Output {
     this.output.money = this.wealth * this.moneyEfficiency;
     this.output.goods = this.industry * this.industryEfficiency;
     this.output.food = this.agriculture * this.agricultureEfficiency;
@@ -105,7 +105,7 @@ export default class Cell {
     return this.output;
   }
 
-  tick = function(this: Cell): void {
+  nextRound(this: Cell): void {
     this.updateCell();
 
     Object.keys(this.output).map(function(this: Cell, i) {
