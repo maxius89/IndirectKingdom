@@ -10607,9 +10607,9 @@ World.listOfKingdoms = [];
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LandType", function() { return LandType; });
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_1__);
 
 
 class Cell {
@@ -10663,7 +10663,7 @@ class Cell {
         }
     }
     static initCell(coordinates) {
-        var rng = seedrandom__WEBPACK_IMPORTED_MODULE_0__(_script__WEBPACK_IMPORTED_MODULE_1__["g"].randomSeed + coordinates.row + coordinates.col);
+        var rng = seedrandom__WEBPACK_IMPORTED_MODULE_1__(_script__WEBPACK_IMPORTED_MODULE_0__["g"].randomSeed + coordinates.row + coordinates.col);
         var numberOfLandTypes = Object.keys(LandType).length / 2;
         var type = Math.floor(rng() * numberOfLandTypes);
         return new Cell(coordinates, type);
@@ -11865,9 +11865,9 @@ class Kingdom {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Layout; });
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
+/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(0);
 
 
 
@@ -11886,10 +11886,10 @@ class Layout {
         $("#mapDiv").css("left", "0px");
         $("#dashDiv").css("position", "absolute");
         this.rethinkPanels();
-        this.addButton(_script__WEBPACK_IMPORTED_MODULE_0__["runGame"], 'Start / Stop');
-        this.addButton(_script__WEBPACK_IMPORTED_MODULE_0__["showPopulation"], 'Show Population');
+        this.addButton(_script__WEBPACK_IMPORTED_MODULE_2__["runGame"], 'Start / Stop');
+        this.addButton(_script__WEBPACK_IMPORTED_MODULE_2__["showPopulation"], 'Show Population');
         this.addInfoPanel();
-        this.updateMap(_world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells);
+        this.updateMap(_world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells);
     }
     static drawLayout() {
         var mapDiv = $(document.createElement('div'));
@@ -11944,8 +11944,8 @@ class Layout {
                 newCol.attr("highlighted", "false");
                 newCol.attr("type", "none");
                 newCol.html("&nbsp;");
-                var cellType = _world__WEBPACK_IMPORTED_MODULE_1__["default"].map[i][j].type;
-                newCol.attr("type", _cell__WEBPACK_IMPORTED_MODULE_2__["LandType"][cellType]);
+                var cellType = _world__WEBPACK_IMPORTED_MODULE_0__["default"].map[i][j].type;
+                newCol.attr("type", _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"][cellType]);
                 this.showCellIcon(newCol, cellType);
             }
         }
@@ -11960,16 +11960,16 @@ class Layout {
         img.css("top", Layout.mActualCellSize / 8 + "px");
         img.css("left", Layout.mActualCellSize / 8 + "px");
         switch (type) {
-            case _cell__WEBPACK_IMPORTED_MODULE_2__["LandType"].Farm:
+            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Farm:
                 img.attr("src", "img/farm.svg");
                 break;
-            case _cell__WEBPACK_IMPORTED_MODULE_2__["LandType"].Settlement:
+            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Settlement:
                 img.attr("src", "img/settlement.svg");
                 break;
-            case _cell__WEBPACK_IMPORTED_MODULE_2__["LandType"].Forest:
+            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Forest:
                 img.attr("src", "img/forest.svg");
                 break;
-            case _cell__WEBPACK_IMPORTED_MODULE_2__["LandType"].Mountain:
+            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Mountain:
                 img.attr("src", "img/mountain.svg");
                 break;
             default:
@@ -12105,22 +12105,22 @@ class Layout {
         }
     }
     static clicked() {
-        var clickedCellKingdom = _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_0__["g"].kingdomNames.indexOf($(this).attr("status"))];
-        for (var i = 0; i < _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms.length; i++) {
-            _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[i].highlighted = false;
+        var clickedCellKingdom = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames.indexOf($(this).attr("status"))];
+        for (var i = 0; i < _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.length; i++) {
+            _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[i].highlighted = false;
         }
-        if (_script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom === clickedCellKingdom) {
-            _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom = null;
+        if (_script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom === clickedCellKingdom) {
+            _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom = null;
         }
         else {
-            _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_0__["g"].kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
-            _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom = clickedCellKingdom;
+            _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
+            _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom = clickedCellKingdom;
         }
         Layout.setHighlightedCells();
         Layout.writeToInfoPanel();
     }
     static setHighlightedCells() {
-        _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfKingdoms.forEach(function (kingdom) {
+        _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.forEach(function (kingdom) {
             $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
         });
         var clickedCells = $(".cell[highlighted = false]");
@@ -12137,11 +12137,11 @@ class Layout {
         var text2 = "&nbsp;";
         var text3 = "&nbsp;";
         var text4 = "&nbsp;";
-        if (_script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom != null) {
-            text1 = _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.name + " wealth: " + _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.econ.wealth;
-            text2 = _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.name + " industry: " + _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.econ.industry;
-            text3 = _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.name + " agriculture: " + _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.econ.agriculture;
-            text4 = _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.name + " population: " + _script__WEBPACK_IMPORTED_MODULE_0__["g"].highlightedKindom.econ.population;
+        if (_script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom != null) {
+            text1 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " wealth: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.wealth;
+            text2 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " industry: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.industry;
+            text3 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " agriculture: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.agriculture;
+            text4 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " population: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.population;
         }
         else {
             text1 = text2 = text3 = text4 = "&nbsp;";

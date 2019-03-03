@@ -1,7 +1,7 @@
-import { g as global } from './script';
 import Cell from './cell';
 import World from './world';
 import { LandType } from './cell';
+import { g as global } from './script';
 import { runGame, showPopulation } from './script';
 
 export default class Layout {
