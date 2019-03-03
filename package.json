@@ -1,0 +1,31 @@
+{
+  "name": "IndirectKingdom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxius89/IndirectKingdom.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maxius89/IndirectKingdom/issues"
+  },
+  "homepage": "https://github.com/maxius89/IndirectKingdom#readme",
+  "devDependencies": {
+    "@types/jquery": "^3.3.29",
+    "jquery": "^3.3.1",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.5"
+  },
+  "dependencies": {
+    "@types/seedrandom": "^2.4.27",
+    "seedrandom": "^2.4.4"
+  }
+}
