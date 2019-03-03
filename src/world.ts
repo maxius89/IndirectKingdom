@@ -10,9 +10,9 @@ export default class World {
   static listOfCells: Cell[] = [];
   static listOfKingdoms: Kingdom[] = [];
 
-  constructor(dim: number[]) {
-    this.numRows = dim[0];
-    this.numCols = dim[1];
+  constructor(dim: Dimension) {
+    this.numRows = dim.rows;
+    this.numCols = dim.cols;
 
     this.initMap();
 
@@ -24,15 +24,15 @@ export default class World {
   }
 
   initKingdoms(): void {
-    let redKingdom = new Kingdom(global.kingdomNames[0], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], this);
-    let blueKingdom = new Kingdom(global.kingdomNames[1], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], this);
-    let greenKingdom = new Kingdom(global.kingdomNames[2], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], this);
-    let unclaimed = new Kingdom(global.kingdomNames[3], "#7777cc", [], this);
-    unclaimed.updateCellsList();
+    let unclaimed = new Kingdom(global.kingdomNames[0], "#7777cc", [], this);
+    World.listOfCells.forEach(function(cell: Cell) { unclaimed.claimTerritory(cell); });
 
-    World.listOfKingdoms = [redKingdom, blueKingdom, greenKingdom, unclaimed];
+    let redKingdom = new Kingdom(global.kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], this);
+    let blueKingdom = new Kingdom(global.kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], this);
+    let greenKingdom = new Kingdom(global.kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], this);
 
-    //layout.updateMap(g.listOfCells);
+    World.listOfKingdoms = [unclaimed, redKingdom, blueKingdom, greenKingdom];
+    World.listOfKingdoms.forEach(function(kingdom: Kingdom) { kingdom.init(); });
   }
 
   initMap(): void {
@@ -46,5 +46,9 @@ export default class World {
     }
   }
 
+}
 
+interface Dimension {
+  rows: number;
+  cols: number;
 }

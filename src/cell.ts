@@ -1,13 +1,12 @@
 import * as seedrandom from 'seedrandom';
 import Kingdom from './kingdom';
-import World from './world';
 import { g as global } from './script';
 
 export default class Cell {
 
   id: string;
   owner: Kingdom;
-  output: any;
+  output: Output;
   type: LandType;
   pos: CellCoordinates;
 
@@ -23,10 +22,9 @@ export default class Cell {
 
   baseEfficiency: BaseEfficiency;
 
-  constructor(coordinates: CellCoordinates, type: LandType, owner: Kingdom) {
+  constructor(coordinates: CellCoordinates, type: LandType) {
     this.pos = coordinates;
     this.id = "r" + coordinates.row + "c" + coordinates.col;
-    this.owner = owner;
     this.type = type;
 
     this.output = {    // Object for cell output per turn
@@ -79,22 +77,14 @@ export default class Cell {
   }
 
   static initCell(coordinates: CellCoordinates): Cell {
-    var newRnd = seedrandom(global.randomSeed + coordinates.row + coordinates.col);
+    var rng = seedrandom(global.randomSeed + coordinates.row + coordinates.col);
     var numberOfLandTypes = Object.keys(LandType).length / 2;
-    var type: LandType = Math.floor(newRnd() * numberOfLandTypes);
+    var type: LandType = Math.floor(rng() * numberOfLandTypes);
 
-    var tempWorld = new World([0, 0]);
-    var unclaimedOwner = new Kingdom("unclaimed", "#7777cc", [], tempWorld);
-    let newCell = new Cell(coordinates, type, unclaimedOwner); // TODO: Remove unclaimedOwner dependency
-
-    return newCell;
+    return new Cell(coordinates, type);
   }
 
-  clearPreviousOwnership = function(this: Cell): void {
-    this.owner.loseTerritory(this);
-  }
-
-  updateCell = function(this: Cell) {
+  updateCell = function(this: Cell): void {
     var populationPower = this.population; // TODO: Get a function with diminishing return;
     var excessFood = this.agriculture - this.population;
 
@@ -107,7 +97,7 @@ export default class Cell {
 
   }
 
-  generateOutput = function(this: Cell) {
+  generateOutput = function(this: Cell): Output {
     this.output.money = this.wealth * this.moneyEfficiency;
     this.output.goods = this.industry * this.industryEfficiency;
     this.output.food = this.agriculture * this.agricultureEfficiency;
@@ -115,7 +105,7 @@ export default class Cell {
     return this.output;
   }
 
-  tick = function(this: Cell) {
+  tick = function(this: Cell): void {
     this.updateCell();
 
     Object.keys(this.output).map(function(this: Cell, i) {
@@ -132,14 +122,20 @@ export enum LandType {
   Mountain
 }
 
-export interface CellCoordinates {
-  row: number;
-  col: number;
-}
-
 interface BaseEfficiency {
   money: number;
   goods: number;
   food: number;
   people: number;
+}
+
+export interface CellCoordinates {
+  row: number;
+  col: number;
+}
+
+interface Output {
+  money: number;
+  goods: number;
+  food: number;
 }

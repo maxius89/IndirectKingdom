@@ -10,7 +10,7 @@ export default class Kingdom {
   econ: Economy;
   income: Income;
 
-  constructor(name: string, color: string, cells: string[], world: World) {
+  constructor(name: string, color: string, cellIDs: string[], world: World) {
     this.name = name;
     this.color = color;
     this.cells = [];
@@ -30,42 +30,41 @@ export default class Kingdom {
       food: 0
     };
 
-    cells.forEach(function(this: Kingdom, cell: string) {
-      var currentCell = World.listOfCells.find(function(element) {
-        return element.id === cell;
+    cellIDs.forEach(function(this: Kingdom, cellId: string) {
+      var currentCell = World.listOfCells.find(function(cell) {
+        return cell.id === cellId;
       });
 
-      this.cells.push(currentCell);
-      currentCell.owner = this;
+      this.claimTerritory(currentCell);
     }, this);
   }
 
-  updateCellsList = function(this: Kingdom) {
+  updateCellsList = function(this: Kingdom): void {
     this.cells = World.listOfCells.filter(cell => cell.owner.name === this.name);
-
-    this.setTerritoryStatus();
   }
 
-  setTerritoryStatus = function(this: Kingdom) {
+  setTerritoryStatus = function(this: Kingdom): void {
     this.cells.forEach(function(this: Kingdom, cell: Cell) {
       cell.owner = this;
     }, this);
   }
 
-  claimTerritory = function(this: Kingdom, inputCell: Cell) {
-    if (!this.cells.includes(inputCell)) {
-      inputCell.clearPreviousOwnership();
-      this.cells.push(inputCell);
+  claimTerritory = function(this: Kingdom, claimedCell: Cell): void {
+    if (!this.cells.includes(claimedCell)) {
+      if (claimedCell.owner != undefined) {
+        claimedCell.owner.loseTerritory(claimedCell);
+      }
+      this.cells.push(claimedCell);
       this.setTerritoryStatus();
     }
   }
 
-  loseTerritory = function(this: Kingdom, cell: Cell) {
+  loseTerritory = function(this: Kingdom, cell: Cell): void {
     this.cells.splice(this.cells.indexOf(cell), 1);
-    //cell.owner = listOfKingdoms[listOfKingdoms.length-1]; // unclaimed
+    cell.owner = World.listOfKingdoms[0]; // unclaimed
   }
 
-  findNeighbourCells = function(this: Kingdom) {
+  findNeighbourCells = function(this: Kingdom): Cell[] {
     var neighbours: Cell[] = [];
 
     this.cells.forEach(function(this: Kingdom, cell: Cell) {
@@ -74,73 +73,37 @@ export default class Kingdom {
     return neighbours;
   }
 
-  analizeNeighbours = function(this: Kingdom, inputCell: Cell) {
+  analizeNeighbours = function(this: Kingdom, inputCell: Cell): Cell[] {
     var outputList: Cell[] = [];
     var rowNum = inputCell.pos.row;
     var colNum = inputCell.pos.col;
 
-    var checkedID: string;
-    var targetCell: Cell;
-
     if (rowNum > 0) {
-      checkedID = "r" + (rowNum - 1) + "c" + colNum;
-
-      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
-      if (targetCell != null) {
-        outputList.push(targetCell);
-      }
+      outputList.push(World.map[rowNum - 1][colNum]);
     }
 
     if (rowNum < this.world.numRows - 1) {
-      checkedID = "r" + (rowNum + 1) + "c" + colNum;
-
-      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
-      if (targetCell != null) {
-        outputList.push(targetCell);
-      }
+      outputList.push(World.map[rowNum + 1][colNum]);
     }
 
     if (colNum > 0) {
-      checkedID = "r" + rowNum + "c" + (colNum - 1);
-
-      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
-      if (targetCell != null) {
-        outputList.push(targetCell);
-      }
+      outputList.push(World.map[rowNum][colNum - 1]);
     }
 
     if (colNum < this.world.numCols - 1) {
-      checkedID = "r" + rowNum + "c" + (colNum + 1);
-
-      targetCell = this.checkTargetCellOwner(checkedID, inputCell);
-      if (targetCell != null) {
-        outputList.push(targetCell);
-      }
+      outputList.push(World.map[rowNum][colNum + 1]);
     }
 
-    return outputList;
+    return outputList.filter(cell => cell.owner != this);
   }
 
-  checkTargetCellOwner = function(this: Kingdom, checkedId: string, inputCell: Cell) {
-    var targetCell = World.listOfCells.find(function(cell) {
-      return cell.id === checkedId;
-    });
-
-    if (targetCell.owner != inputCell.owner) {
-      return targetCell;
-    }
-    else {
-      return null;
-    }
-  }
-
-  init = function(this: Kingdom) {
-    this.setTerritoryStatus();
+  init = function(this: Kingdom): void {
     this.updateCellsList();
+    this.setTerritoryStatus();
     this.calculateEconomy();
   }
 
-  calculateEconomy = function(this: Kingdom) {
+  calculateEconomy = function(this: Kingdom): void {
     Object.keys(this.econ).forEach(i => this.econ[i] = 0);
 
     this.cells.forEach(function(this: Kingdom, currentCell: Cell) {

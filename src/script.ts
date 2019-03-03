@@ -10,7 +10,7 @@ $(document).ready(function() {
 
   // Initializations
   setConsts();
-  new World([g.sceneCols, g.sceneRows]);
+  new World({ cols: g.sceneCols, rows: g.sceneRows });
   layout.initLayout();
 
   // Event Listeners
@@ -28,27 +28,27 @@ $(document).ready(function() {
   //setTimeout(test,500);
 });
 
-function setConsts() {
+function setConsts(): void {
 
   // System variables
-  g.started = false;
-  g.runner = null;
   g.highlightedKindom = null;
-  g.showPopulation = false;
   g.resizeTimeout = null;
+  g.runner = null;
+  g.showPopulation = false;
+  g.started = false;
 
-  g.randomSeed = "0001";               // Seed for random number generation
+  g.randomSeed = "0001";
 
-  g.kingdomNames = ["Red Kingdom", "Blue Kingdom", "Green Kingdom", "unclaimed"];  // Name of the kingdoms
+  g.kingdomNames = ["unclaimed", "Red Kingdom", "Blue Kingdom", "Green Kingdom"];
 
-  g.turnLength = 100;				// ms			 // Length of a turn
+  g.turnLength = 100;
 
-  g.sceneRows = 25;                    // Number of the rows of the Map
-  g.sceneCols = 25;                    // Number of the coloumns of the Map
+  g.sceneRows = 25;
+  g.sceneCols = 25;
   console.log(g);
 }
 
-export function runGame() {
+export function runGame(): void {
   if (g.started === false) {
     g.runner = setInterval(function() {
       nextRound();
@@ -61,15 +61,11 @@ export function runGame() {
   }
 }
 
-function nextRound() {
+function nextRound(): void {
   var rng = seedrandom();
-  World.listOfCells.forEach(function(cell) {
-    cell.tick();
-  });
+  World.listOfCells.forEach(function(cell) { cell.tick(); });
 
-  var numOfActiveKingdoms = World.listOfKingdoms.length - 1;
-
-  for (var i = 0; i < numOfActiveKingdoms; i++) {
+  for (var i = 1; i < World.listOfKingdoms.length; i++) {
     var attackList = World.listOfKingdoms[i].findNeighbourCells();
     var target = Math.floor(rng() * attackList.length);
 
@@ -77,7 +73,7 @@ function nextRound() {
     World.listOfKingdoms[i].calculateEconomy();
   }
 
-  World.listOfKingdoms[numOfActiveKingdoms].calculateEconomy();
+  World.listOfKingdoms[0].calculateEconomy();
 
   Layout.writeToInfoPanel();
   Layout.setHighlightedCells();
@@ -91,6 +87,6 @@ function nextRound() {
   }
 }
 
-export function showPopulation() {
+export function showPopulation(): void {
   g.showPopulation = true;
 }

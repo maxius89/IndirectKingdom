@@ -6,21 +6,21 @@ import { runGame, showPopulation } from './script';
 
 export default class Layout {
 
-  wWidth: number;  // Window Width
-  wHeight: number; // Window Height
-  wOrientation: Orientation; // Window Orientation
-  wShort: number; // Window Short size
-  wLong: number; // Window Long size
+  static wWidth: number;  // Window Width
+  static wHeight: number; // Window Height
+  static wOrientation: Orientation; // Window Orientation
+  static wShort: number; // Window Short size
+  static wLong: number; // Window Long size
 
-  mWidth: number; // Map Width
-  mHeight: number; // Map Height
-  mUpscaled: boolean; // Map Upscaled
-  mDownscaled: boolean; // Map Downscaled
+  static mWidth: number; // Map Width
+  static mHeight: number; // Map Height
+  static mUpscaled: boolean; // Map Upscaled
+  static mDownscaled: boolean; // Map Downscaled
   static mActualCellSize = 30; // Actual Cell size
 
-  dThickness: number; // Dashboard Thickness
-  dLength: number;  // Dashboard Length
-  dDisabled: boolean; // Dashboard Disabled
+  static dThickness: number; // Dashboard Thickness
+  static dLength: number;  // Dashboard Length
+  static dDisabled: boolean; // Dashboard Disabled
 
   static readonly borderRatio = 0.02;              // Cell-size/border thickness ratio
   static readonly minCellSize = 20; 		// px      // Minimum size of the drawn cells
@@ -38,8 +38,8 @@ export default class Layout {
 
   initLayout(): void {
 
-    this.wWidth = $(window).width();
-    this.wHeight = $(window).height();
+    Layout.wWidth = $(window).width();
+    Layout.wHeight = $(window).height();
 
     this.drawLayout();
     let newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
@@ -61,7 +61,7 @@ export default class Layout {
     this.updateMap(World.listOfCells);
   }
 
-  drawLayout() {
+  drawLayout(): void {
     var mapDiv = $(document.createElement('div'));
     var dashDiv = $(document.createElement('div'));
 
@@ -75,18 +75,18 @@ export default class Layout {
     $("#mapDiv").css("overflow-y", "scroll");
   }
 
-  addButton(buttonFunction: Function, buttonText: string) {
+  addButton(buttonFunction: Function, buttonText: string): void {
     var button = $("<button>").text(buttonText);
     button.click((evt) => buttonFunction(evt));
     $("#dashDiv").append(button);
   }
 
-  addInfoPanel() {
+  addInfoPanel(): void {
     var infoPanel = $(document.createElement('div'));
     $("#dashDiv").append(infoPanel);
     infoPanel.attr("id", "infoPanel");
-    infoPanel.css("width", this.dThickness + "px");
-    infoPanel.css("height", this.dLength / 2 + "px");
+    infoPanel.css("width", Layout.dThickness + "px");
+    infoPanel.css("height", Layout.dLength / 2 + "px");
     infoPanel.css("background-color", "#ffffff");
     //infoPanel.html("infoPanel initialized.");
 
@@ -113,8 +113,6 @@ export default class Layout {
     var tbody = $(document.createElement('tbody'));
     table.append(tbody);
 
-    var newListOfCells: Cell[] = [];
-
     for (var i = 0; i < height; ++i) {
       var newRow = $(document.createElement("tr"));
       table.append(newRow);
@@ -129,12 +127,9 @@ export default class Layout {
         newCol.attr("type", "none");
         newCol.html("&nbsp;");
 
-        var newCell = Cell.initCell({ row: i, col: j });
-
-        newCol.attr("type", LandType[newCell.type]);
-
-        newListOfCells.push(newCell);
-        this.showCellIcon(newCol, newCell.type);
+        var cellType = World.map[i][j].type;
+        newCol.attr("type", LandType[cellType]);
+        this.showCellIcon(newCol, cellType);
       }
     }
 
@@ -169,16 +164,16 @@ export default class Layout {
     }
   }
 
-  updateMap(map: Cell[]) {
+  updateMap(map: Cell[]): void {
     map.forEach(function(cell) {
       $("#" + cell.id).attr("status", cell.owner.name);
       $("#" + cell.id).css("background-color", cell.owner.color);
     });
   }
 
-  rethinkPanels() {
-    this.wWidth = $(window).width();
-    this.wHeight = $(window).height();
+  rethinkPanels(): void {
+    Layout.wWidth = $(window).width();
+    Layout.wHeight = $(window).height();
 
     this.decideWindowOrientation();
     this.calcDashboardSize();
@@ -187,107 +182,107 @@ export default class Layout {
     this.updateLayout();
   }
 
-  decideWindowOrientation() {
-    this.wOrientation = (this.wWidth > this.wHeight ?
+  decideWindowOrientation(): void {
+    Layout.wOrientation = (Layout.wWidth > Layout.wHeight ?
       Orientation.Landscape : Orientation.Portrait);
-    if (this.wOrientation === Orientation.Portrait) {
-      this.wShort = this.wWidth;
-      this.wLong = this.wHeight;
+    if (Layout.wOrientation === Orientation.Portrait) {
+      Layout.wShort = Layout.wWidth;
+      Layout.wLong = Layout.wHeight;
     }
     else {
-      this.wShort = this.wHeight;
-      this.wLong = this.wWidth;
+      Layout.wShort = Layout.wHeight;
+      Layout.wLong = Layout.wWidth;
     }
   }
 
-  calcDashboardSize() {
-    if (this.wLong < Layout.minThickness * Layout.minDashboardThickessRatio) {
-      this.dLength = 0;
-      this.dThickness = 0;
-      this.dDisabled = true;
+  calcDashboardSize(): void {
+    if (Layout.wLong < Layout.minThickness * Layout.minDashboardThickessRatio) {
+      Layout.dLength = 0;
+      Layout.dThickness = 0;
+      Layout.dDisabled = true;
     }
     else {
-      this.dLength = this.wShort;
-      this.dThickness = Math.floor(this.dLength * Layout.thicknessRatio);
-      this.dThickness = Math.max(this.dThickness, Layout.minThickness);
-      this.dThickness = Math.min(this.dThickness, Layout.maxThickness);
-      this.dDisabled = false;
+      Layout.dLength = Layout.wShort;
+      Layout.dThickness = Math.floor(Layout.dLength * Layout.thicknessRatio);
+      Layout.dThickness = Math.max(Layout.dThickness, Layout.minThickness);
+      Layout.dThickness = Math.min(Layout.dThickness, Layout.maxThickness);
+      Layout.dDisabled = false;
     }
   }
 
-  calcMapSize() {
-    this.mWidth = this.wWidth;
-    this.mHeight = this.wHeight;
+  calcMapSize(): void {
+    Layout.mWidth = Layout.wWidth;
+    Layout.mHeight = Layout.wHeight;
 
-    if (this.wOrientation == Orientation.Landscape) {
-      this.mWidth -= this.dThickness;
+    if (Layout.wOrientation == Orientation.Landscape) {
+      Layout.mWidth -= Layout.dThickness;
     }
     else {
-      this.mHeight -= this.dThickness;
+      Layout.mHeight -= Layout.dThickness;
     }
   }
 
-  calcCellNum() {
-    this.mUpscaled = this.upscaleCells();
-    if (this.mUpscaled) return;
+  calcCellNum(): void {
+    Layout.mUpscaled = this.upscaleCells();
+    if (Layout.mUpscaled) return;
 
-    this.mDownscaled = this.makeCellsFit();
+    Layout.mDownscaled = this.makeCellsFit();
   }
 
-  calcCellSize() {
+  calcCellSize(): void {
     this.calcCellNum();
     this.resizeCells();
   }
 
-  updateLayout() {
-    $("#mapDiv").css("width", this.mWidth + "px");
-    $("#mapDiv").css("height", this.mHeight + "px");
+  updateLayout(): void {
+    $("#mapDiv").css("width", Layout.mWidth + "px");
+    $("#mapDiv").css("height", Layout.mHeight + "px");
     $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
 
-    if (this.wOrientation == Orientation.Landscape) {
-      $("#dashDiv").css("width", this.dThickness + "px");
-      $("#dashDiv").css("height", this.dLength + "px");
+    if (Layout.wOrientation == Orientation.Landscape) {
+      $("#dashDiv").css("width", Layout.dThickness + "px");
+      $("#dashDiv").css("height", Layout.dLength + "px");
 
       $("#dashDiv").css("top", "0px");
-      $("#dashDiv").css("left", this.mWidth + "px");
+      $("#dashDiv").css("left", Layout.mWidth + "px");
     }
     else {
-      $("#dashDiv").css("width", this.dLength + "px");
-      $("#dashDiv").css("height", this.dThickness + "px");
+      $("#dashDiv").css("width", Layout.dLength + "px");
+      $("#dashDiv").css("height", Layout.dThickness + "px");
 
-      $("#dashDiv").css("top", this.mHeight + "px");
+      $("#dashDiv").css("top", Layout.mHeight + "px");
       $("#dashDiv").css("left", "0px");
     }
   }
 
-  upscaleCells() {
+  upscaleCells(): boolean {
     var verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
-    if (this.mWidth < verticalMapSize) return false;
+    if (Layout.mWidth < verticalMapSize) return false;
 
     var horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
-    if (this.mHeight < horizontalMapSize) return false;
+    if (Layout.mHeight < horizontalMapSize) return false;
 
-    var verticalScale = this.mWidth / verticalMapSize;
-    var horizontalScale = this.mHeight / horizontalMapSize;
+    var verticalScale = Layout.mWidth / verticalMapSize;
+    var horizontalScale = Layout.mHeight / horizontalMapSize;
     var scale = Math.min(verticalScale, horizontalScale);
     Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
     return true;
   }
 
-  makeCellsFit() {
+  makeCellsFit(): boolean {
     var minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
-    if (this.mWidth >= minMapSize && this.mHeight >= minMapSize) return false;
+    if (Layout.mWidth >= minMapSize && Layout.mHeight >= minMapSize) return false;
 
-    var verticalScale = this.mWidth / minMapSize;
-    var horizontalScale = this.mHeight / minMapSize;
+    var verticalScale = Layout.mWidth / minMapSize;
+    var horizontalScale = Layout.mHeight / minMapSize;
     var scale = Math.min(verticalScale, horizontalScale);
     Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
     return true;
   }
 
-  resizeCells() {
+  resizeCells(): void {
     Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
     Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
 
@@ -304,7 +299,7 @@ export default class Layout {
     $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
   }
 
-  zoom(event: MouseWheelEvent) {
+  zoom(event: MouseWheelEvent): void {
     if (event.ctrlKey === true) {
       event.preventDefault();
 
@@ -360,7 +355,7 @@ export default class Layout {
   }
 
 
-  static writeToInfoPanel() {
+  static writeToInfoPanel(): void {
     var text1 = "&nbsp;";
     var text2 = "&nbsp;";
     var text3 = "&nbsp;";
