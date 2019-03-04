@@ -150,9 +150,7 @@ function nextRound() {
     _layout__WEBPACK_IMPORTED_MODULE_2__["default"].setHighlightedCells();
     _layout__WEBPACK_IMPORTED_MODULE_2__["default"].updateMap(_world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells);
     if (g.showPopulation) { // TODO: Temporary solution
-        _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells.forEach(function (cell) {
-            $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population)));
-        });
+        _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
     }
 }
 function showPopulation() {
@@ -10570,18 +10568,18 @@ class World {
         this.initKingdoms();
     }
     initKingdoms() {
-        let unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[0], "#7777cc", [], false, this);
-        World.listOfCells.forEach(function (cell) { unclaimed.claimTerritory(cell); });
-        let redKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
-        let blueKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
-        let greenKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
+        const unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[0], "#7777cc", [], false, this);
+        World.listOfCells.forEach(cell => unclaimed.claimTerritory(cell));
+        const redKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
+        const blueKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
+        const greenKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
         World.listOfKingdoms = [unclaimed, redKingdom, blueKingdom, greenKingdom];
-        World.listOfKingdoms.forEach(function (kingdom) { kingdom.init(); });
+        World.listOfKingdoms.forEach(kingdom => kingdom.init());
     }
     initMap() {
-        for (var i = 0; i < this.numRows; ++i) {
+        for (let i = 0; i < this.numRows; ++i) {
             World.map[i] = [];
-            for (var j = 0; j < this.numCols; ++j) {
+            for (let j = 0; j < this.numCols; ++j) {
                 var newCell = _cell__WEBPACK_IMPORTED_MODULE_0__["default"].initCell({ row: i, col: j });
                 World.listOfCells.push(newCell);
                 World.map[i][j] = newCell;
@@ -10590,8 +10588,8 @@ class World {
     }
     static nextRound() {
         var rng = seedrandom__WEBPACK_IMPORTED_MODULE_3__();
-        World.listOfCells.forEach(function (cell) { cell.nextRound(); });
-        World.listOfKingdoms.forEach(function (kingdom) { kingdom.nextRound(rng()); });
+        World.listOfCells.forEach(cell => cell.nextRound());
+        World.listOfKingdoms.forEach(kingdom => kingdom.nextRound(rng()));
     }
 }
 World.map = [[]];
@@ -10663,14 +10661,14 @@ class Cell {
         }
     }
     static initCell(coordinates) {
-        var rng = seedrandom__WEBPACK_IMPORTED_MODULE_1__(_script__WEBPACK_IMPORTED_MODULE_0__["g"].randomSeed + coordinates.row + coordinates.col);
-        var numberOfLandTypes = Object.keys(LandType).length / 2;
-        var type = Math.floor(rng() * numberOfLandTypes);
+        const rng = seedrandom__WEBPACK_IMPORTED_MODULE_1__(_script__WEBPACK_IMPORTED_MODULE_0__["g"].randomSeed + coordinates.row + coordinates.col);
+        const numberOfLandTypes = Object.keys(LandType).length / 2;
+        const type = Math.floor(rng() * numberOfLandTypes);
         return new Cell(coordinates, type);
     }
     updateCell() {
-        var populationPower = this.population; // TODO: Get a function with diminishing return;
-        var excessFood = this.agriculture - this.population;
+        const populationPower = this.population; // TODO: Get a function with diminishing return;
+        const excessFood = this.agriculture - this.population;
         this.moneyEfficiency = this.baseEfficiency.money * populationPower;
         this.industryEfficiency = this.baseEfficiency.goods * populationPower;
         this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
@@ -11761,11 +11759,6 @@ __webpack_require__.r(__webpack_exports__);
 class Kingdom {
     constructor(name, color, cellIDs, active, world) {
         this.cells = [];
-        this.setTerritoryStatus = function () {
-            this.cells.forEach(function (cell) {
-                cell.owner = this;
-            }, this);
-        };
         this.name = name;
         this.color = color;
         this.cells = [];
@@ -11784,22 +11777,23 @@ class Kingdom {
             food: 0
         };
         cellIDs.forEach(function (cellId) {
-            var currentCell = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.find(function (cell) {
-                return cell.id === cellId;
-            });
+            const currentCell = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.find(cell => cell.id === cellId);
             this.claimTerritory(currentCell);
         }, this);
     }
     nextRound(random) {
         if (this.active) {
-            var attackList = this.findNeighbourCells();
-            var target = Math.floor(random * attackList.length);
+            const attackList = this.findNeighbourCells();
+            const target = Math.floor(random * attackList.length);
             this.claimTerritory(attackList[target]);
         }
         this.calculateEconomy();
     }
     updateCellsList() {
-        this.cells = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.filter(cell => cell.owner.name === this.name);
+        this.cells = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.filter(cell => cell.owner === this);
+    }
+    setTerritoryStatus() {
+        this.cells.forEach(cell => cell.owner = this);
     }
     claimTerritory(claimedCell) {
         if (!this.cells.includes(claimedCell)) {
@@ -11815,16 +11809,16 @@ class Kingdom {
         cell.owner = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[0]; // unclaimed
     }
     findNeighbourCells() {
-        var neighbours = [];
-        this.cells.forEach(function (cell) {
+        let neighbours = [];
+        this.cells.forEach(cell => {
             neighbours = neighbours.concat(this.analizeNeighbours(cell));
-        }, this);
+        });
         return neighbours;
     }
     analizeNeighbours(inputCell) {
-        var outputList = [];
-        var rowNum = inputCell.pos.row;
-        var colNum = inputCell.pos.col;
+        let outputList = [];
+        const rowNum = inputCell.pos.row;
+        const colNum = inputCell.pos.col;
         if (rowNum > 0) {
             outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum - 1][colNum]);
         }
@@ -11846,12 +11840,12 @@ class Kingdom {
     }
     calculateEconomy() {
         Object.keys(this.econ).forEach(i => this.econ[i] = 0);
-        this.cells.forEach(function (currentCell) {
-            this.econ.wealth += currentCell.wealth;
-            this.econ.industry += currentCell.industry;
-            this.econ.agriculture += currentCell.agriculture;
-            this.econ.population += currentCell.population;
-        }, this);
+        this.cells.forEach(cell => {
+            this.econ.wealth += cell.wealth;
+            this.econ.industry += cell.industry;
+            this.econ.agriculture += cell.agriculture;
+            this.econ.population += cell.population;
+        });
     }
 }
 ;
@@ -11871,13 +11865,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 class Layout {
     static initLayout() {
         Layout.wWidth = $(window).width();
         Layout.wHeight = $(window).height();
         this.drawLayout();
-        let newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
+        const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
         $("#mapDiv").append(newMap);
         $("#mapDiv").css("background-color", "#00ff00"); // Test color
         $("#dashDiv").css("background-color", "#ff00ff"); // Test color
@@ -11892,8 +11885,8 @@ class Layout {
         this.updateMap(_world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells);
     }
     static drawLayout() {
-        var mapDiv = $(document.createElement('div'));
-        var dashDiv = $(document.createElement('div'));
+        const mapDiv = $(document.createElement('div'));
+        const dashDiv = $(document.createElement('div'));
         $("body").append(mapDiv);
         $("body").append(dashDiv);
         mapDiv.attr("id", "mapDiv");
@@ -11902,41 +11895,41 @@ class Layout {
         $("#mapDiv").css("overflow-y", "scroll");
     }
     static addButton(buttonFunction, buttonText) {
-        var button = $("<button>").text(buttonText);
+        const button = $("<button>").text(buttonText);
         button.click((evt) => buttonFunction(evt));
         $("#dashDiv").append(button);
     }
     static addInfoPanel() {
-        var infoPanel = $(document.createElement('div'));
+        const infoPanel = $(document.createElement('div'));
         $("#dashDiv").append(infoPanel);
         infoPanel.attr("id", "infoPanel");
         infoPanel.css("width", Layout.dThickness + "px");
         infoPanel.css("height", Layout.dLength / 2 + "px");
         infoPanel.css("background-color", "#ffffff");
         //infoPanel.html("infoPanel initialized.");
-        var infoWealth = $(document.createElement("div"));
+        const infoWealth = $(document.createElement("div"));
         infoWealth.attr("id", "infoWealth");
         infoPanel.append(infoWealth);
-        var infoIndustry = $(document.createElement("div"));
+        const infoIndustry = $(document.createElement("div"));
         infoIndustry.attr("id", "infoIndustry");
         infoPanel.append(infoIndustry);
-        var infoAgriculture = $(document.createElement("div"));
+        const infoAgriculture = $(document.createElement("div"));
         infoAgriculture.attr("id", "infoAgriculture");
         infoPanel.append(infoAgriculture);
-        var infoPopulation = $(document.createElement("div"));
+        const infoPopulation = $(document.createElement("div"));
         infoPopulation.attr("id", "infoPopulation");
         infoPanel.append(infoPopulation);
     }
     static createMap(width, height) {
-        var table = $(document.createElement('table'));
+        const table = $(document.createElement('table'));
         table.attr("id", "map");
-        var tbody = $(document.createElement('tbody'));
+        const tbody = $(document.createElement('tbody'));
         table.append(tbody);
-        for (var i = 0; i < height; ++i) {
-            var newRow = $(document.createElement("tr"));
+        for (let i = 0; i < height; ++i) {
+            const newRow = $(document.createElement("tr"));
             table.append(newRow);
-            for (var j = 0; j < width; ++j) {
-                var newCol = $(document.createElement("td"));
+            for (let j = 0; j < width; ++j) {
+                const newCol = $(document.createElement("td"));
                 newRow.append(newCol);
                 newCol.addClass("cell");
                 newCol.attr("id", "r" + i + "c" + j);
@@ -11944,7 +11937,7 @@ class Layout {
                 newCol.attr("highlighted", "false");
                 newCol.attr("type", "none");
                 newCol.html("&nbsp;");
-                var cellType = _world__WEBPACK_IMPORTED_MODULE_0__["default"].map[i][j].type;
+                const cellType = _world__WEBPACK_IMPORTED_MODULE_0__["default"].map[i][j].type;
                 newCol.attr("type", _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"][cellType]);
                 this.showCellIcon(newCol, cellType);
             }
@@ -11952,7 +11945,7 @@ class Layout {
         return table;
     }
     static showCellIcon(cell, type) {
-        var img = $(document.createElement("img"));
+        let img = $(document.createElement("img"));
         cell.append(img);
         img.addClass("cellImg");
         img.css("height", Layout.mActualCellSize / 2 + "px");
@@ -12055,25 +12048,25 @@ class Layout {
         }
     }
     static upscaleCells() {
-        var verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
+        const verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
         if (Layout.mWidth < verticalMapSize)
             return false;
-        var horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
+        const horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
         if (Layout.mHeight < horizontalMapSize)
             return false;
-        var verticalScale = Layout.mWidth / verticalMapSize;
-        var horizontalScale = Layout.mHeight / horizontalMapSize;
-        var scale = Math.min(verticalScale, horizontalScale);
+        const verticalScale = Layout.mWidth / verticalMapSize;
+        const horizontalScale = Layout.mHeight / horizontalMapSize;
+        const scale = Math.min(verticalScale, horizontalScale);
         Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
         return true;
     }
     static makeCellsFit() {
-        var minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
+        const minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
         if (Layout.mWidth >= minMapSize && Layout.mHeight >= minMapSize)
             return false;
-        var verticalScale = Layout.mWidth / minMapSize;
-        var horizontalScale = Layout.mHeight / minMapSize;
-        var scale = Math.min(verticalScale, horizontalScale);
+        const verticalScale = Layout.mWidth / minMapSize;
+        const horizontalScale = Layout.mHeight / minMapSize;
+        const scale = Math.min(verticalScale, horizontalScale);
         Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
         return true;
     }
@@ -12082,7 +12075,7 @@ class Layout {
         Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
         $(".cell").css("height", Layout.mActualCellSize + "px");
         $(".cell").css("width", Layout.mActualCellSize + "px");
-        var bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+        const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
         $(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
             "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
         $(".cellImg").css("height", Layout.mActualCellSize / 2 + "px");
@@ -12105,15 +12098,13 @@ class Layout {
         }
     }
     static clicked() {
-        var clickedCellKingdom = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames.indexOf($(this).attr("status"))];
-        for (var i = 0; i < _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.length; i++) {
-            _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[i].highlighted = false;
-        }
+        const clickedCellKingdom = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.find(kingdom => $(this).attr("status") === kingdom.name);
+        _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
         if (_script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom === clickedCellKingdom) {
             _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom = null;
         }
         else {
-            _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
+            clickedCellKingdom.highlighted = true;
             _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom = clickedCellKingdom;
         }
         Layout.setHighlightedCells();
@@ -12123,20 +12114,20 @@ class Layout {
         _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.forEach(function (kingdom) {
             $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
         });
-        var clickedCells = $(".cell[highlighted = false]");
-        var nonClickedCells = $(".cell[highlighted = true]");
-        var clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-        var nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
+        const clickedCells = $(".cell[highlighted = false]");
+        const nonClickedCells = $(".cell[highlighted = true]");
+        const clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+        const nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
         clickedCells.css("box-shadow", "inset " + clickedBorderSize + "px " + clickedBorderSize + "px #ffffff," +
             "inset -" + clickedBorderSize + "px -" + clickedBorderSize + "px #ffffff");
         nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize + "px " + nonClickedBorderSize + "px #dddd55," +
             "inset -" + nonClickedBorderSize + "px -" + nonClickedBorderSize + "px #dddd55");
     }
     static writeToInfoPanel() {
-        var text1 = "&nbsp;";
-        var text2 = "&nbsp;";
-        var text3 = "&nbsp;";
-        var text4 = "&nbsp;";
+        let text1 = "&nbsp;";
+        let text2 = "&nbsp;";
+        let text3 = "&nbsp;";
+        let text4 = "&nbsp;";
         if (_script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom != null) {
             text1 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " wealth: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.wealth;
             text2 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " industry: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.industry;
