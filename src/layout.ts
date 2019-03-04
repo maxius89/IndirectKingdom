@@ -1,8 +1,6 @@
-import Cell from './cell';
 import World from './world';
-import { LandType } from './cell';
-import { g as global } from './script';
-import { runGame, showPopulation } from './script';
+import Cell, { LandType } from './cell';
+import { g as global, runGame, showPopulation } from './script';
 
 export default class Layout {
 
@@ -42,7 +40,7 @@ export default class Layout {
     Layout.wHeight = $(window).height();
 
     this.drawLayout();
-    let newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
+    const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
     $("#mapDiv").append(newMap);
 
     $("#mapDiv").css("background-color", "#00ff00");  // Test color
@@ -62,8 +60,8 @@ export default class Layout {
   }
 
   static drawLayout(): void {
-    var mapDiv = $(document.createElement('div'));
-    var dashDiv = $(document.createElement('div'));
+    const mapDiv = $(document.createElement('div'));
+    const dashDiv = $(document.createElement('div'));
 
     $("body").append(mapDiv);
     $("body").append(dashDiv);
@@ -76,13 +74,13 @@ export default class Layout {
   }
 
   static addButton(buttonFunction: Function, buttonText: string): void {
-    var button = $("<button>").text(buttonText);
+    const button = $("<button>").text(buttonText);
     button.click((evt) => buttonFunction(evt));
     $("#dashDiv").append(button);
   }
 
   static addInfoPanel(): void {
-    var infoPanel = $(document.createElement('div'));
+    const infoPanel = $(document.createElement('div'));
     $("#dashDiv").append(infoPanel);
     infoPanel.attr("id", "infoPanel");
     infoPanel.css("width", Layout.dThickness + "px");
@@ -90,35 +88,35 @@ export default class Layout {
     infoPanel.css("background-color", "#ffffff");
     //infoPanel.html("infoPanel initialized.");
 
-    var infoWealth = $(document.createElement("div"));
+    const infoWealth = $(document.createElement("div"));
     infoWealth.attr("id", "infoWealth");
     infoPanel.append(infoWealth);
 
-    var infoIndustry = $(document.createElement("div"));
+    const infoIndustry = $(document.createElement("div"));
     infoIndustry.attr("id", "infoIndustry");
     infoPanel.append(infoIndustry);
 
-    var infoAgriculture = $(document.createElement("div"));
+    const infoAgriculture = $(document.createElement("div"));
     infoAgriculture.attr("id", "infoAgriculture");
     infoPanel.append(infoAgriculture);
 
-    var infoPopulation = $(document.createElement("div"));
+    const infoPopulation = $(document.createElement("div"));
     infoPopulation.attr("id", "infoPopulation");
     infoPanel.append(infoPopulation);
   }
 
   static createMap(width: number, height: number): JQuery {
-    var table = $(document.createElement('table'));
+    const table = $(document.createElement('table'));
     table.attr("id", "map");
-    var tbody = $(document.createElement('tbody'));
+    const tbody = $(document.createElement('tbody'));
     table.append(tbody);
 
-    for (var i = 0; i < height; ++i) {
-      var newRow = $(document.createElement("tr"));
+    for (let i = 0; i < height; ++i) {
+      const newRow = $(document.createElement("tr"));
       table.append(newRow);
 
-      for (var j = 0; j < width; ++j) {
-        var newCol = $(document.createElement("td"));
+      for (let j = 0; j < width; ++j) {
+        const newCol = $(document.createElement("td"));
         newRow.append(newCol);
         newCol.addClass("cell");
         newCol.attr("id", "r" + i + "c" + j);
@@ -127,7 +125,7 @@ export default class Layout {
         newCol.attr("type", "none");
         newCol.html("&nbsp;");
 
-        var cellType = World.map[i][j].type;
+        const cellType = World.map[i][j].type;
         newCol.attr("type", LandType[cellType]);
         this.showCellIcon(newCol, cellType);
       }
@@ -137,7 +135,7 @@ export default class Layout {
   }
 
   static showCellIcon(cell: JQuery, type: LandType): void {
-    var img = $(document.createElement("img"));
+    let img = $(document.createElement("img"));
     cell.append(img);
 
     img.addClass("cellImg");
@@ -256,27 +254,27 @@ export default class Layout {
   }
 
   static upscaleCells(): boolean {
-    var verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
+    const verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
     if (Layout.mWidth < verticalMapSize) return false;
 
-    var horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
+    const horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
     if (Layout.mHeight < horizontalMapSize) return false;
 
-    var verticalScale = Layout.mWidth / verticalMapSize;
-    var horizontalScale = Layout.mHeight / horizontalMapSize;
-    var scale = Math.min(verticalScale, horizontalScale);
+    const verticalScale = Layout.mWidth / verticalMapSize;
+    const horizontalScale = Layout.mHeight / horizontalMapSize;
+    const scale = Math.min(verticalScale, horizontalScale);
     Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
     return true;
   }
 
   static makeCellsFit(): boolean {
-    var minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
+    const minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
     if (Layout.mWidth >= minMapSize && Layout.mHeight >= minMapSize) return false;
 
-    var verticalScale = Layout.mWidth / minMapSize;
-    var horizontalScale = Layout.mHeight / minMapSize;
-    var scale = Math.min(verticalScale, horizontalScale);
+    const verticalScale = Layout.mWidth / minMapSize;
+    const horizontalScale = Layout.mHeight / minMapSize;
+    const scale = Math.min(verticalScale, horizontalScale);
     Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
     return true;
@@ -289,7 +287,7 @@ export default class Layout {
     $(".cell").css("height", Layout.mActualCellSize + "px");
     $(".cell").css("width", Layout.mActualCellSize + "px");
 
-    var bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+    const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
     $(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
       "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
 
@@ -318,17 +316,16 @@ export default class Layout {
 
 
   static clicked(): void {
-    var clickedCellKingdom = World.listOfKingdoms[global.kingdomNames.indexOf($(this).attr("status"))];
+    const clickedCellKingdom = World.listOfKingdoms.find(kingdom =>
+      $(this).attr("status") === kingdom.name);
 
-    for (var i = 0; i < World.listOfKingdoms.length; i++) {
-      World.listOfKingdoms[i].highlighted = false;
-    }
+    World.listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
 
     if (global.highlightedKindom === clickedCellKingdom) {
       global.highlightedKindom = null;
     }
     else {
-      World.listOfKingdoms[global.kingdomNames.indexOf($(this).attr("status"))].highlighted = true;
+      clickedCellKingdom.highlighted = true;
       global.highlightedKindom = clickedCellKingdom;
     }
 
@@ -341,11 +338,11 @@ export default class Layout {
       $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
     });
 
-    var clickedCells = $(".cell[highlighted = false]");
-    var nonClickedCells = $(".cell[highlighted = true]");
+    const clickedCells = $(".cell[highlighted = false]");
+    const nonClickedCells = $(".cell[highlighted = true]");
 
-    var clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-    var nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
+    const clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+    const nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
 
     clickedCells.css("box-shadow", "inset " + clickedBorderSize + "px " + clickedBorderSize + "px #ffffff," +
       "inset -" + clickedBorderSize + "px -" + clickedBorderSize + "px #ffffff");
@@ -356,10 +353,10 @@ export default class Layout {
 
 
   static writeToInfoPanel(): void {
-    var text1 = "&nbsp;";
-    var text2 = "&nbsp;";
-    var text3 = "&nbsp;";
-    var text4 = "&nbsp;";
+    let text1 = "&nbsp;";
+    let text2 = "&nbsp;";
+    let text3 = "&nbsp;";
+    let text4 = "&nbsp;";
     if (global.highlightedKindom != null) {
       text1 = global.highlightedKindom.name + " wealth: " + global.highlightedKindom.econ.wealth;
       text2 = global.highlightedKindom.name + " industry: " + global.highlightedKindom.econ.industry;

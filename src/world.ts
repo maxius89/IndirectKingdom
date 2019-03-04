@@ -24,21 +24,21 @@ export default class World {
   }
 
   initKingdoms(): void {
-    let unclaimed = new Kingdom(global.kingdomNames[0], "#7777cc", [], false, this);
-    World.listOfCells.forEach(function(cell: Cell) { unclaimed.claimTerritory(cell); });
+    const unclaimed = new Kingdom(global.kingdomNames[0], "#7777cc", [], false, this);
+    World.listOfCells.forEach(cell => unclaimed.claimTerritory(cell));
 
-    let redKingdom = new Kingdom(global.kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
-    let blueKingdom = new Kingdom(global.kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
-    let greenKingdom = new Kingdom(global.kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
+    const redKingdom = new Kingdom(global.kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
+    const blueKingdom = new Kingdom(global.kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
+    const greenKingdom = new Kingdom(global.kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
 
     World.listOfKingdoms = [unclaimed, redKingdom, blueKingdom, greenKingdom];
-    World.listOfKingdoms.forEach(function(kingdom: Kingdom) { kingdom.init(); });
+    World.listOfKingdoms.forEach(kingdom => kingdom.init());
   }
 
   initMap(): void {
-    for (var i = 0; i < this.numRows; ++i) {
+    for (let i = 0; i < this.numRows; ++i) {
       World.map[i] = [];
-      for (var j = 0; j < this.numCols; ++j) {
+      for (let j = 0; j < this.numCols; ++j) {
         var newCell = Cell.initCell({ row: i, col: j });
         World.listOfCells.push(newCell);
         World.map[i][j] = newCell;
@@ -49,8 +49,8 @@ export default class World {
   static nextRound(): void {
     var rng = seedrandom();
 
-    World.listOfCells.forEach(function(cell) { cell.nextRound(); });
-    World.listOfKingdoms.forEach(function(kingdom) { kingdom.nextRound(rng()); });
+    World.listOfCells.forEach(cell => cell.nextRound());
+    World.listOfKingdoms.forEach(kingdom => kingdom.nextRound(rng()));
   }
 
 }

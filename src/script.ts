@@ -67,9 +67,9 @@ function nextRound(): void {
   Layout.updateMap(World.listOfCells);
 
   if (g.showPopulation) {  // TODO: Temporary solution
-    World.listOfCells.forEach(function(cell) {
-      $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population)));
-    });
+    World.listOfCells.forEach(cell =>
+      $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population)))
+    );
   }
 }
 

@@ -77,16 +77,16 @@ export default class Cell {
   }
 
   static initCell(coordinates: CellCoordinates): Cell {
-    var rng = seedrandom(global.randomSeed + coordinates.row + coordinates.col);
-    var numberOfLandTypes = Object.keys(LandType).length / 2;
-    var type: LandType = Math.floor(rng() * numberOfLandTypes);
+    const rng = seedrandom(global.randomSeed + coordinates.row + coordinates.col);
+    const numberOfLandTypes = Object.keys(LandType).length / 2;
+    const type: LandType = Math.floor(rng() * numberOfLandTypes);
 
     return new Cell(coordinates, type);
   }
 
   updateCell(this: Cell): void {
-    var populationPower = this.population; // TODO: Get a function with diminishing return;
-    var excessFood = this.agriculture - this.population;
+    const populationPower = this.population; // TODO: Get a function with diminishing return;
+    const excessFood = this.agriculture - this.population;
 
     this.moneyEfficiency = this.baseEfficiency.money * populationPower;
     this.industryEfficiency = this.baseEfficiency.goods * populationPower;

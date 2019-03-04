@@ -34,18 +34,15 @@ export default class Kingdom {
     };
 
     cellIDs.forEach(function(this: Kingdom, cellId: string) {
-      var currentCell = World.listOfCells.find(function(cell) {
-        return cell.id === cellId;
-      });
-
+      const currentCell = World.listOfCells.find(cell => cell.id === cellId);
       this.claimTerritory(currentCell);
     }, this);
   }
 
   nextRound(random: number): void {
     if (this.active) {
-      var attackList = this.findNeighbourCells();
-      var target = Math.floor(random * attackList.length);
+      const attackList = this.findNeighbourCells();
+      const target = Math.floor(random * attackList.length);
 
       this.claimTerritory(attackList[target]);
     }
@@ -54,13 +51,11 @@ export default class Kingdom {
 
 
   updateCellsList(this: Kingdom): void {
-    this.cells = World.listOfCells.filter(cell => cell.owner.name === this.name);
+    this.cells = World.listOfCells.filter(cell => cell.owner === this);
   }
 
-  setTerritoryStatus = function(this: Kingdom): void {
-    this.cells.forEach(function(this: Kingdom, cell: Cell) {
-      cell.owner = this;
-    }, this);
+  setTerritoryStatus(this: Kingdom): void {
+    this.cells.forEach(cell => cell.owner = this);
   }
 
   claimTerritory(this: Kingdom, claimedCell: Cell): void {
@@ -79,18 +74,18 @@ export default class Kingdom {
   }
 
   findNeighbourCells(this: Kingdom): Cell[] {
-    var neighbours: Cell[] = [];
+    let neighbours: Cell[] = [];
 
-    this.cells.forEach(function(this: Kingdom, cell: Cell) {
-      neighbours = neighbours.concat(this.analizeNeighbours(cell));
-    }, this);
+    this.cells.forEach(cell => {
+      neighbours = neighbours.concat(this.analizeNeighbours(cell))
+    });
     return neighbours;
   }
 
   analizeNeighbours(this: Kingdom, inputCell: Cell): Cell[] {
-    var outputList: Cell[] = [];
-    var rowNum = inputCell.pos.row;
-    var colNum = inputCell.pos.col;
+    let outputList: Cell[] = [];
+    const rowNum = inputCell.pos.row;
+    const colNum = inputCell.pos.col;
 
     if (rowNum > 0) {
       outputList.push(World.map[rowNum - 1][colNum]);
@@ -120,12 +115,12 @@ export default class Kingdom {
   calculateEconomy(this: Kingdom): void {
     Object.keys(this.econ).forEach(i => this.econ[i] = 0);
 
-    this.cells.forEach(function(this: Kingdom, currentCell: Cell) {
-      this.econ.wealth += currentCell.wealth;
-      this.econ.industry += currentCell.industry;
-      this.econ.agriculture += currentCell.agriculture;
-      this.econ.population += currentCell.population;
-    }, this);
+    this.cells.forEach(cell => {
+      this.econ.wealth += cell.wealth;
+      this.econ.industry += cell.industry;
+      this.econ.agriculture += cell.agriculture;
+      this.econ.population += cell.population;
+    });
   }
 
 }
