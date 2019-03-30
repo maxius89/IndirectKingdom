@@ -1,6 +1,6 @@
 import Kingdom from './kingdom';
 import { g as global } from './script';
-import seedrandom from 'seedrandom';
+import * as seedrandom from 'seedrandom';
 
 export default class Cell {
 

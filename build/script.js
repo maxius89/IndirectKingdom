@@ -107,11 +107,11 @@ $(document).ready(function () {
     _layout__WEBPACK_IMPORTED_MODULE_2__["default"].initLayout();
     // Event Listeners
     $(window).resize(function () {
-        if (g.resizeTimeout != null)
+        if (g.resizeTimeout != 0)
             clearTimeout(g.resizeTimeout);
         g.resizeTimeout = setTimeout(function () {
             _layout__WEBPACK_IMPORTED_MODULE_2__["default"].rethinkPanels();
-            g.resizeTimeout = null;
+            g.resizeTimeout = 0;
         }, 200);
     });
     $(".cell").click(_layout__WEBPACK_IMPORTED_MODULE_2__["default"].clicked);
@@ -121,8 +121,8 @@ $(document).ready(function () {
 function setConsts() {
     // System variables
     g.highlightedKindom = null;
-    g.resizeTimeout = null;
-    g.runner = null;
+    g.resizeTimeout = 0;
+    g.runner = 0;
     g.showPopulation = false;
     g.started = false;
     g.randomSeed = "0001";
@@ -131,6 +131,7 @@ function setConsts() {
     g.sceneRows = 25;
     g.sceneCols = 25;
     console.log(g);
+    return true;
 }
 function runGame() {
     if (g.started === false) {
@@ -10538,6 +10539,17 @@ return jQuery;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Globals; });
 class Globals {
+    constructor() {
+        this.resizeTimeout = 0;
+        this.runner = 0;
+        this.showPopulation = false;
+        this.started = false;
+        this.randomSeed = ""; // Seed for random number generation
+        this.kingdomNames = []; // Name of the kingdoms
+        this.turnLength = 0; // ms		   // Length of a turn
+        this.sceneRows = 0; // Number of the rows of the Map
+        this.sceneCols = 0; // Number of the coloumns of the Map
+    }
 }
 
 
@@ -11867,8 +11879,8 @@ __webpack_require__.r(__webpack_exports__);
 
 class Layout {
     static initLayout() {
-        Layout.wWidth = $(window).width();
-        Layout.wHeight = $(window).height();
+        Layout.wWidth = Number($(window).width());
+        Layout.wHeight = Number($(window).height());
         this.drawLayout();
         const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
         $("#mapDiv").append(newMap);
@@ -11976,8 +11988,8 @@ class Layout {
         });
     }
     static rethinkPanels() {
-        Layout.wWidth = $(window).width();
-        Layout.wHeight = $(window).height();
+        Layout.wWidth = Number($(window).width());
+        Layout.wHeight = Number($(window).height());
         this.decideWindowOrientation();
         this.calcDashboardSize();
         this.calcMapSize();
