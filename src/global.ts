@@ -4,17 +4,17 @@ export default class Globals {
 
   highlightedKindom: Kingdom;
 
-  resizeTimeout: number;
-  runner: number;
-  showPopulation: boolean;
-  started: boolean;
+  resizeTimeout: number = 0;
+  runner: number = 0;
+  showPopulation: boolean = false;
+  started: boolean = false;
 
-  randomSeed: string;                  // Seed for random number generation
+  randomSeed: string = "";                  // Seed for random number generation
 
-  kingdomNames: string[];              // Name of the kingdoms
+  kingdomNames: string[] = [];              // Name of the kingdoms
 
-  turnLength: number;				// ms		   // Length of a turn
+  turnLength: number = 0;				// ms		   // Length of a turn
 
-  sceneRows: number;                   // Number of the rows of the Map
-  sceneCols: number;                   // Number of the coloumns of the Map
+  sceneRows: number = 0;                   // Number of the rows of the Map
+  sceneCols: number = 0;                   // Number of the coloumns of the Map
 }

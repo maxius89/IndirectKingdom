@@ -36,8 +36,8 @@ export default class Layout {
 
   static initLayout(): void {
 
-    Layout.wWidth = $(window).width();
-    Layout.wHeight = $(window).height();
+    Layout.wWidth = Number($(window).width());
+    Layout.wHeight = Number($(window).height());
 
     this.drawLayout();
     const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
@@ -170,8 +170,8 @@ export default class Layout {
   }
 
   static rethinkPanels(): void {
-    Layout.wWidth = $(window).width();
-    Layout.wHeight = $(window).height();
+    Layout.wWidth = Number($(window).width());
+    Layout.wHeight = Number($(window).height());
 
     this.decideWindowOrientation();
     this.calcDashboardSize();

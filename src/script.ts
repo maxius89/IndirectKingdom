@@ -12,10 +12,10 @@ $(document).ready(function() {
 
   // Event Listeners
   $(window).resize(function() {
-    if (g.resizeTimeout != null) clearTimeout(g.resizeTimeout);
+    if (g.resizeTimeout != 0) clearTimeout(g.resizeTimeout);
     g.resizeTimeout = setTimeout(function() {
       Layout.rethinkPanels();
-      g.resizeTimeout = null;
+      g.resizeTimeout = 0;
     }, 200);
   });
 
@@ -25,12 +25,12 @@ $(document).ready(function() {
   //setTimeout(test,500);
 });
 
-function setConsts(): void {
+function setConsts(): boolean {
 
   // System variables
   g.highlightedKindom = null;
-  g.resizeTimeout = null;
-  g.runner = null;
+  g.resizeTimeout = 0;
+  g.runner = 0;
   g.showPopulation = false;
   g.started = false;
 
@@ -43,6 +43,8 @@ function setConsts(): void {
   g.sceneRows = 25;
   g.sceneCols = 25;
   console.log(g);
+
+  return true;
 }
 
 export function runGame(): void {
