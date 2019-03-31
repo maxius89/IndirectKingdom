@@ -86,77 +86,75 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return g; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "runGame", function() { return runGame; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "showPopulation", function() { return showPopulation; });
-/* harmony import */ var _global__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
-
-
-
-var g = new _global__WEBPACK_IMPORTED_MODULE_0__["default"];
+/* WEBPACK VAR INJECTION */(function($) {
+Object.defineProperty(exports, "__esModule", { value: true });
+const global_1 = __webpack_require__(2);
+const world_1 = __webpack_require__(3);
+const layout_1 = __webpack_require__(18);
+exports.g = new global_1.default;
 $(document).ready(function () {
     // Initializations
     setConsts();
-    new _world__WEBPACK_IMPORTED_MODULE_1__["default"]({ cols: g.sceneCols, rows: g.sceneRows });
-    _layout__WEBPACK_IMPORTED_MODULE_2__["default"].initLayout();
+    new world_1.default({ cols: exports.g.sceneCols, rows: exports.g.sceneRows });
+    layout_1.default.initLayout();
+    //
     // Event Listeners
     $(window).resize(function () {
-        if (g.resizeTimeout != 0)
-            clearTimeout(g.resizeTimeout);
-        g.resizeTimeout = setTimeout(function () {
-            _layout__WEBPACK_IMPORTED_MODULE_2__["default"].rethinkPanels();
-            g.resizeTimeout = 0;
+        if (exports.g.resizeTimeout != 0)
+            clearTimeout(exports.g.resizeTimeout);
+        exports.g.resizeTimeout = setTimeout(function () {
+            layout_1.default.rethinkPanels();
+            exports.g.resizeTimeout = 0;
         }, 200);
     });
-    $(".cell").click(_layout__WEBPACK_IMPORTED_MODULE_2__["default"].clicked);
-    $("#mapDiv")[0].addEventListener("wheel", _layout__WEBPACK_IMPORTED_MODULE_2__["default"].zoom.bind(_layout__WEBPACK_IMPORTED_MODULE_2__["default"]));
+    $(".cell").click(layout_1.default.clicked);
+    $("#mapDiv")[0].addEventListener("wheel", layout_1.default.zoom.bind(layout_1.default));
     //setTimeout(test,500);
 });
 function setConsts() {
     // System variables
-    g.highlightedKindom = null;
-    g.resizeTimeout = 0;
-    g.runner = 0;
-    g.showPopulation = false;
-    g.started = false;
-    g.randomSeed = "0001";
-    g.kingdomNames = ["unclaimed", "Red Kingdom", "Blue Kingdom", "Green Kingdom"];
-    g.turnLength = 100;
-    g.sceneRows = 25;
-    g.sceneCols = 25;
-    console.log(g);
+    exports.g.highlightedKindom = null;
+    exports.g.resizeTimeout = 0;
+    exports.g.runner = 0;
+    exports.g.showPopulation = false;
+    exports.g.started = false;
+    exports.g.randomSeed = "0001";
+    exports.g.kingdomNames = ["unclaimed", "Red Kingdom", "Blue Kingdom", "Green Kingdom"];
+    exports.g.turnLength = 100;
+    exports.g.sceneRows = 25;
+    exports.g.sceneCols = 25;
+    console.log(exports.g);
     return true;
 }
 function runGame() {
-    if (g.started === false) {
-        g.runner = setInterval(function () {
+    if (exports.g.started === false) {
+        exports.g.runner = setInterval(function () {
             nextRound();
-        }, g.turnLength);
-        g.started = true;
+        }, exports.g.turnLength);
+        exports.g.started = true;
     }
     else {
-        clearInterval(g.runner);
-        g.started = false;
+        clearInterval(exports.g.runner);
+        exports.g.started = false;
     }
 }
+exports.runGame = runGame;
 function nextRound() {
-    _world__WEBPACK_IMPORTED_MODULE_1__["default"].nextRound();
-    _layout__WEBPACK_IMPORTED_MODULE_2__["default"].writeToInfoPanel();
-    _layout__WEBPACK_IMPORTED_MODULE_2__["default"].setHighlightedCells();
-    _layout__WEBPACK_IMPORTED_MODULE_2__["default"].updateMap(_world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells);
-    if (g.showPopulation) { // TODO: Temporary solution
-        _world__WEBPACK_IMPORTED_MODULE_1__["default"].listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
+    world_1.default.nextRound();
+    layout_1.default.writeToInfoPanel();
+    layout_1.default.setHighlightedCells();
+    layout_1.default.updateMap(world_1.default.listOfCells);
+    if (exports.g.showPopulation) { // TODO: Temporary solution
+        world_1.default.listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
     }
 }
 function showPopulation() {
-    g.showPopulation = true;
+    exports.g.showPopulation = true;
 }
+exports.showPopulation = showPopulation;
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
@@ -10533,11 +10531,11 @@ return jQuery;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Globals; });
+
+Object.defineProperty(exports, "__esModule", { value: true });
 class Globals {
     constructor() {
         this.resizeTimeout = 0;
@@ -10551,24 +10549,20 @@ class Globals {
         this.sceneCols = 0; // Number of the coloumns of the Map
     }
 }
+exports.default = Globals;
 
 
 /***/ }),
 /* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return World; });
-/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* harmony import */ var _kingdom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(0);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_3__);
 
-
-
-
+Object.defineProperty(exports, "__esModule", { value: true });
+const cell_1 = __webpack_require__(4);
+const kingdom_1 = __webpack_require__(17);
+const script_1 = __webpack_require__(0);
+const seedrandom = __webpack_require__(5);
 class World {
     constructor(dim) {
         this.numRows = dim.rows;
@@ -10580,11 +10574,11 @@ class World {
         this.initKingdoms();
     }
     initKingdoms() {
-        const unclaimed = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[0], "#7777cc", [], false, this);
+        const unclaimed = new kingdom_1.default(script_1.g.kingdomNames[0], "#7777cc", [], false, this);
         World.listOfCells.forEach(cell => unclaimed.claimTerritory(cell));
-        const redKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
-        const blueKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
-        const greenKingdom = new _kingdom__WEBPACK_IMPORTED_MODULE_1__["default"](_script__WEBPACK_IMPORTED_MODULE_2__["g"].kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
+        const redKingdom = new kingdom_1.default(script_1.g.kingdomNames[1], "red", ["r0c0", "r0c1", "r1c0", "r2c0"], true, this);
+        const blueKingdom = new kingdom_1.default(script_1.g.kingdomNames[2], "blue", ["r4c2", "r3c2", "r4c3", "r3c3"], true, this);
+        const greenKingdom = new kingdom_1.default(script_1.g.kingdomNames[3], "green", ["r9c7", "r9c6", "r9c5", "r8c6"], true, this);
         World.listOfKingdoms = [unclaimed, redKingdom, blueKingdom, greenKingdom];
         World.listOfKingdoms.forEach(kingdom => kingdom.init());
     }
@@ -10592,14 +10586,14 @@ class World {
         for (let i = 0; i < this.numRows; ++i) {
             World.map[i] = [];
             for (let j = 0; j < this.numCols; ++j) {
-                var newCell = _cell__WEBPACK_IMPORTED_MODULE_0__["default"].initCell({ row: i, col: j });
+                var newCell = cell_1.default.initCell({ row: i, col: j });
                 World.listOfCells.push(newCell);
                 World.map[i][j] = newCell;
             }
         }
     }
     static nextRound() {
-        var rng = seedrandom__WEBPACK_IMPORTED_MODULE_3__();
+        var rng = seedrandom();
         World.listOfCells.forEach(cell => cell.nextRound());
         World.listOfKingdoms.forEach(kingdom => kingdom.nextRound(rng()));
     }
@@ -10607,21 +10601,18 @@ class World {
 World.map = [[]];
 World.listOfCells = [];
 World.listOfKingdoms = [];
+exports.default = World;
 
 
 /***/ }),
 /* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cell; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LandType", function() { return LandType; });
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
-/* harmony import */ var seedrandom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(seedrandom__WEBPACK_IMPORTED_MODULE_1__);
 
-
+Object.defineProperty(exports, "__esModule", { value: true });
+const script_1 = __webpack_require__(0);
+const seedrandom = __webpack_require__(5);
 class Cell {
     constructor(coordinates, type) {
         this.pos = coordinates;
@@ -10673,7 +10664,7 @@ class Cell {
         }
     }
     static initCell(coordinates) {
-        const rng = seedrandom__WEBPACK_IMPORTED_MODULE_1__(_script__WEBPACK_IMPORTED_MODULE_0__["g"].randomSeed + coordinates.row + coordinates.col);
+        const rng = seedrandom(script_1.g.randomSeed + coordinates.row + coordinates.col);
         const numberOfLandTypes = Object.keys(LandType).length / 2;
         const type = Math.floor(rng() * numberOfLandTypes);
         return new Cell(coordinates, type);
@@ -10700,13 +10691,14 @@ class Cell {
         }, this);
     }
 }
+exports.default = Cell;
 var LandType;
 (function (LandType) {
     LandType[LandType["Farm"] = 0] = "Farm";
     LandType[LandType["Settlement"] = 1] = "Settlement";
     LandType[LandType["Forest"] = 2] = "Forest";
     LandType[LandType["Mountain"] = 3] = "Mountain";
-})(LandType || (LandType = {}));
+})(LandType = exports.LandType || (exports.LandType = {}));
 
 
 /***/ }),
@@ -11761,13 +11753,12 @@ if ( true && module.exports) {
 
 /***/ }),
 /* 17 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Kingdom; });
-/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 
+Object.defineProperty(exports, "__esModule", { value: true });
+const world_1 = __webpack_require__(3);
 class Kingdom {
     constructor(name, color, cellIDs, active, world) {
         this.cells = [];
@@ -11789,7 +11780,7 @@ class Kingdom {
             food: 0
         };
         cellIDs.forEach(function (cellId) {
-            const currentCell = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.find(cell => cell.id === cellId);
+            const currentCell = world_1.default.listOfCells.find(cell => cell.id === cellId);
             this.claimTerritory(currentCell);
         }, this);
     }
@@ -11802,7 +11793,7 @@ class Kingdom {
         this.calculateEconomy();
     }
     updateCellsList() {
-        this.cells = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells.filter(cell => cell.owner === this);
+        this.cells = world_1.default.listOfCells.filter(cell => cell.owner === this);
     }
     setTerritoryStatus() {
         this.cells.forEach(cell => cell.owner = this);
@@ -11818,7 +11809,7 @@ class Kingdom {
     }
     loseTerritory(cell) {
         this.cells.splice(this.cells.indexOf(cell), 1);
-        cell.owner = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms[0]; // unclaimed
+        cell.owner = world_1.default.listOfKingdoms[0]; // unclaimed
     }
     findNeighbourCells() {
         let neighbours = [];
@@ -11832,16 +11823,16 @@ class Kingdom {
         const rowNum = inputCell.pos.row;
         const colNum = inputCell.pos.col;
         if (rowNum > 0) {
-            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum - 1][colNum]);
+            outputList.push(world_1.default.map[rowNum - 1][colNum]);
         }
         if (rowNum < this.world.numRows - 1) {
-            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum + 1][colNum]);
+            outputList.push(world_1.default.map[rowNum + 1][colNum]);
         }
         if (colNum > 0) {
-            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum][colNum - 1]);
+            outputList.push(world_1.default.map[rowNum][colNum - 1]);
         }
         if (colNum < this.world.numCols - 1) {
-            outputList.push(_world__WEBPACK_IMPORTED_MODULE_0__["default"].map[rowNum][colNum + 1]);
+            outputList.push(world_1.default.map[rowNum][colNum + 1]);
         }
         return outputList.filter(cell => cell.owner != this);
     }
@@ -11860,25 +11851,27 @@ class Kingdom {
         });
     }
 }
+exports.default = Kingdom;
 ;
 ;
 
 
 /***/ }),
 /* 18 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Layout; });
-/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
-/* harmony import */ var _cell__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-/* harmony import */ var _script__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(0);
-
-
-
+/* WEBPACK VAR INJECTION */(function($) {
+Object.defineProperty(exports, "__esModule", { value: true });
+const world_1 = __webpack_require__(3);
+const cell_1 = __webpack_require__(4);
+const script_1 = __webpack_require__(0);
+const React = __webpack_require__(19);
+const ReactDOM = __webpack_require__(20);
+const test_1 = __webpack_require__(21);
 class Layout {
     static initLayout() {
+        ReactDOM.render(React.createElement(test_1.Hello, { compiler: "TypeScript", framework: "React" }), document.getElementById("main"));
         Layout.wWidth = Number($(window).width());
         Layout.wHeight = Number($(window).height());
         this.drawLayout();
@@ -11891,10 +11884,10 @@ class Layout {
         $("#mapDiv").css("left", "0px");
         $("#dashDiv").css("position", "absolute");
         this.rethinkPanels();
-        this.addButton(_script__WEBPACK_IMPORTED_MODULE_2__["runGame"], 'Start / Stop');
-        this.addButton(_script__WEBPACK_IMPORTED_MODULE_2__["showPopulation"], 'Show Population');
+        this.addButton(script_1.runGame, 'Start / Stop');
+        this.addButton(script_1.showPopulation, 'Show Population');
         this.addInfoPanel();
-        this.updateMap(_world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfCells);
+        this.updateMap(world_1.default.listOfCells);
     }
     static drawLayout() {
         const mapDiv = $(document.createElement('div'));
@@ -11949,8 +11942,8 @@ class Layout {
                 newCol.attr("highlighted", "false");
                 newCol.attr("type", "none");
                 newCol.html("&nbsp;");
-                const cellType = _world__WEBPACK_IMPORTED_MODULE_0__["default"].map[i][j].type;
-                newCol.attr("type", _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"][cellType]);
+                const cellType = world_1.default.map[i][j].type;
+                newCol.attr("type", cell_1.LandType[cellType]);
                 this.showCellIcon(newCol, cellType);
             }
         }
@@ -11965,16 +11958,16 @@ class Layout {
         img.css("top", Layout.mActualCellSize / 8 + "px");
         img.css("left", Layout.mActualCellSize / 8 + "px");
         switch (type) {
-            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Farm:
+            case cell_1.LandType.Farm:
                 img.attr("src", "img/farm.svg");
                 break;
-            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Settlement:
+            case cell_1.LandType.Settlement:
                 img.attr("src", "img/settlement.svg");
                 break;
-            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Forest:
+            case cell_1.LandType.Forest:
                 img.attr("src", "img/forest.svg");
                 break;
-            case _cell__WEBPACK_IMPORTED_MODULE_1__["LandType"].Mountain:
+            case cell_1.LandType.Mountain:
                 img.attr("src", "img/mountain.svg");
                 break;
             default:
@@ -12110,20 +12103,20 @@ class Layout {
         }
     }
     static clicked() {
-        const clickedCellKingdom = _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.find(kingdom => $(this).attr("status") === kingdom.name);
-        _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
-        if (_script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom === clickedCellKingdom) {
-            _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom = null;
+        const clickedCellKingdom = world_1.default.listOfKingdoms.find(kingdom => $(this).attr("status") === kingdom.name);
+        world_1.default.listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
+        if (script_1.g.highlightedKindom === clickedCellKingdom) {
+            script_1.g.highlightedKindom = null;
         }
         else {
             clickedCellKingdom.highlighted = true;
-            _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom = clickedCellKingdom;
+            script_1.g.highlightedKindom = clickedCellKingdom;
         }
         Layout.setHighlightedCells();
         Layout.writeToInfoPanel();
     }
     static setHighlightedCells() {
-        _world__WEBPACK_IMPORTED_MODULE_0__["default"].listOfKingdoms.forEach(function (kingdom) {
+        world_1.default.listOfKingdoms.forEach(function (kingdom) {
             $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
         });
         const clickedCells = $(".cell[highlighted = false]");
@@ -12140,11 +12133,11 @@ class Layout {
         let text2 = "&nbsp;";
         let text3 = "&nbsp;";
         let text4 = "&nbsp;";
-        if (_script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom != null) {
-            text1 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " wealth: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.wealth;
-            text2 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " industry: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.industry;
-            text3 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " agriculture: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.agriculture;
-            text4 = _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.name + " population: " + _script__WEBPACK_IMPORTED_MODULE_2__["g"].highlightedKindom.econ.population;
+        if (script_1.g.highlightedKindom != null) {
+            text1 = script_1.g.highlightedKindom.name + " wealth: " + script_1.g.highlightedKindom.econ.wealth;
+            text2 = script_1.g.highlightedKindom.name + " industry: " + script_1.g.highlightedKindom.econ.industry;
+            text3 = script_1.g.highlightedKindom.name + " agriculture: " + script_1.g.highlightedKindom.econ.agriculture;
+            text4 = script_1.g.highlightedKindom.name + " population: " + script_1.g.highlightedKindom.econ.population;
         }
         else {
             text1 = text2 = text3 = text4 = "&nbsp;";
@@ -12167,6 +12160,7 @@ Layout.thicknessRatio = 0.2;
 Layout.minThickness = 200; // px      // Dashboard thickness minimum
 Layout.maxThickness = 400; // px      // Dashboard thickness maximum
 Layout.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
+exports.default = Layout;
 var Orientation;
 (function (Orientation) {
     Orientation[Orientation["Portrait"] = 0] = "Portrait";
@@ -12174,6 +12168,34 @@ var Orientation;
 })(Orientation || (Orientation = {}));
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+module.exports = React;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
+
+module.exports = ReactDOM;
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(19);
+exports.Hello = (props) => React.createElement("h1", { style: { color: 'red' } },
+    " Hello from ",
+    props.compiler,
+    " and ",
+    props.framework,
+    " !");
+
 
 /***/ })
 /******/ ]);

@@ -2,7 +2,12 @@ import World from './world';
 import Cell, { LandType } from './cell';
 import { g as global, runGame, showPopulation } from './script';
 
+import * as React from 'react';
+import * as ReactDOM from "react-dom";
+import { Hello } from "./components/test";
+
 export default class Layout {
+
 
   static wWidth: number;  // Window Width
   static wHeight: number; // Window Height
@@ -34,7 +39,14 @@ export default class Layout {
   static readonly maxThickness = 400;   // px      // Dashboard thickness maximum
   static readonly minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
 
+
   static initLayout(): void {
+
+    ReactDOM.render(
+      <Hello compiler="TypeScript" framework = "React" />,
+      document.getElementById("main")
+    );
+
 
     Layout.wWidth = Number($(window).width());
     Layout.wHeight = Number($(window).height());

@@ -9,13 +9,17 @@ module.exports= {
   },
   module: {
     rules: [{
-      test:/\.ts$/,
+      test:/\.(ts|tsx)$/,
       include: path.resolve(__dirname, 'src'),
       loader: 'ts-loader'
     }]
   },
+  externals: {
+      "react": "React",
+      "react-dom": "ReactDOM"
+  },
   resolve: {
-    extensions: ["*", ".webpack.js", ".web.js", ".ts", ".js"]
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
   },
   plugins: [
         new webpack.ProvidePlugin({

@@ -3,10 +3,15 @@
     "outDir": "./build",
     "allowJs": true,
     "target": "es6",
-     "lib": ["es6", "dom", "es2017"]
+    "module": "commonjs",
+    "lib": ["es6", "dom", "es2017"],
+    "jsx": "react"
   },
-  "files" :[
+  "files": [
     "src/script.ts"
+  ],
+  "include": [
+    "./src/*"
   ]
 
 }
