@@ -4,7 +4,7 @@ import { g as global, runGame, showPopulation } from './script';
 
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
-import { Hello } from "./components/test";
+import Main from "./components/main";
 
 export default class Layout {
 
@@ -43,25 +43,15 @@ export default class Layout {
   static initLayout(): void {
 
     ReactDOM.render(
-      <Hello compiler="TypeScript" framework = "React" />,
+      <Main/>,
       document.getElementById("main")
     );
 
+    Layout.wWidth = Number(window.innerWidth);
+    Layout.wHeight = Number(window.innerHeight);
 
-    Layout.wWidth = Number($(window).width());
-    Layout.wHeight = Number($(window).height());
-
-    this.drawLayout();
     const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
     $("#mapDiv").append(newMap);
-
-    $("#mapDiv").css("background-color", "#00ff00");  // Test color
-    $("#dashDiv").css("background-color", "#ff00ff"); // Test color
-
-    $("#mapDiv").css("position", "absolute");
-    $("#mapDiv").css("top", "0px");
-    $("#mapDiv").css("left", "0px");
-    $("#dashDiv").css("position", "absolute");
 
     this.rethinkPanels();
     this.addButton(runGame, 'Start / Stop');
@@ -69,20 +59,6 @@ export default class Layout {
     this.addInfoPanel();
 
     this.updateMap(World.listOfCells);
-  }
-
-  static drawLayout(): void {
-    const mapDiv = $(document.createElement('div'));
-    const dashDiv = $(document.createElement('div'));
-
-    $("body").append(mapDiv);
-    $("body").append(dashDiv);
-
-    mapDiv.attr("id", "mapDiv");
-    dashDiv.attr("id", "dashDiv");
-
-    $("#mapDiv").css("overflow-x", "scroll");
-    $("#mapDiv").css("overflow-y", "scroll");
   }
 
   static addButton(buttonFunction: Function, buttonText: string): void {

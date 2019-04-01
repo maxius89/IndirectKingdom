@@ -100,7 +100,6 @@ $(document).ready(function () {
     setConsts();
     new world_1.default({ cols: exports.g.sceneCols, rows: exports.g.sceneRows });
     layout_1.default.initLayout();
-    //
     // Event Listeners
     $(window).resize(function () {
         if (exports.g.resizeTimeout != 0)
@@ -11868,36 +11867,19 @@ const cell_1 = __webpack_require__(4);
 const script_1 = __webpack_require__(0);
 const React = __webpack_require__(19);
 const ReactDOM = __webpack_require__(20);
-const test_1 = __webpack_require__(21);
+const main_1 = __webpack_require__(21);
 class Layout {
     static initLayout() {
-        ReactDOM.render(React.createElement(test_1.Hello, { compiler: "TypeScript", framework: "React" }), document.getElementById("main"));
-        Layout.wWidth = Number($(window).width());
-        Layout.wHeight = Number($(window).height());
-        this.drawLayout();
+        ReactDOM.render(React.createElement(main_1.default, null), document.getElementById("main"));
+        Layout.wWidth = Number(window.innerWidth);
+        Layout.wHeight = Number(window.innerHeight);
         const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
         $("#mapDiv").append(newMap);
-        $("#mapDiv").css("background-color", "#00ff00"); // Test color
-        $("#dashDiv").css("background-color", "#ff00ff"); // Test color
-        $("#mapDiv").css("position", "absolute");
-        $("#mapDiv").css("top", "0px");
-        $("#mapDiv").css("left", "0px");
-        $("#dashDiv").css("position", "absolute");
         this.rethinkPanels();
         this.addButton(script_1.runGame, 'Start / Stop');
         this.addButton(script_1.showPopulation, 'Show Population');
         this.addInfoPanel();
         this.updateMap(world_1.default.listOfCells);
-    }
-    static drawLayout() {
-        const mapDiv = $(document.createElement('div'));
-        const dashDiv = $(document.createElement('div'));
-        $("body").append(mapDiv);
-        $("body").append(dashDiv);
-        mapDiv.attr("id", "mapDiv");
-        dashDiv.attr("id", "dashDiv");
-        $("#mapDiv").css("overflow-x", "scroll");
-        $("#mapDiv").css("overflow-y", "scroll");
     }
     static addButton(buttonFunction, buttonText) {
         const button = $("<button>").text(buttonText);
@@ -12189,12 +12171,26 @@ module.exports = ReactDOM;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
-exports.Hello = (props) => React.createElement("h1", { style: { color: 'red' } },
-    " Hello from ",
-    props.compiler,
-    " and ",
-    props.framework,
-    " !");
+class Main extends React.Component {
+    render() {
+        const absolute = 'absolute';
+        const mapDivStyle = {
+            backgroundColor: "#00ff00",
+            position: absolute,
+            overflow: "scroll",
+            top: 0,
+            left: 0
+        };
+        const dashDivStyle = {
+            backgroundColor: "#ff00ff",
+            position: absolute
+        };
+        return (React.createElement(React.Fragment, null,
+            React.createElement("div", { id: "mapDiv", style: mapDivStyle }),
+            React.createElement("div", { id: "dashDiv", style: dashDivStyle })));
+    }
+}
+exports.default = Main;
 
 
 /***/ })
