@@ -11863,98 +11863,17 @@ exports.default = Kingdom;
 /* WEBPACK VAR INJECTION */(function($) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const world_1 = __webpack_require__(3);
-const cell_1 = __webpack_require__(4);
 const script_1 = __webpack_require__(0);
 const React = __webpack_require__(19);
 const ReactDOM = __webpack_require__(20);
 const main_1 = __webpack_require__(21);
 class Layout {
     static initLayout() {
-        ReactDOM.render(React.createElement(main_1.default, null), document.getElementById("main"));
+        ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows }), document.getElementById("main"));
         Layout.wWidth = Number(window.innerWidth);
         Layout.wHeight = Number(window.innerHeight);
-        const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
-        $("#mapDiv").append(newMap);
         this.rethinkPanels();
-        this.addButton(script_1.runGame, 'Start / Stop');
-        this.addButton(script_1.showPopulation, 'Show Population');
-        this.addInfoPanel();
         this.updateMap(world_1.default.listOfCells);
-    }
-    static addButton(buttonFunction, buttonText) {
-        const button = $("<button>").text(buttonText);
-        button.click((evt) => buttonFunction(evt));
-        $("#dashDiv").append(button);
-    }
-    static addInfoPanel() {
-        const infoPanel = $(document.createElement('div'));
-        $("#dashDiv").append(infoPanel);
-        infoPanel.attr("id", "infoPanel");
-        infoPanel.css("width", Layout.dThickness + "px");
-        infoPanel.css("height", Layout.dLength / 2 + "px");
-        infoPanel.css("background-color", "#ffffff");
-        //infoPanel.html("infoPanel initialized.");
-        const infoWealth = $(document.createElement("div"));
-        infoWealth.attr("id", "infoWealth");
-        infoPanel.append(infoWealth);
-        const infoIndustry = $(document.createElement("div"));
-        infoIndustry.attr("id", "infoIndustry");
-        infoPanel.append(infoIndustry);
-        const infoAgriculture = $(document.createElement("div"));
-        infoAgriculture.attr("id", "infoAgriculture");
-        infoPanel.append(infoAgriculture);
-        const infoPopulation = $(document.createElement("div"));
-        infoPopulation.attr("id", "infoPopulation");
-        infoPanel.append(infoPopulation);
-    }
-    static createMap(width, height) {
-        const table = $(document.createElement('table'));
-        table.attr("id", "map");
-        const tbody = $(document.createElement('tbody'));
-        table.append(tbody);
-        for (let i = 0; i < height; ++i) {
-            const newRow = $(document.createElement("tr"));
-            table.append(newRow);
-            for (let j = 0; j < width; ++j) {
-                const newCol = $(document.createElement("td"));
-                newRow.append(newCol);
-                newCol.addClass("cell");
-                newCol.attr("id", "r" + i + "c" + j);
-                newCol.attr("status", "unclaimed");
-                newCol.attr("highlighted", "false");
-                newCol.attr("type", "none");
-                newCol.html("&nbsp;");
-                const cellType = world_1.default.map[i][j].type;
-                newCol.attr("type", cell_1.LandType[cellType]);
-                this.showCellIcon(newCol, cellType);
-            }
-        }
-        return table;
-    }
-    static showCellIcon(cell, type) {
-        let img = $(document.createElement("img"));
-        cell.append(img);
-        img.addClass("cellImg");
-        img.css("height", Layout.mActualCellSize / 2 + "px");
-        img.css("width", Layout.mActualCellSize / 2 + "px");
-        img.css("top", Layout.mActualCellSize / 8 + "px");
-        img.css("left", Layout.mActualCellSize / 8 + "px");
-        switch (type) {
-            case cell_1.LandType.Farm:
-                img.attr("src", "img/farm.svg");
-                break;
-            case cell_1.LandType.Settlement:
-                img.attr("src", "img/settlement.svg");
-                break;
-            case cell_1.LandType.Forest:
-                img.attr("src", "img/forest.svg");
-                break;
-            case cell_1.LandType.Mountain:
-                img.attr("src", "img/mountain.svg");
-                break;
-            default:
-            //TODO: create Unknown cell-type svg.
-        }
     }
     static updateMap(map) {
         map.forEach(function (cell) {
@@ -12171,8 +12090,12 @@ module.exports = ReactDOM;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
+const map_1 = __webpack_require__(22);
+const infoPanel_1 = __webpack_require__(24);
+const script_1 = __webpack_require__(0);
 class Main extends React.Component {
     render() {
+        const { rowNum, colNum } = this.props;
         const absolute = 'absolute';
         const mapDivStyle = {
             backgroundColor: "#00ff00",
@@ -12186,11 +12109,129 @@ class Main extends React.Component {
             position: absolute
         };
         return (React.createElement(React.Fragment, null,
-            React.createElement("div", { id: "mapDiv", style: mapDivStyle }),
-            React.createElement("div", { id: "dashDiv", style: dashDivStyle })));
+            React.createElement("div", { id: "mapDiv", style: mapDivStyle },
+                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum })),
+            React.createElement("div", { id: "dashDiv", style: dashDivStyle },
+                React.createElement("button", { onClick: script_1.runGame }, "Start / Stop"),
+                React.createElement("button", { onClick: script_1.showPopulation }, "Show Population"),
+                React.createElement(infoPanel_1.default, null))));
     }
 }
 exports.default = Main;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(19);
+const cell_1 = __webpack_require__(23);
+class Map extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.createTable = () => {
+            const { rowNum, colNum } = this.props;
+            let table = [];
+            // Outer loop to create parent
+            for (let i = 0; i < rowNum; i++) {
+                let rows = [];
+                for (let j = 0; j < colNum; j++) {
+                    //Inner loop to create children
+                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j }));
+                }
+                //Create the parent and add the childrens
+                table.push(React.createElement("tr", { key: "r" + i }, rows));
+            }
+            return table;
+        };
+    }
+    render() {
+        return (React.createElement("table", { id: "map" },
+            React.createElement("tbody", null, this.createTable())));
+    }
+}
+exports.default = Map;
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(19);
+const cell_1 = __webpack_require__(4);
+const world_1 = __webpack_require__(3);
+class Cell extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            status: 'unclaimed',
+            highlighted: false,
+            type: 'none'
+        };
+    }
+    showCellIcon() {
+        //img.css("height", Layout.mActualCellSize / 2 + "px"); //TODO
+        //img.css("width", Layout.mActualCellSize / 2 + "px");
+        //img.css("top", Layout.mActualCellSize / 8 + "px");
+        //img.css("left", Layout.mActualCellSize / 8 + "px");
+        const { row, col } = this.props;
+        const type = world_1.default.map[row][col].type;
+        let src;
+        switch (type) {
+            case cell_1.LandType.Farm:
+                src = 'img/farm.svg';
+                break;
+            case cell_1.LandType.Settlement:
+                src = 'img/settlement.svg';
+                break;
+            case cell_1.LandType.Forest:
+                src = 'img/forest.svg';
+                break;
+            case cell_1.LandType.Mountain:
+                src = 'img/mountain.svg';
+                break;
+            default:
+            //TODO: create Unknown cell-type svg.
+        }
+        return (React.createElement("img", { className: "cellImg", src: src }));
+    }
+    render() {
+        const { col, row } = this.props;
+        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell" }, this.showCellIcon()));
+    }
+}
+exports.default = Cell;
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(19);
+class InfoPanel extends React.Component {
+    render() {
+        const infoPanelStyle = {
+            backgroundColor: "#ffffff",
+            width: 200,
+            height: 377 //TODO: Layout.dLength / 2
+        };
+        return (React.createElement("div", { id: "infoPanel", style: infoPanelStyle },
+            React.createElement("div", { id: "infoWealth" }),
+            React.createElement("div", { id: "infoIndustry" }),
+            React.createElement("div", { id: "infoAgriculture" }),
+            React.createElement("div", { id: "infoPopulation" })));
+    }
+}
+exports.default = InfoPanel;
 
 
 /***/ })

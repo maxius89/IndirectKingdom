@@ -1,6 +1,6 @@
 import World from './world';
-import Cell, { LandType } from './cell';
-import { g as global, runGame, showPopulation } from './script';
+import Cell from './cell';
+import { g as global } from './script';
 
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
@@ -43,111 +43,16 @@ export default class Layout {
   static initLayout(): void {
 
     ReactDOM.render(
-      <Main/>,
+      <Main colNum={Layout.sceneCols} rowNum={Layout.sceneRows}/>,
       document.getElementById("main")
     );
 
     Layout.wWidth = Number(window.innerWidth);
     Layout.wHeight = Number(window.innerHeight);
 
-    const newMap = this.createMap(Layout.sceneCols, Layout.sceneRows);
-    $("#mapDiv").append(newMap);
-
     this.rethinkPanels();
-    this.addButton(runGame, 'Start / Stop');
-    this.addButton(showPopulation, 'Show Population');
-    this.addInfoPanel();
 
     this.updateMap(World.listOfCells);
-  }
-
-  static addButton(buttonFunction: Function, buttonText: string): void {
-    const button = $("<button>").text(buttonText);
-    button.click((evt) => buttonFunction(evt));
-    $("#dashDiv").append(button);
-  }
-
-  static addInfoPanel(): void {
-    const infoPanel = $(document.createElement('div'));
-    $("#dashDiv").append(infoPanel);
-    infoPanel.attr("id", "infoPanel");
-    infoPanel.css("width", Layout.dThickness + "px");
-    infoPanel.css("height", Layout.dLength / 2 + "px");
-    infoPanel.css("background-color", "#ffffff");
-    //infoPanel.html("infoPanel initialized.");
-
-    const infoWealth = $(document.createElement("div"));
-    infoWealth.attr("id", "infoWealth");
-    infoPanel.append(infoWealth);
-
-    const infoIndustry = $(document.createElement("div"));
-    infoIndustry.attr("id", "infoIndustry");
-    infoPanel.append(infoIndustry);
-
-    const infoAgriculture = $(document.createElement("div"));
-    infoAgriculture.attr("id", "infoAgriculture");
-    infoPanel.append(infoAgriculture);
-
-    const infoPopulation = $(document.createElement("div"));
-    infoPopulation.attr("id", "infoPopulation");
-    infoPanel.append(infoPopulation);
-  }
-
-  static createMap(width: number, height: number): JQuery {
-    const table = $(document.createElement('table'));
-    table.attr("id", "map");
-    const tbody = $(document.createElement('tbody'));
-    table.append(tbody);
-
-    for (let i = 0; i < height; ++i) {
-      const newRow = $(document.createElement("tr"));
-      table.append(newRow);
-
-      for (let j = 0; j < width; ++j) {
-        const newCol = $(document.createElement("td"));
-        newRow.append(newCol);
-        newCol.addClass("cell");
-        newCol.attr("id", "r" + i + "c" + j);
-        newCol.attr("status", "unclaimed");
-        newCol.attr("highlighted", "false");
-        newCol.attr("type", "none");
-        newCol.html("&nbsp;");
-
-        const cellType = World.map[i][j].type;
-        newCol.attr("type", LandType[cellType]);
-        this.showCellIcon(newCol, cellType);
-      }
-    }
-
-    return table;
-  }
-
-  static showCellIcon(cell: JQuery, type: LandType): void {
-    let img = $(document.createElement("img"));
-    cell.append(img);
-
-    img.addClass("cellImg");
-    img.css("height", Layout.mActualCellSize / 2 + "px");
-    img.css("width", Layout.mActualCellSize / 2 + "px");
-    img.css("top", Layout.mActualCellSize / 8 + "px");
-    img.css("left", Layout.mActualCellSize / 8 + "px");
-
-    switch (type) {
-      case LandType.Farm:
-        img.attr("src", "img/farm.svg");
-        break;
-      case LandType.Settlement:
-        img.attr("src", "img/settlement.svg");
-        break;
-      case LandType.Forest:
-        img.attr("src", "img/forest.svg");
-        break;
-      case LandType.Mountain:
-        img.attr("src", "img/mountain.svg");
-        break;
-      default:
-      //TODO: create Unknown cell-type svg.
-    }
   }
 
   static updateMap(map: Cell[]): void {
