@@ -11869,17 +11869,18 @@ const ReactDOM = __webpack_require__(20);
 const main_1 = __webpack_require__(21);
 class Layout {
     static initLayout() {
-        ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows }), document.getElementById("main"));
+        ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
         Layout.wWidth = Number(window.innerWidth);
         Layout.wHeight = Number(window.innerHeight);
         this.rethinkPanels();
-        this.updateMap(world_1.default.listOfCells);
+        //this.updateMap(World.listOfCells);
     }
     static updateMap(map) {
-        map.forEach(function (cell) {
-            $("#" + cell.id).attr("status", cell.owner.name);
-            $("#" + cell.id).css("background-color", cell.owner.color);
-        });
+        ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
+        //  map.forEach(function(cell) {
+        //    $("#" + cell.id).attr("status", cell.owner.name);
+        //  //  $("#" + cell.id).css("background-color", cell.owner.color);
+        //  });
     }
     static rethinkPanels() {
         Layout.wWidth = Number($(window).width());
@@ -12095,7 +12096,7 @@ const infoPanel_1 = __webpack_require__(24);
 const script_1 = __webpack_require__(0);
 class Main extends React.Component {
     render() {
-        const { rowNum, colNum } = this.props;
+        const { rowNum, colNum, worldMap } = this.props;
         const absolute = 'absolute';
         const mapDivStyle = {
             backgroundColor: "#00ff00",
@@ -12110,7 +12111,7 @@ class Main extends React.Component {
         };
         return (React.createElement(React.Fragment, null,
             React.createElement("div", { id: "mapDiv", style: mapDivStyle },
-                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum })),
+                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum, worldMap: worldMap })),
             React.createElement("div", { id: "dashDiv", style: dashDivStyle },
                 React.createElement("button", { onClick: script_1.runGame }, "Start / Stop"),
                 React.createElement("button", { onClick: script_1.showPopulation }, "Show Population"),
@@ -12133,14 +12134,14 @@ class Map extends React.Component {
     constructor() {
         super(...arguments);
         this.createTable = () => {
-            const { rowNum, colNum } = this.props;
+            const { rowNum, colNum, worldMap } = this.props;
             let table = [];
             // Outer loop to create parent
             for (let i = 0; i < rowNum; i++) {
                 let rows = [];
                 for (let j = 0; j < colNum; j++) {
                     //Inner loop to create children
-                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j }));
+                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j, cellObj: worldMap[i][j] }));
                 }
                 //Create the parent and add the childrens
                 table.push(React.createElement("tr", { key: "r" + i }, rows));
@@ -12172,8 +12173,20 @@ class Cell extends React.Component {
         this.state = {
             status: 'unclaimed',
             highlighted: false,
-            type: 'none'
+            type: 'none',
+            backgroundColor: '#7777cc'
         };
+        this.updateCell = () => {
+            console.log("cell updated");
+            const owner = this.props.cellObj.owner;
+            this.setState({
+                status: owner.name,
+                backgroundColor: owner.color
+            });
+        };
+    }
+    componentDidMount() {
+        this.updateCell();
     }
     showCellIcon() {
         //img.css("height", Layout.mActualCellSize / 2 + "px"); //TODO
@@ -12203,7 +12216,7 @@ class Cell extends React.Component {
     }
     render() {
         const { col, row } = this.props;
-        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell" }, this.showCellIcon()));
+        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell", style: { backgroundColor: this.state.backgroundColor } }, this.showCellIcon()));
     }
 }
 exports.default = Cell;

@@ -1,15 +1,16 @@
 import * as React from "react";
 import * as CSS from 'csstype';
+import Cell from '../cell';
 import Map from './map';
 import InfoPanel from './infoPanel';
 import {runGame, showPopulation } from '../script';
 
-export interface MainProps { colNum: number; rowNum: number; }
+export interface MainProps { colNum: number; rowNum: number; worldMap:Cell[][]}
 
 class Main extends React.Component<MainProps>  {
 
   public render() {
-    const { rowNum, colNum } = this.props;
+    const { rowNum, colNum, worldMap } = this.props;
 
     const absolute: CSS.PositionProperty = 'absolute';
 
@@ -29,7 +30,7 @@ class Main extends React.Component<MainProps>  {
     return (
       <React.Fragment>
         <div id="mapDiv" style={mapDivStyle}>
-          <Map colNum={colNum} rowNum={rowNum}/>
+          <Map colNum={colNum} rowNum={rowNum} worldMap={worldMap}/>
         </div>
         <div id="dashDiv" style={dashDivStyle}>
           <button onClick={runGame}>Start / Stop</button>

@@ -1,12 +1,13 @@
 import * as React from "react";
 import Cell from "./cell";
+import CellObj from '../cell';
 
-export interface MapProps { colNum: number; rowNum: number; }
+export interface MapProps { colNum: number; rowNum: number; worldMap: CellObj[][]}
 
 class Map extends React.Component<MapProps>  {
 
   private createTable = () => {
-    const { rowNum, colNum } = this.props;
+    const { rowNum, colNum, worldMap } = this.props;
      let table = []
 
      // Outer loop to create parent
@@ -15,7 +16,7 @@ class Map extends React.Component<MapProps>  {
        for (let j = 0; j < colNum; j++) {
        //Inner loop to create children
          rows.push(
-           <Cell key={"r"+i+"c"+j} row={i} col={j}/>
+           <Cell key={"r"+i+"c"+j} row={i} col={j} cellObj={worldMap[i][j]}/>
          )
        }
        //Create the parent and add the childrens

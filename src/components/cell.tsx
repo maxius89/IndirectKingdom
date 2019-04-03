@@ -1,15 +1,21 @@
 import * as React from "react";
 import { LandType } from '../cell';
 import World from '../world';
+import CellObj from '../cell';
 
-export interface CellProps { row: number; col: number; }
+export interface CellProps { row: number; col: number; cellObj: CellObj}
 
 class Cell extends React.Component<CellProps> {
   state= {
     status: 'unclaimed',
     highlighted: false,
-    type: 'none'
+    type: 'none',
+    backgroundColor: '#7777cc'
   };
+
+  componentDidMount() {
+    this.updateCell();
+  }
 
    showCellIcon(): JSX.Element {
     //img.css("height", Layout.mActualCellSize / 2 + "px"); //TODO
@@ -39,6 +45,16 @@ class Cell extends React.Component<CellProps> {
     return (<img className="cellImg" src={src}></img>);
   }
 
+  updateCell = () => {
+    console.log("cell updated")
+    const owner = this.props.cellObj.owner;
+
+    this.setState({
+      status: owner.name,
+      backgroundColor: owner.color
+    });
+  }
+
   public render() {
     const {col, row} = this.props;
 
@@ -46,6 +62,7 @@ class Cell extends React.Component<CellProps> {
       <td
         id={"r"+row+"c"+col}
         className="cell"
+        style={{backgroundColor: this.state.backgroundColor}}
         /*status="unclaimed"  TODO*/
         /*highlighted="false"  TODO*/
         /*type="none"  TODO*/

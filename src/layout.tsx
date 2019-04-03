@@ -43,7 +43,7 @@ export default class Layout {
   static initLayout(): void {
 
     ReactDOM.render(
-      <Main colNum={Layout.sceneCols} rowNum={Layout.sceneRows}/>,
+      <Main colNum={Layout.sceneCols} rowNum={Layout.sceneRows} worldMap={World.map}/>,
       document.getElementById("main")
     );
 
@@ -52,14 +52,20 @@ export default class Layout {
 
     this.rethinkPanels();
 
-    this.updateMap(World.listOfCells);
+    //this.updateMap(World.listOfCells);
   }
 
   static updateMap(map: Cell[]): void {
-    map.forEach(function(cell) {
-      $("#" + cell.id).attr("status", cell.owner.name);
-      $("#" + cell.id).css("background-color", cell.owner.color);
-    });
+    ReactDOM.render(
+      <Main colNum={Layout.sceneCols} rowNum={Layout.sceneRows} worldMap={World.map}/>,
+      document.getElementById("main")
+    );
+
+
+  //  map.forEach(function(cell) {
+  //    $("#" + cell.id).attr("status", cell.owner.name);
+  //  //  $("#" + cell.id).css("background-color", cell.owner.color);
+  //  });
   }
 
   static rethinkPanels(): void {
