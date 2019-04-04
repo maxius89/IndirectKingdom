@@ -1,5 +1,4 @@
 import World from './world';
-import Cell from './cell';
 import { g as global } from './script';
 
 import * as React from 'react';
@@ -51,21 +50,13 @@ export default class Layout {
     Layout.wHeight = Number(window.innerHeight);
 
     this.rethinkPanels();
-
-    //this.updateMap(World.listOfCells);
   }
 
-  static updateMap(map: Cell[]): void {
+  static updateMap(): void {
     ReactDOM.render(
       <Main colNum={Layout.sceneCols} rowNum={Layout.sceneRows} worldMap={World.map}/>,
       document.getElementById("main")
     );
-
-
-  //  map.forEach(function(cell) {
-  //    $("#" + cell.id).attr("status", cell.owner.name);
-  //  //  $("#" + cell.id).css("background-color", cell.owner.color);
-  //  });
   }
 
   static rethinkPanels(): void {

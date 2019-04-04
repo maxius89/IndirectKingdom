@@ -66,7 +66,7 @@ function nextRound(): void {
   Layout.writeToInfoPanel();
   Layout.setHighlightedCells();
 
-  Layout.updateMap(World.listOfCells);
+  Layout.updateMap();
 
   if (g.showPopulation) {  // TODO: Temporary solution
     World.listOfCells.forEach(cell =>

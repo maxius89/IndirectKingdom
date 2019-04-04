@@ -145,7 +145,7 @@ function nextRound() {
     world_1.default.nextRound();
     layout_1.default.writeToInfoPanel();
     layout_1.default.setHighlightedCells();
-    layout_1.default.updateMap(world_1.default.listOfCells);
+    layout_1.default.updateMap();
     if (exports.g.showPopulation) { // TODO: Temporary solution
         world_1.default.listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
     }
@@ -11873,14 +11873,9 @@ class Layout {
         Layout.wWidth = Number(window.innerWidth);
         Layout.wHeight = Number(window.innerHeight);
         this.rethinkPanels();
-        //this.updateMap(World.listOfCells);
     }
-    static updateMap(map) {
+    static updateMap() {
         ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
-        //  map.forEach(function(cell) {
-        //    $("#" + cell.id).attr("status", cell.owner.name);
-        //  //  $("#" + cell.id).css("background-color", cell.owner.color);
-        //  });
     }
     static rethinkPanels() {
         Layout.wWidth = Number($(window).width());
@@ -12166,15 +12161,15 @@ exports.default = Map;
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
 const cell_1 = __webpack_require__(4);
-const world_1 = __webpack_require__(3);
+;
 class Cell extends React.Component {
     constructor() {
         super(...arguments);
         this.state = {
-            status: 'unclaimed',
+            status: this.props.cellObj.owner.name,
             highlighted: false,
             type: 'none',
-            backgroundColor: '#7777cc'
+            backgroundColor: this.props.cellObj.owner.color
         };
         this.updateCell = () => {
             console.log("cell updated");
@@ -12193,8 +12188,8 @@ class Cell extends React.Component {
         //img.css("width", Layout.mActualCellSize / 2 + "px");
         //img.css("top", Layout.mActualCellSize / 8 + "px");
         //img.css("left", Layout.mActualCellSize / 8 + "px");
-        const { row, col } = this.props;
-        const type = world_1.default.map[row][col].type;
+        const { cellObj } = this.props;
+        const type = cellObj.type;
         let src;
         switch (type) {
             case cell_1.LandType.Farm:
@@ -12215,8 +12210,9 @@ class Cell extends React.Component {
         return (React.createElement("img", { className: "cellImg", src: src }));
     }
     render() {
+        console.log("Render cell: " + this.props.cellObj.owner.name);
         const { col, row } = this.props;
-        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell", style: { backgroundColor: this.state.backgroundColor } }, this.showCellIcon()));
+        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell", style: { backgroundColor: this.props.cellObj.owner.color }, onClick: this.props.onClick }, this.showCellIcon()));
     }
 }
 exports.default = Cell;

@@ -1,16 +1,20 @@
 import * as React from "react";
 import { LandType } from '../cell';
-import World from '../world';
 import CellObj from '../cell';
 
-export interface CellProps { row: number; col: number; cellObj: CellObj}
+export interface CellProps {
+  row: number;
+  col: number;
+  cellObj: CellObj,
+  onClick?:(event: any) => void
+};
 
 class Cell extends React.Component<CellProps> {
   state= {
-    status: 'unclaimed',
+    status: this.props.cellObj.owner.name,
     highlighted: false,
     type: 'none',
-    backgroundColor: '#7777cc'
+    backgroundColor: this.props.cellObj.owner.color
   };
 
   componentDidMount() {
@@ -22,8 +26,8 @@ class Cell extends React.Component<CellProps> {
     //img.css("width", Layout.mActualCellSize / 2 + "px");
     //img.css("top", Layout.mActualCellSize / 8 + "px");
     //img.css("left", Layout.mActualCellSize / 8 + "px");
-    const {row, col} = this.props;
-    const type = World.map[row][col].type;
+    const {cellObj} = this.props;
+    const type = cellObj.type;
 
     let src:string;
     switch (type) {
@@ -56,13 +60,15 @@ class Cell extends React.Component<CellProps> {
   }
 
   public render() {
+    console.log("Render cell: " + this.props.cellObj.owner.name);
     const {col, row} = this.props;
 
     return (
       <td
         id={"r"+row+"c"+col}
         className="cell"
-        style={{backgroundColor: this.state.backgroundColor}}
+        style={{backgroundColor: this.props.cellObj.owner.color}}
+        onClick={this.props.onClick}
         /*status="unclaimed"  TODO*/
         /*highlighted="false"  TODO*/
         /*type="none"  TODO*/
