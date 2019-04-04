@@ -1,12 +1,13 @@
 import * as React from "react";
 import { LandType } from '../cell';
 import CellObj from '../cell';
+import Kingdom from '../kingdom';
 
 export interface CellProps {
   row: number;
   col: number;
   cellObj: CellObj,
-  onClick?:(event: any) => void
+  onSelect?:(event: Kingdom) => void
 };
 
 class Cell extends React.Component<CellProps> {
@@ -50,7 +51,6 @@ class Cell extends React.Component<CellProps> {
   }
 
   updateCell = () => {
-    console.log("cell updated")
     const owner = this.props.cellObj.owner;
 
     this.setState({
@@ -60,7 +60,6 @@ class Cell extends React.Component<CellProps> {
   }
 
   public render() {
-    console.log("Render cell: " + this.props.cellObj.owner.name);
     const {col, row} = this.props;
 
     return (
@@ -68,7 +67,7 @@ class Cell extends React.Component<CellProps> {
         id={"r"+row+"c"+col}
         className="cell"
         style={{backgroundColor: this.props.cellObj.owner.color}}
-        onClick={this.props.onClick}
+        onClick={() =>this.props.onSelect(this.props.cellObj.owner)}
         /*status="unclaimed"  TODO*/
         /*highlighted="false"  TODO*/
         /*type="none"  TODO*/

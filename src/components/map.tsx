@@ -2,7 +2,12 @@ import * as React from "react";
 import Cell from "./cell";
 import CellObj from '../cell';
 
-export interface MapProps { colNum: number; rowNum: number; worldMap: CellObj[][]}
+export interface MapProps {
+  colNum: number;
+  rowNum: number;
+  worldMap: CellObj[][];
+  onSelect:  (event: any) => void
+ }
 
 class Map extends React.Component<MapProps>  {
 
@@ -16,7 +21,13 @@ class Map extends React.Component<MapProps>  {
        for (let j = 0; j < colNum; j++) {
        //Inner loop to create children
          rows.push(
-           <Cell key={"r"+i+"c"+j} row={i} col={j} cellObj={worldMap[i][j]}/>
+           <Cell
+            key={"r"+i+"c"+j}
+            row={i}
+            col={j}
+            cellObj={worldMap[i][j]}
+            onSelect={this.props.onSelect}
+            />
          )
        }
        //Create the parent and add the childrens
