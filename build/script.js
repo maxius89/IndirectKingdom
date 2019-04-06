@@ -142,7 +142,6 @@ function runGame() {
 exports.runGame = runGame;
 function nextRound() {
     world_1.default.nextRound();
-    //Layout.setHighlightedCells();
     layout_1.default.updateMap();
     if (exports.g.showPopulation) { // TODO: Temporary solution
         world_1.default.listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
@@ -11860,9 +11859,9 @@ exports.default = Kingdom;
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {
 Object.defineProperty(exports, "__esModule", { value: true });
-const world_1 = __webpack_require__(3);
 const React = __webpack_require__(19);
 const ReactDOM = __webpack_require__(20);
+const world_1 = __webpack_require__(3);
 const main_1 = __webpack_require__(21);
 class Layout {
     static initLayout() {
@@ -11881,7 +11880,6 @@ class Layout {
         this.calcDashboardSize();
         this.calcMapSize();
         this.calcCellSize();
-        this.updateLayout();
     }
     static decideWindowOrientation() {
         Layout.wOrientation = (Layout.wWidth > Layout.wHeight ?
@@ -11929,32 +11927,15 @@ class Layout {
         this.calcCellNum();
         this.resizeCells();
     }
-    static updateLayout() {
-        $("#mapDiv").css("width", Layout.mWidth + "px");
-        $("#mapDiv").css("height", Layout.mHeight + "px");
-        $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
-        if (Layout.wOrientation == Orientation.Landscape) {
-            $("#dashDiv").css("width", Layout.dThickness + "px");
-            $("#dashDiv").css("height", Layout.dLength + "px");
-            $("#dashDiv").css("top", "0px");
-            $("#dashDiv").css("left", Layout.mWidth + "px");
-        }
-        else {
-            $("#dashDiv").css("width", Layout.dLength + "px");
-            $("#dashDiv").css("height", Layout.dThickness + "px");
-            $("#dashDiv").css("top", Layout.mHeight + "px");
-            $("#dashDiv").css("left", "0px");
-        }
-    }
     static upscaleCells() {
         const verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
-        if (Layout.mWidth < verticalMapSize)
+        if (Layout.mHeight < verticalMapSize)
             return false;
         const horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
-        if (Layout.mHeight < horizontalMapSize)
+        if (Layout.mWidth < horizontalMapSize)
             return false;
-        const verticalScale = Layout.mWidth / verticalMapSize;
-        const horizontalScale = Layout.mHeight / horizontalMapSize;
+        const verticalScale = Layout.mHeight / verticalMapSize;
+        const horizontalScale = Layout.mWidth / horizontalMapSize;
         const scale = Math.min(verticalScale, horizontalScale);
         Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
         return true;
@@ -12038,44 +12019,61 @@ module.exports = ReactDOM;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
+const resize_1 = __webpack_require__(22);
 const world_1 = __webpack_require__(3);
-const map_1 = __webpack_require__(22);
-//import Layout from '../layout';
-const infoPanel_1 = __webpack_require__(24);
+const map_1 = __webpack_require__(23);
+const infoPanel_1 = __webpack_require__(25);
 const script_1 = __webpack_require__(0);
 class Main extends React.Component {
     constructor() {
         super(...arguments);
+        this.updateDimensions = () => {
+            this.setState({ panelSize: resize_1.default.calculatePanelSizes() });
+        };
         this.handleSelect = (kingdom) => {
             const clickedCellKingdom = world_1.default.listOfKingdoms.find(listKingdom => listKingdom === kingdom);
-            let highlightedKindom = this.state.highlightedKindom === clickedCellKingdom ?
-                null : clickedCellKingdom;
+            let highlightedKindom = this.state.highlightedKindom === clickedCellKingdom
+                ? null
+                : clickedCellKingdom;
             this.setState({ highlightedKindom });
         };
     }
     componentWillMount() {
-        this.setState({
-            highlightedKindom: null
-        });
+        this.setState({ panelSize: resize_1.default.calculatePanelSizes(), highlightedKindom: null });
     }
+    ;
+    componentDidMount() {
+        window.addEventListener("resize", this.updateDimensions);
+    }
+    ;
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions);
+    }
+    ;
     render() {
         const { rowNum, colNum, worldMap } = this.props;
-        const { highlightedKindom } = this.state;
+        const { highlightedKindom, panelSize } = this.state;
         const absolute = 'absolute';
         const mapDivStyle = {
             backgroundColor: "#00ff00",
             position: absolute,
             overflow: "scroll",
             top: 0,
-            left: 0
+            left: 0,
+            width: panelSize.mapWidth,
+            height: panelSize.mapHeight
         };
         const dashDivStyle = {
             backgroundColor: "#ff00ff",
-            position: absolute
+            position: absolute,
+            width: panelSize.dashboardWidth,
+            height: panelSize.dashboardHeight,
+            top: panelSize.dashboardTop,
+            left: panelSize.dashboardLeft
         };
         return (React.createElement(React.Fragment, null,
             React.createElement("div", { id: "mapDiv", style: mapDivStyle },
-                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum, worldMap: worldMap, highlightedKindom: highlightedKindom, onSelect: this.handleSelect })),
+                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum, worldMap: worldMap, highlightedKindom: highlightedKindom, cellSize: panelSize.mapCellSize, onSelect: this.handleSelect })),
             React.createElement("div", { id: "dashDiv", style: dashDivStyle },
                 React.createElement("button", { onClick: script_1.runGame }, "Start / Stop"),
                 React.createElement("button", { onClick: script_1.showPopulation }, "Show Population"),
@@ -12092,8 +12090,144 @@ exports.default = Main;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var Orientation;
+(function (Orientation) {
+    Orientation[Orientation["Portrait"] = 0] = "Portrait";
+    Orientation[Orientation["Landscape"] = 1] = "Landscape";
+})(Orientation || (Orientation = {}));
+class Resize {
+    static calculatePanelSizes() {
+        Resize.wWidth = Number(window.innerWidth);
+        Resize.wHeight = Number(window.innerHeight);
+        Resize.decideWindowOrientation();
+        Resize.calcDashboardSize();
+        Resize.calcMapSize();
+        Resize.positionDashboard();
+        Resize.calcCellSize();
+        return ({
+            windowWidth: Resize.wWidth,
+            windowHeight: Resize.wHeight,
+            mapWidth: Resize.mWidth,
+            mapHeight: Resize.mHeight,
+            mapCellSize: Resize.mActualCellSize,
+            dashboardWidth: Resize.dWidth,
+            dashboardHeight: Resize.dHeight,
+            dashboardTop: Resize.dTop,
+            dashboardLeft: Resize.dLeft,
+            dashboardDisabled: Resize.dDisabled
+        });
+    }
+    ;
+    static decideWindowOrientation() {
+        Resize.wOrientation = (Resize.wWidth > Resize.wHeight ?
+            Orientation.Landscape : Orientation.Portrait);
+        Resize.wShort = Resize.wOrientation === Orientation.Portrait ?
+            Resize.wWidth : Resize.wHeight;
+        Resize.wLong = Resize.wOrientation === Orientation.Portrait ?
+            Resize.wHeight : Resize.wWidth;
+    }
+    ;
+    static calcDashboardSize() {
+        if (Resize.wLong < Resize.minThickness * Resize.minDashboardThickessRatio) {
+            Resize.dLength = 0;
+            Resize.dThickness = 0;
+            Resize.dDisabled = true;
+        }
+        else {
+            Resize.dLength = Resize.wShort;
+            Resize.dThickness = Math.floor(Resize.dLength * Resize.thicknessRatio);
+            Resize.dThickness = Math.max(Resize.dThickness, Resize.minThickness);
+            Resize.dThickness = Math.min(Resize.dThickness, Resize.maxThickness);
+            Resize.dDisabled = false;
+        }
+    }
+    ;
+    static calcMapSize() {
+        Resize.mWidth = Resize.wWidth;
+        Resize.mHeight = Resize.wHeight;
+        if (Resize.wOrientation === Orientation.Landscape)
+            Resize.mWidth -= Resize.dThickness;
+        else
+            Resize.mHeight -= Resize.dThickness;
+    }
+    ;
+    static positionDashboard() {
+        if (Resize.wOrientation === Orientation.Landscape) {
+            Resize.dWidth = Resize.dThickness;
+            Resize.dHeight = Resize.dLength;
+            Resize.dTop = 0;
+            Resize.dLeft = Resize.mWidth;
+        }
+        else {
+            Resize.dWidth = Resize.dLength;
+            Resize.dHeight = Resize.dThickness;
+            Resize.dTop = Resize.mHeight;
+            Resize.dLeft = 0;
+        }
+        /*  $("#mapDiv").css("width", Layout.mWidth + "px");
+          $("#mapDiv").css("height", Layout.mHeight + "px");
+          $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
+    
+          if (Layout.wOrientation == Orientation.Landscape) {
+            $("#dashDiv").css("width", Layout.dThickness + "px");
+            $("#dashDiv").css("height", Layout.dLength + "px");
+    
+            $("#dashDiv").css("top", "0px");
+            $("#dashDiv").css("left", Layout.mWidth + "px");
+          }
+          else {
+            $("#dashDiv").css("width", Layout.dLength + "px");
+            $("#dashDiv").css("height", Layout.dThickness + "px");
+    
+            $("#dashDiv").css("top", Layout.mHeight + "px");
+            $("#dashDiv").css("left", "0px");
+          }*/
+    }
+    ;
+    static calcCellSize() {
+        const verticalMapSize = Resize.sceneRows * Resize.mActualCellSize;
+        if (Resize.mHeight < verticalMapSize)
+            return;
+        const horizontalMapSize = Resize.sceneCols * Resize.mActualCellSize;
+        if (Resize.mWidth < horizontalMapSize)
+            return;
+        const verticalScale = Resize.mHeight / verticalMapSize;
+        const horizontalScale = Resize.mWidth / horizontalMapSize;
+        const scale = Math.min(verticalScale, horizontalScale);
+        Resize.mActualCellSize = Math.floor(Resize.mActualCellSize * scale);
+        Resize.mActualCellSize =
+            Resize.roundToNumber(Resize.mActualCellSize, Resize.stepCellSize);
+    }
+    ;
+    static roundToNumber(rounded, roundTo) {
+        return Math.round(rounded / roundTo) * roundTo;
+    }
+    ;
+}
+Resize.mActualCellSize = 30; // Actual Cell size
+Resize.borderRatio = 0.02; // Cell-size/border thickness ratio
+Resize.minCellSize = 20; // px      // Minimum size of the drawn cells
+Resize.maxCellSize = 100; // px      // Maximum size of the drawn cells
+Resize.stepCellSize = 5; // px      // Cell-size increment/decrement constant
+Resize.minDrawnCells = 3; // Minimum number of drawn cells
+Resize.sceneRows = 25; // Number of the rows of the Map
+Resize.sceneCols = 25; // Number of the coloumns of the Map
+Resize.thicknessRatio = 0.2;
+Resize.minThickness = 200; // px      // Dashboard thickness minimum
+Resize.maxThickness = 400; // px      // Dashboard thickness maximum
+Resize.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
+exports.default = Resize;
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
-const cell_1 = __webpack_require__(23);
+const cell_1 = __webpack_require__(24);
 class Map extends React.Component {
     constructor() {
         super(...arguments);
@@ -12106,13 +12240,18 @@ class Map extends React.Component {
                     const mapCell = worldMap[i][j];
                     rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j, cellObj: mapCell, onSelect: this.props.onSelect, isHighlighted: mapCell.owner === highlightedKindom }));
                 }
-                table.push(React.createElement("tr", { key: "r" + i }, rows));
+                table.push(React.createElement("tr", { key: "r" + i },
+                    " ",
+                    rows,
+                    " "));
             }
             return table;
         };
     }
     render() {
-        return (React.createElement("table", { id: "map" },
+        const { cellSize, colNum } = this.props;
+        const mapStyle = { width: cellSize * colNum };
+        return (React.createElement("table", { id: "map", style: mapStyle },
             React.createElement("tbody", null, this.createTable())));
     }
 }
@@ -12120,7 +12259,7 @@ exports.default = Map;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12189,7 +12328,7 @@ exports.default = Cell;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

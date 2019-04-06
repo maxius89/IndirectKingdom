@@ -1,11 +1,9 @@
-import World from './world';
-
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
+import World from './world';
 import Main from "./components/main";
 
 export default class Layout {
-
 
   static wWidth: number;  // Window Width
   static wHeight: number; // Window Height
@@ -66,7 +64,6 @@ export default class Layout {
     this.calcDashboardSize();
     this.calcMapSize();
     this.calcCellSize();
-    this.updateLayout();
   }
 
   static decideWindowOrientation(): void {
@@ -121,36 +118,15 @@ export default class Layout {
     this.resizeCells();
   }
 
-  static updateLayout(): void {
-    $("#mapDiv").css("width", Layout.mWidth + "px");
-    $("#mapDiv").css("height", Layout.mHeight + "px");
-    $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
-
-    if (Layout.wOrientation == Orientation.Landscape) {
-      $("#dashDiv").css("width", Layout.dThickness + "px");
-      $("#dashDiv").css("height", Layout.dLength + "px");
-
-      $("#dashDiv").css("top", "0px");
-      $("#dashDiv").css("left", Layout.mWidth + "px");
-    }
-    else {
-      $("#dashDiv").css("width", Layout.dLength + "px");
-      $("#dashDiv").css("height", Layout.dThickness + "px");
-
-      $("#dashDiv").css("top", Layout.mHeight + "px");
-      $("#dashDiv").css("left", "0px");
-    }
-  }
-
   static upscaleCells(): boolean {
     const verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
-    if (Layout.mWidth < verticalMapSize) return false;
+    if (Layout.mHeight < verticalMapSize) return false;
 
     const horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
-    if (Layout.mHeight < horizontalMapSize) return false;
+    if (Layout.mWidth < horizontalMapSize) return false;
 
-    const verticalScale = Layout.mWidth / verticalMapSize;
-    const horizontalScale = Layout.mHeight / horizontalMapSize;
+    const verticalScale = Layout.mHeight / verticalMapSize;
+    const horizontalScale = Layout.mWidth / horizontalMapSize;
     const scale = Math.min(verticalScale, horizontalScale);
     Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
 
