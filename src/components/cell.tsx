@@ -6,8 +6,9 @@ import Kingdom from '../kingdom';
 export interface CellProps {
   row: number;
   col: number;
-  cellObj: CellObj,
-  onSelect?:(event: Kingdom) => void
+  cellObj: CellObj;
+  onSelect?:(event: Kingdom) => void;
+  isHighlighted: boolean
 };
 
 class Cell extends React.Component<CellProps> {
@@ -60,18 +61,23 @@ class Cell extends React.Component<CellProps> {
   }
 
   public render() {
-    const {col, row} = this.props;
+    const {col, row, isHighlighted} = this.props;
+
+    const nonSelectedStyle = {boxShadow: "inset 1px 1px #ffffff, inset -1px -1px #ffffff"};
+    const selectedStyle = {boxShadow: "inset 1px 1px #dddd55, inset -1px -1px #dddd55"}; // TODO: width calculation
+
+    const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
+    const backGroundstyle = {backgroundColor: this.props.cellObj.owner.color};
+
+    const cellSstyle = {...boxShadowStyle, ...backGroundstyle};
 
     return (
       <td
         id={"r"+row+"c"+col}
         className="cell"
-        style={{backgroundColor: this.props.cellObj.owner.color}}
+        style={cellSstyle}
         onClick={() =>this.props.onSelect(this.props.cellObj.owner)}
-        /*status="unclaimed"  TODO*/
-        /*highlighted="false"  TODO*/
-        /*type="none"  TODO*/
-        >
+      >
         {this.showCellIcon()}
       </td>
     );

@@ -1,5 +1,4 @@
 import World from './world';
-import { g as global } from './script';
 
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
@@ -177,9 +176,9 @@ export default class Layout {
     $(".cell").css("height", Layout.mActualCellSize + "px");
     $(".cell").css("width", Layout.mActualCellSize + "px");
 
-    const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-    $(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
-      "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
+    //const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+    //$(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
+    //  "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
 
     $(".cellImg").css("height", Layout.mActualCellSize / 2 + "px");
     $(".cellImg").css("width", Layout.mActualCellSize / 2 + "px");
@@ -202,65 +201,6 @@ export default class Layout {
       $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
       $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
     }
-  }
-
-
-  static clicked(): void {
-    const clickedCellKingdom = World.listOfKingdoms.find(kingdom =>
-      $(this).attr("status") === kingdom.name);
-
-    World.listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
-
-    if (global.highlightedKindom === clickedCellKingdom) {
-      global.highlightedKindom = null;
-    }
-    else {
-      clickedCellKingdom.highlighted = true;
-      global.highlightedKindom = clickedCellKingdom;
-    }
-
-    Layout.setHighlightedCells();
-    Layout.writeToInfoPanel();
-  }
-
-  static setHighlightedCells(): void {
-    World.listOfKingdoms.forEach(function(kingdom) {
-      $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
-    });
-
-    const clickedCells = $(".cell[highlighted = false]");
-    const nonClickedCells = $(".cell[highlighted = true]");
-
-    const clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-    const nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
-
-    clickedCells.css("box-shadow", "inset " + clickedBorderSize + "px " + clickedBorderSize + "px #ffffff," +
-      "inset -" + clickedBorderSize + "px -" + clickedBorderSize + "px #ffffff");
-
-    nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize + "px " + nonClickedBorderSize + "px #dddd55," +
-      "inset -" + nonClickedBorderSize + "px -" + nonClickedBorderSize + "px #dddd55");
-  }
-
-
-  static writeToInfoPanel(): void {
-    let text1 = "&nbsp;";
-    let text2 = "&nbsp;";
-    let text3 = "&nbsp;";
-    let text4 = "&nbsp;";
-    if (global.highlightedKindom != null) {
-      text1 = global.highlightedKindom.name + " wealth: " + global.highlightedKindom.econ.wealth;
-      text2 = global.highlightedKindom.name + " industry: " + global.highlightedKindom.econ.industry;
-      text3 = global.highlightedKindom.name + " agriculture: " + global.highlightedKindom.econ.agriculture;
-      text4 = global.highlightedKindom.name + " population: " + global.highlightedKindom.econ.population;
-    }
-    else {
-      text1 = text2 = text3 = text4 = "&nbsp;"
-    }
-
-    $("#infoWealth").html(text1);
-    $("#infoIndustry").html(text2);
-    $("#infoAgriculture").html(text3);
-    $("#infoPopulation").html(text4);
   }
 
 }

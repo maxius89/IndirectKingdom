@@ -4,14 +4,19 @@ import Cell from '../cell';
 import Kingdom from '../kingdom';
 import World from '../world';
 import Map from './map';
+//import Layout from '../layout';
 import InfoPanel from './infoPanel';
 import {runGame, showPopulation } from '../script';
 
-export interface MainProps { colNum: number; rowNum: number; worldMap:Cell[][]}
+export interface MainProps {
+  colNum: number;
+  rowNum: number;
+  worldMap:Cell[][]
+}
 
 class Main extends React.Component<MainProps>  {
   state: {
-    highlightedKindom: Kingdom;
+    highlightedKindom: (Kingdom|null);
   };
 
   componentWillMount() {
@@ -21,30 +26,20 @@ class Main extends React.Component<MainProps>  {
   }
 
   handleSelect = (kingdom: Kingdom) => {
-    const clickedCellKingdom = World.listOfKingdoms.find(listKingdom =>
-        listKingdom === kingdom);
-        console.log(clickedCellKingdom.name);
+    const clickedCellKingdom = World.listOfKingdoms.find(
+      listKingdom =>listKingdom === kingdom
+    );
 
-    World.listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
+    let highlightedKindom =
+     this.state.highlightedKindom === clickedCellKingdom ?
+      null : clickedCellKingdom;
 
-    if (this.state.highlightedKindom === clickedCellKingdom){
-      this.setState({highlightedKindom: null});
-    }
-    else {
-      //clickedCellKingdom.highlighted = true;
-      this.setState({highlightedKindom: clickedCellKingdom});
-    }
-
-    console.log(this.state.highlightedKindom);
-
-  /*
-    Layout.setHighlightedCells();
-    Layout.writeToInfoPanel();*/
-
+    this.setState({highlightedKindom});
   };
 
   public render() {
     const { rowNum, colNum, worldMap } = this.props;
+    const { highlightedKindom } = this.state;
 
     const absolute: CSS.PositionProperty = 'absolute';
 
@@ -64,12 +59,18 @@ class Main extends React.Component<MainProps>  {
     return (
       <React.Fragment>
         <div id="mapDiv" style={mapDivStyle}>
-          <Map colNum={colNum} rowNum={rowNum} worldMap={worldMap} onSelect={this.handleSelect}/>
+          <Map
+            colNum={colNum}
+            rowNum={rowNum}
+            worldMap={worldMap}
+            highlightedKindom={highlightedKindom}
+            onSelect={this.handleSelect}
+          />
         </div>
         <div id="dashDiv" style={dashDivStyle}>
           <button onClick={runGame}>Start / Stop</button>
           <button onClick={showPopulation}>Show Population</button>
-          <InfoPanel/>
+          <InfoPanel highlightedKindom={highlightedKindom}/>
         </div>
       </React.Fragment>
     );

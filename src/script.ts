@@ -19,7 +19,6 @@ $(document).ready(function() {
     }, 200);
   });
 
-  $(".cell").click(Layout.clicked);
   $("#mapDiv")[0].addEventListener("wheel", Layout.zoom.bind(Layout));
 
   //setTimeout(test,500);
@@ -62,10 +61,6 @@ export function runGame(): void {
 
 function nextRound(): void {
   World.nextRound();
-
-  Layout.writeToInfoPanel();
-  Layout.setHighlightedCells();
-
   Layout.updateMap();
 
   if (g.showPopulation) {  // TODO: Temporary solution

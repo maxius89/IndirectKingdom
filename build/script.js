@@ -109,7 +109,6 @@ $(document).ready(function () {
             exports.g.resizeTimeout = 0;
         }, 200);
     });
-    $(".cell").click(layout_1.default.clicked);
     $("#mapDiv")[0].addEventListener("wheel", layout_1.default.zoom.bind(layout_1.default));
     //setTimeout(test,500);
 });
@@ -143,8 +142,7 @@ function runGame() {
 exports.runGame = runGame;
 function nextRound() {
     world_1.default.nextRound();
-    layout_1.default.writeToInfoPanel();
-    layout_1.default.setHighlightedCells();
+    //Layout.setHighlightedCells();
     layout_1.default.updateMap();
     if (exports.g.showPopulation) { // TODO: Temporary solution
         world_1.default.listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
@@ -11863,7 +11861,6 @@ exports.default = Kingdom;
 /* WEBPACK VAR INJECTION */(function($) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const world_1 = __webpack_require__(3);
-const script_1 = __webpack_require__(0);
 const React = __webpack_require__(19);
 const ReactDOM = __webpack_require__(20);
 const main_1 = __webpack_require__(21);
@@ -11977,9 +11974,9 @@ class Layout {
         Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
         $(".cell").css("height", Layout.mActualCellSize + "px");
         $(".cell").css("width", Layout.mActualCellSize + "px");
-        const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-        $(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
-            "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
+        //const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
+        //$(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
+        //  "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
         $(".cellImg").css("height", Layout.mActualCellSize / 2 + "px");
         $(".cellImg").css("width", Layout.mActualCellSize / 2 + "px");
         $(".cellImg").css("top", Layout.mActualCellSize / 8 + "px");
@@ -11998,51 +11995,6 @@ class Layout {
             $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
             $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
         }
-    }
-    static clicked() {
-        const clickedCellKingdom = world_1.default.listOfKingdoms.find(kingdom => $(this).attr("status") === kingdom.name);
-        world_1.default.listOfKingdoms.forEach(kingdom => kingdom.highlighted = false);
-        if (script_1.g.highlightedKindom === clickedCellKingdom) {
-            script_1.g.highlightedKindom = null;
-        }
-        else {
-            clickedCellKingdom.highlighted = true;
-            script_1.g.highlightedKindom = clickedCellKingdom;
-        }
-        Layout.setHighlightedCells();
-        Layout.writeToInfoPanel();
-    }
-    static setHighlightedCells() {
-        world_1.default.listOfKingdoms.forEach(function (kingdom) {
-            $(".cell[status = '" + kingdom.name + "']").attr("highlighted", String(kingdom.highlighted));
-        });
-        const clickedCells = $(".cell[highlighted = false]");
-        const nonClickedCells = $(".cell[highlighted = true]");
-        const clickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-        const nonClickedBorderSize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio) * 2;
-        clickedCells.css("box-shadow", "inset " + clickedBorderSize + "px " + clickedBorderSize + "px #ffffff," +
-            "inset -" + clickedBorderSize + "px -" + clickedBorderSize + "px #ffffff");
-        nonClickedCells.css("box-shadow", "inset " + nonClickedBorderSize + "px " + nonClickedBorderSize + "px #dddd55," +
-            "inset -" + nonClickedBorderSize + "px -" + nonClickedBorderSize + "px #dddd55");
-    }
-    static writeToInfoPanel() {
-        let text1 = "&nbsp;";
-        let text2 = "&nbsp;";
-        let text3 = "&nbsp;";
-        let text4 = "&nbsp;";
-        if (script_1.g.highlightedKindom != null) {
-            text1 = script_1.g.highlightedKindom.name + " wealth: " + script_1.g.highlightedKindom.econ.wealth;
-            text2 = script_1.g.highlightedKindom.name + " industry: " + script_1.g.highlightedKindom.econ.industry;
-            text3 = script_1.g.highlightedKindom.name + " agriculture: " + script_1.g.highlightedKindom.econ.agriculture;
-            text4 = script_1.g.highlightedKindom.name + " population: " + script_1.g.highlightedKindom.econ.population;
-        }
-        else {
-            text1 = text2 = text3 = text4 = "&nbsp;";
-        }
-        $("#infoWealth").html(text1);
-        $("#infoIndustry").html(text2);
-        $("#infoAgriculture").html(text3);
-        $("#infoPopulation").html(text4);
     }
 }
 Layout.mActualCellSize = 30; // Actual Cell size
@@ -12086,12 +12038,29 @@ module.exports = ReactDOM;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
+const world_1 = __webpack_require__(3);
 const map_1 = __webpack_require__(22);
+//import Layout from '../layout';
 const infoPanel_1 = __webpack_require__(24);
 const script_1 = __webpack_require__(0);
 class Main extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.handleSelect = (kingdom) => {
+            const clickedCellKingdom = world_1.default.listOfKingdoms.find(listKingdom => listKingdom === kingdom);
+            let highlightedKindom = this.state.highlightedKindom === clickedCellKingdom ?
+                null : clickedCellKingdom;
+            this.setState({ highlightedKindom });
+        };
+    }
+    componentWillMount() {
+        this.setState({
+            highlightedKindom: null
+        });
+    }
     render() {
         const { rowNum, colNum, worldMap } = this.props;
+        const { highlightedKindom } = this.state;
         const absolute = 'absolute';
         const mapDivStyle = {
             backgroundColor: "#00ff00",
@@ -12106,11 +12075,11 @@ class Main extends React.Component {
         };
         return (React.createElement(React.Fragment, null,
             React.createElement("div", { id: "mapDiv", style: mapDivStyle },
-                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum, worldMap: worldMap })),
+                React.createElement(map_1.default, { colNum: colNum, rowNum: rowNum, worldMap: worldMap, highlightedKindom: highlightedKindom, onSelect: this.handleSelect })),
             React.createElement("div", { id: "dashDiv", style: dashDivStyle },
                 React.createElement("button", { onClick: script_1.runGame }, "Start / Stop"),
                 React.createElement("button", { onClick: script_1.showPopulation }, "Show Population"),
-                React.createElement(infoPanel_1.default, null))));
+                React.createElement(infoPanel_1.default, { highlightedKindom: highlightedKindom }))));
     }
 }
 exports.default = Main;
@@ -12129,16 +12098,14 @@ class Map extends React.Component {
     constructor() {
         super(...arguments);
         this.createTable = () => {
-            const { rowNum, colNum, worldMap } = this.props;
+            const { rowNum, colNum, worldMap, highlightedKindom } = this.props;
             let table = [];
-            // Outer loop to create parent
             for (let i = 0; i < rowNum; i++) {
                 let rows = [];
                 for (let j = 0; j < colNum; j++) {
-                    //Inner loop to create children
-                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j, cellObj: worldMap[i][j] }));
+                    const mapCell = worldMap[i][j];
+                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j, cellObj: mapCell, onSelect: this.props.onSelect, isHighlighted: mapCell.owner === highlightedKindom }));
                 }
-                //Create the parent and add the childrens
                 table.push(React.createElement("tr", { key: "r" + i }, rows));
             }
             return table;
@@ -12172,7 +12139,6 @@ class Cell extends React.Component {
             backgroundColor: this.props.cellObj.owner.color
         };
         this.updateCell = () => {
-            console.log("cell updated");
             const owner = this.props.cellObj.owner;
             this.setState({
                 status: owner.name,
@@ -12210,9 +12176,13 @@ class Cell extends React.Component {
         return (React.createElement("img", { className: "cellImg", src: src }));
     }
     render() {
-        console.log("Render cell: " + this.props.cellObj.owner.name);
-        const { col, row } = this.props;
-        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell", style: { backgroundColor: this.props.cellObj.owner.color }, onClick: this.props.onClick }, this.showCellIcon()));
+        const { col, row, isHighlighted } = this.props;
+        const nonSelectedStyle = { boxShadow: "inset 1px 1px #ffffff, inset -1px -1px #ffffff" };
+        const selectedStyle = { boxShadow: "inset 1px 1px #dddd55, inset -1px -1px #dddd55" }; // TODO: width calculation
+        const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
+        const backGroundstyle = { backgroundColor: this.props.cellObj.owner.color };
+        const cellSstyle = Object.assign({}, boxShadowStyle, backGroundstyle);
+        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell", style: cellSstyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, this.showCellIcon()));
     }
 }
 exports.default = Cell;
@@ -12233,11 +12203,15 @@ class InfoPanel extends React.Component {
             width: 200,
             height: 377 //TODO: Layout.dLength / 2
         };
+        if (!this.props.highlightedKindom) {
+            return React.createElement("div", { id: "infoPanel", style: infoPanelStyle });
+        }
+        const { name, econ } = this.props.highlightedKindom;
         return (React.createElement("div", { id: "infoPanel", style: infoPanelStyle },
-            React.createElement("div", { id: "infoWealth" }),
-            React.createElement("div", { id: "infoIndustry" }),
-            React.createElement("div", { id: "infoAgriculture" }),
-            React.createElement("div", { id: "infoPopulation" })));
+            React.createElement("div", { id: "infoWealth" }, name + " wealth: " + econ.wealth),
+            React.createElement("div", { id: "infoIndustry" }, name + " industry: " + econ.industry),
+            React.createElement("div", { id: "infoAgriculture" }, name + " agriculture: " + econ.agriculture),
+            React.createElement("div", { id: "infoPopulation" }, name + " population: " + econ.population)));
     }
 }
 exports.default = InfoPanel;
