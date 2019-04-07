@@ -1,35 +1,24 @@
 import Globals from './global';
 import World from './world';
-import Layout from './layout';
+import renderLayout from './layout';
 export var g = new Globals;
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function(): void {
   setConsts();
   new World({ cols: g.sceneCols, rows: g.sceneRows });
-  Layout.renderLayout();
+  renderLayout();
 
   //setTimeout(test,500);
 });
 
-function setConsts(): boolean {
-
-  // System variables
-  g.runner = 0;
-  g.showPopulation = false;
-  g.started = false;
-
+function setConsts(): void {
   g.randomSeed = "0001";
-
   g.kingdomNames = ["unclaimed", "Red Kingdom", "Blue Kingdom", "Green Kingdom"];
-
   g.turnLength = 100;
-
   g.sceneRows = 25;
   g.sceneCols = 25;
   console.log(g);
-
-  return true;
-}
+};
 
 export function runGame(): void {
   if (!g.started) {
@@ -42,13 +31,13 @@ export function runGame(): void {
     clearInterval(g.runner);
     g.started = false;
   }
-}
+};
 
 function nextRound(): void {
   World.nextRound();
-  Layout.renderLayout();
-}
+  renderLayout();
+};
 
 export function showPopulation(): void {
   g.showPopulation = true;
-}
+};

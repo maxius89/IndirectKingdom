@@ -98,22 +98,18 @@ exports.g = new global_1.default;
 document.addEventListener("DOMContentLoaded", function () {
     setConsts();
     new world_1.default({ cols: exports.g.sceneCols, rows: exports.g.sceneRows });
-    layout_1.default.renderLayout();
+    layout_1.default();
     //setTimeout(test,500);
 });
 function setConsts() {
-    // System variables
-    exports.g.runner = 0;
-    exports.g.showPopulation = false;
-    exports.g.started = false;
     exports.g.randomSeed = "0001";
     exports.g.kingdomNames = ["unclaimed", "Red Kingdom", "Blue Kingdom", "Green Kingdom"];
     exports.g.turnLength = 100;
     exports.g.sceneRows = 25;
     exports.g.sceneCols = 25;
     console.log(exports.g);
-    return true;
 }
+;
 function runGame() {
     if (!exports.g.started) {
         exports.g.runner = setInterval(function () {
@@ -127,14 +123,17 @@ function runGame() {
     }
 }
 exports.runGame = runGame;
+;
 function nextRound() {
     world_1.default.nextRound();
-    layout_1.default.renderLayout();
+    layout_1.default();
 }
+;
 function showPopulation() {
     exports.g.showPopulation = true;
 }
 exports.showPopulation = showPopulation;
+;
 
 
 /***/ }),
@@ -1474,12 +1473,11 @@ const ReactDOM = __webpack_require__(19);
 const world_1 = __webpack_require__(2);
 const main_1 = __webpack_require__(20);
 const script_1 = __webpack_require__(0);
-class Layout {
-    static renderLayout() {
-        ReactDOM.render(React.createElement(main_1.default, { colNum: script_1.g.sceneCols, rowNum: script_1.g.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
-    }
+function renderLayout() {
+    ReactDOM.render(React.createElement(main_1.default, { colNum: script_1.g.sceneCols, rowNum: script_1.g.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
 }
-exports.default = Layout;
+exports.default = renderLayout;
+;
 
 
 /***/ }),
@@ -1502,11 +1500,11 @@ module.exports = ReactDOM;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(18);
-const resize_1 = __webpack_require__(21);
+const map_1 = __webpack_require__(21);
+const infoPanel_1 = __webpack_require__(23);
 const world_1 = __webpack_require__(2);
-const map_1 = __webpack_require__(22);
-const infoPanel_1 = __webpack_require__(24);
 const script_1 = __webpack_require__(0);
+const resize_1 = __webpack_require__(24);
 class Main extends React.Component {
     constructor() {
         super(...arguments);
@@ -1567,14 +1565,147 @@ class Main extends React.Component {
             React.createElement("div", { id: "dashDiv", style: dashDivStyle },
                 React.createElement("button", { onClick: script_1.runGame }, "Start / Stop"),
                 React.createElement("button", { onClick: script_1.showPopulation }, "Show Population"),
-                React.createElement(infoPanel_1.default, { highlightedKindom: highlightedKindom }))));
+                React.createElement(infoPanel_1.default, { highlightedKindom: highlightedKindom, height: panelSize.dashboardHeight / 2, width: panelSize.dashboardWidth }))));
     }
+    ;
 }
 exports.default = Main;
 
 
 /***/ }),
 /* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(18);
+const cell_1 = __webpack_require__(22);
+class Map extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.createTable = () => {
+            const { rowNum, colNum, worldMap, highlightedKindom, cellSize } = this.props;
+            let table = [];
+            for (let i = 0; i < rowNum; ++i) {
+                let rows = [];
+                for (let j = 0; j < colNum; ++j) {
+                    const mapCell = worldMap[i][j];
+                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, cellSize: cellSize, cellObj: mapCell, onSelect: this.props.onSelect, isHighlighted: mapCell.owner === highlightedKindom }));
+                }
+                table.push(React.createElement("tr", { key: "r" + i }, rows));
+            }
+            return table;
+        };
+    }
+    render() {
+        const { cellSize, colNum } = this.props;
+        const mapStyle = { width: cellSize * colNum };
+        return (React.createElement("table", { id: "map", style: mapStyle },
+            React.createElement("tbody", null, this.createTable())));
+    }
+    ;
+}
+exports.default = Map;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(18);
+const cell_1 = __webpack_require__(3);
+const script_1 = __webpack_require__(0);
+class Cell extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.borderRatio = 0.02; // Cell-size/border thickness ratio
+    }
+    showCellIcon() {
+        const { cellObj, cellSize } = this.props;
+        const type = cellObj.type;
+        const cellImgStyle = {
+            height: cellSize / 2,
+            width: cellSize / 2,
+            top: cellSize / 8,
+            left: cellSize / 8
+        };
+        let src;
+        switch (type) {
+            case cell_1.LandType.Farm:
+                src = 'img/farm.svg';
+                break;
+            case cell_1.LandType.Settlement:
+                src = 'img/settlement.svg';
+                break;
+            case cell_1.LandType.Forest:
+                src = 'img/forest.svg';
+                break;
+            case cell_1.LandType.Mountain:
+                src = 'img/mountain.svg';
+                break;
+            default:
+            //TODO: create Unknown cell-type svg.
+        }
+        return (React.createElement("img", { className: "cellImg", style: cellImgStyle, src: src }));
+    }
+    render() {
+        const { isHighlighted, cellSize, cellObj } = this.props;
+        const borderThickness = isHighlighted ?
+            Math.ceil(cellSize * this.borderRatio) * 2 :
+            Math.ceil(cellSize * this.borderRatio);
+        const nonSelectedStyle = { boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #ffffff," +
+                "inset -" + borderThickness + "px -" + borderThickness + "px #ffffff" };
+        const selectedStyle = { boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #dddd55," +
+                "inset -" + borderThickness + "px -" + borderThickness + "px #dddd55" };
+        const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
+        const backGroundstyle = { backgroundColor: cellObj.owner.color };
+        const cellStyle = Object.assign({ height: cellSize, width: cellSize }, boxShadowStyle, backGroundstyle);
+        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellStyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, script_1.g.showPopulation ?
+            String(Math.round(cellObj.population))
+            : this.showCellIcon()));
+    }
+    ;
+}
+exports.default = Cell;
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const React = __webpack_require__(18);
+class InfoPanel extends React.Component {
+    render() {
+        const { highlightedKindom, height, width } = this.props;
+        const infoPanelStyle = {
+            backgroundColor: "#ffffff",
+            width,
+            height
+        };
+        if (!highlightedKindom) {
+            return React.createElement("div", { id: "infoPanel", style: infoPanelStyle });
+        }
+        const { name, econ } = this.props.highlightedKindom;
+        return (React.createElement("div", { id: "infoPanel", style: infoPanelStyle },
+            React.createElement("div", { id: "infoWealth" }, name + " wealth: " + econ.wealth),
+            React.createElement("div", { id: "infoIndustry" }, name + " industry: " + econ.industry),
+            React.createElement("div", { id: "infoAgriculture" }, name + " agriculture: " + econ.agriculture),
+            React.createElement("div", { id: "infoPopulation" }, name + " population: " + econ.population)));
+    }
+    ;
+}
+exports.default = InfoPanel;
+
+
+/***/ }),
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1702,149 +1833,6 @@ Resize.zoomMap = (event) => {
     return Resize.mActualCellSize = Resize.normalizeCellSize();
 };
 exports.default = Resize;
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
-const cell_1 = __webpack_require__(23);
-class Map extends React.Component {
-    constructor() {
-        super(...arguments);
-        this.createTable = () => {
-            const { rowNum, colNum, worldMap, highlightedKindom, cellSize } = this.props;
-            let table = [];
-            for (let i = 0; i < rowNum; i++) {
-                let rows = [];
-                for (let j = 0; j < colNum; j++) {
-                    const mapCell = worldMap[i][j];
-                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, cellSize: cellSize, cellObj: mapCell, onSelect: this.props.onSelect, isHighlighted: mapCell.owner === highlightedKindom }));
-                }
-                table.push(React.createElement("tr", { key: "r" + i }, rows));
-            }
-            return table;
-        };
-    }
-    render() {
-        const { cellSize, colNum } = this.props;
-        const mapStyle = { width: cellSize * colNum };
-        return (React.createElement("table", { id: "map", style: mapStyle },
-            React.createElement("tbody", null, this.createTable())));
-    }
-}
-exports.default = Map;
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
-const cell_1 = __webpack_require__(3);
-const script_1 = __webpack_require__(0);
-;
-class Cell extends React.Component {
-    constructor() {
-        super(...arguments);
-        this.state = {
-            status: this.props.cellObj.owner.name,
-            highlighted: false,
-            type: 'none',
-            backgroundColor: this.props.cellObj.owner.color
-        };
-        this.borderRatio = 0.02; // Cell-size/border thickness ratio
-        this.updateCell = () => {
-            const owner = this.props.cellObj.owner;
-            this.setState({
-                status: owner.name,
-                backgroundColor: owner.color
-            });
-        };
-    }
-    componentDidMount() {
-        this.updateCell();
-    }
-    showCellIcon() {
-        const { cellObj, cellSize } = this.props;
-        const type = cellObj.type;
-        const cellImgStyle = {
-            height: cellSize / 2,
-            width: cellSize / 2,
-            top: cellSize / 8,
-            left: cellSize / 8
-        };
-        let src;
-        switch (type) {
-            case cell_1.LandType.Farm:
-                src = 'img/farm.svg';
-                break;
-            case cell_1.LandType.Settlement:
-                src = 'img/settlement.svg';
-                break;
-            case cell_1.LandType.Forest:
-                src = 'img/forest.svg';
-                break;
-            case cell_1.LandType.Mountain:
-                src = 'img/mountain.svg';
-                break;
-            default:
-            //TODO: create Unknown cell-type svg.
-        }
-        return (React.createElement("img", { className: "cellImg", style: cellImgStyle, src: src }));
-    }
-    render() {
-        const { isHighlighted, cellSize, cellObj } = this.props;
-        const borderThickness = isHighlighted ?
-            Math.ceil(cellSize * this.borderRatio) * 2 :
-            Math.ceil(cellSize * this.borderRatio);
-        const nonSelectedStyle = { boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #ffffff," +
-                "inset -" + borderThickness + "px -" + borderThickness + "px #ffffff" };
-        const selectedStyle = { boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #dddd55," +
-                "inset -" + borderThickness + "px -" + borderThickness + "px #dddd55" };
-        const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
-        const backGroundstyle = { backgroundColor: this.props.cellObj.owner.color };
-        const cellSstyle = Object.assign({ height: cellSize, width: cellSize }, boxShadowStyle, backGroundstyle);
-        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellSstyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, script_1.g.showPopulation ? String(Math.round(cellObj.population)) : this.showCellIcon()));
-    }
-}
-exports.default = Cell;
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
-class InfoPanel extends React.Component {
-    render() {
-        const infoPanelStyle = {
-            backgroundColor: "#ffffff",
-            width: 200,
-            height: 377 //TODO: Layout.dLength / 2
-        };
-        if (!this.props.highlightedKindom) {
-            return React.createElement("div", { id: "infoPanel", style: infoPanelStyle });
-        }
-        const { name, econ } = this.props.highlightedKindom;
-        return (React.createElement("div", { id: "infoPanel", style: infoPanelStyle },
-            React.createElement("div", { id: "infoWealth" }, name + " wealth: " + econ.wealth),
-            React.createElement("div", { id: "infoIndustry" }, name + " industry: " + econ.industry),
-            React.createElement("div", { id: "infoAgriculture" }, name + " agriculture: " + econ.agriculture),
-            React.createElement("div", { id: "infoPopulation" }, name + " population: " + econ.population)));
-    }
-}
-exports.default = InfoPanel;
 
 
 /***/ })

@@ -12,20 +12,19 @@ export interface MapProps {
   onSelect: (event: any) => void;
 }
 
-class Map extends React.Component<MapProps>  {
-
-  private createTable = () => {
+class Map extends React.Component<MapProps> {
+  private createTable = (): React.ReactNode[] => {
     const { rowNum, colNum, worldMap, highlightedKindom, cellSize } = this.props;
-    let table = []
+    let table: React.ReactNode[] = [];
 
-    for (let i = 0; i < rowNum; i++) {
-      let rows = []
-      for (let j = 0; j < colNum; j++) {
+    for (let i = 0; i < rowNum; ++i) {
+      let rows: React.ReactNode[] = [];
+      for (let j = 0; j < colNum; ++j) {
         const mapCell = worldMap[i][j];
         rows.push(
           <Cell
             key={ "r"+i + "c" + j }
-            cellSize= {cellSize}
+            cellSize= { cellSize }
             cellObj = { mapCell }
             onSelect = { this.props.onSelect }
             isHighlighted = { mapCell.owner === highlightedKindom }
@@ -33,23 +32,24 @@ class Map extends React.Component<MapProps>  {
          )
       }
 
-      table.push(<tr key={"r"+i}>{ rows }</tr>)
+      table.push(<tr key={"r"+i}>{ rows }</tr>);
     }
-    return table
+    return table;
   }
 
-  public render() {
-    const {cellSize, colNum} = this.props;
-    const mapStyle = {width: cellSize * colNum};
+  public render(): React.ReactNode {
+    const { cellSize, colNum } = this.props;
+    const mapStyle = { width: cellSize * colNum };
 
     return (
-      <table id= "map" style={mapStyle}>
+      <table id= "map" style={ mapStyle }>
         <tbody>
           { this.createTable() }
         </tbody>
       </table>
     );
-  }
+  };
+  
 }
 
 export default Map;

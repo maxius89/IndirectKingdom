@@ -7,26 +7,15 @@ import { g } from '../script';
 export interface CellProps {
   cellSize: number;
   cellObj: CellObj;
-  onSelect?:(event: Kingdom) => void;
-  isHighlighted: boolean
-};
+  onSelect?: (event: Kingdom) => void;
+  isHighlighted: boolean;
+}
 
 class Cell extends React.Component<CellProps> {
-  state= {
-    status: this.props.cellObj.owner.name,
-    highlighted: false,
-    type: 'none',
-    backgroundColor: this.props.cellObj.owner.color
-  };
-
-  readonly borderRatio = 0.02;// Cell-size/border thickness ratio
-
-  componentDidMount() {
-    this.updateCell();
-  }
+  readonly borderRatio = 0.02; // Cell-size/border thickness ratio
 
    showCellIcon(): JSX.Element {
-     const {cellObj, cellSize} = this.props;
+     const { cellObj, cellSize } = this.props;
      const type = cellObj.type;
      const cellImgStyle = {
        height: cellSize / 2,
@@ -35,7 +24,7 @@ class Cell extends React.Component<CellProps> {
        left: cellSize / 8
      };
 
-    let src:string;
+    let src: string;
     switch (type) {
       case LandType.Farm:
         src = 'img/farm.svg';
@@ -52,34 +41,33 @@ class Cell extends React.Component<CellProps> {
       default:
       //TODO: create Unknown cell-type svg.
     }
-    return (<img className="cellImg" style ={cellImgStyle} src={src}></img>);
+    return (
+      <img
+        className="cellImg"
+        style ={ cellImgStyle }
+        src={ src }
+      />
+    );
   }
 
-  updateCell = () => {
-    const owner = this.props.cellObj.owner;
-
-    this.setState({
-      status: owner.name,
-      backgroundColor: owner.color
-    });
-  }
-
-  public render() {
-    const {isHighlighted, cellSize, cellObj} = this.props;
+  public render(): React.ReactNode {
+    const { isHighlighted, cellSize, cellObj } = this.props;
 
     const borderThickness = isHighlighted ?
-      Math.ceil(cellSize * this.borderRatio)* 2 :
+      Math.ceil(cellSize * this.borderRatio) * 2 :
       Math.ceil(cellSize * this.borderRatio);
 
-    const nonSelectedStyle = {boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #ffffff," +
-      "inset -" + borderThickness + "px -" + borderThickness + "px #ffffff"};
-    const selectedStyle = {boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #dddd55," +
-      "inset -" + borderThickness + "px -" + borderThickness + "px #dddd55"};
+    const nonSelectedStyle = { boxShadow:
+      "inset " + borderThickness + "px " + borderThickness + "px #ffffff," +
+      "inset -" + borderThickness + "px -" + borderThickness + "px #ffffff" };
+    const selectedStyle = { boxShadow:
+      "inset " + borderThickness + "px " + borderThickness + "px #dddd55," +
+      "inset -" + borderThickness + "px -" + borderThickness + "px #dddd55" };
 
     const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
-    const backGroundstyle = {backgroundColor: this.props.cellObj.owner.color};
+    const backGroundstyle = { backgroundColor: cellObj.owner.color };
 
-    const cellSstyle = {
+    const cellStyle = {
       height: cellSize,
       width: cellSize,
       ...boxShadowStyle,
@@ -88,15 +76,20 @@ class Cell extends React.Component<CellProps> {
 
     return (
       <td
-        id={"r"+cellObj.pos.row+"c"+cellObj.pos.col}
+        id={ "r"+cellObj.pos.row+"c"+cellObj.pos.col }
         className="cell"
-        style={cellSstyle}
-        onClick={() =>this.props.onSelect(this.props.cellObj.owner)}
+        style={ cellStyle }
+        onClick={ () =>this.props.onSelect(this.props.cellObj.owner) }
       >
-        {g.showPopulation ? String(Math.round(cellObj.population)) : this.showCellIcon()}
+        {
+          g.showPopulation ?
+          String(Math.round(cellObj.population))
+          : this.showCellIcon()
+        }
       </td>
     );
-  }
+  };
+
 }
 
 export default Cell;

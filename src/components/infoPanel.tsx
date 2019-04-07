@@ -3,17 +3,21 @@ import Kingdom from '../kingdom';
 
 export interface InfoPanelProps {
   highlightedKindom: (Kingdom | undefined);
+  height: number;
+  width: number;
  }
 
 class InfoPanel extends React.Component<InfoPanelProps> {
-  public render() {
+  public render(): React.ReactNode {
+    const { highlightedKindom, height, width } = this.props;
+
     const infoPanelStyle ={
       backgroundColor: "#ffffff",
-      width: 200,  //TODO: Layout.dThickness
-      height: 377  //TODO: Layout.dLength / 2
+      width,
+      height
     };
 
-    if (!this.props.highlightedKindom){return <div id ="infoPanel" style={infoPanelStyle}/>;}
+    if (!highlightedKindom){return <div id ="infoPanel" style={infoPanelStyle}/>;}
 
     const {name, econ} = this.props.highlightedKindom;
     return (
@@ -32,7 +36,8 @@ class InfoPanel extends React.Component<InfoPanelProps> {
         </div>
       </div>
     );
-  }
+  };
+  
 }
 
 export default InfoPanel;

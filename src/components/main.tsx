@@ -1,17 +1,17 @@
 import * as React from "react";
 import * as CSS from 'csstype';
-import Resize, {Output as SizingOutput} from "../util/resize";
+import Map from './map';
+import InfoPanel from './infoPanel';
 import Cell from '../cell';
 import Kingdom from '../kingdom';
 import World from '../world';
-import Map from './map';
-import InfoPanel from './infoPanel';
-import {runGame, showPopulation} from '../script';
+import { runGame, showPopulation } from '../script';
+import Resize, {Output as SizingOutput} from "../util/resize";
 
 export interface MainProps {
   colNum: number;
   rowNum: number;
-  worldMap: Cell[][]
+  worldMap: Cell[][];
 }
 
 class Main extends React.Component<MainProps> {
@@ -20,27 +20,27 @@ class Main extends React.Component<MainProps> {
     panelSize: SizingOutput;
   };
 
-  componentWillMount() {
+  componentWillMount(): void {
     this.setState(
-      {panelSize: Resize.calculatePanelSizes(), highlightedKindom: null}
+      { panelSize: Resize.calculatePanelSizes(), highlightedKindom: null }
     );
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     document.getElementById("mapDiv").addEventListener("wheel", this.zoomMap);
     window.addEventListener("resize", this.updateDimensions);
   };
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     document.getElementById("mapDiv").removeEventListener("wheel", this.zoomMap);
     window.removeEventListener("resize", this.updateDimensions);
   };
 
-  updateDimensions = () => {
-    this.setState({panelSize: Resize.calculatePanelSizes()});
+  updateDimensions = (): void => {
+    this.setState({ panelSize: Resize.calculatePanelSizes() });
   };
 
-  handleSelect = (kingdom : Kingdom) => {
+  handleSelect = (kingdom : Kingdom): void => {
     const clickedCellKingdom = World.listOfKingdoms.find(
       listKingdom => listKingdom === kingdom
     );
@@ -49,18 +49,18 @@ class Main extends React.Component<MainProps> {
       ? null
       : clickedCellKingdom;
 
-    this.setState({highlightedKindom});
+    this.setState({ highlightedKindom });
   };
 
-  zoomMap = (event: MouseWheelEvent) => {
+  zoomMap = (event: MouseWheelEvent): void => {
     const panelSize = {...this.state.panelSize};
     panelSize.mapCellSize= Resize.zoomMap(event);
-    this.setState({panelSize});
+    this.setState({ panelSize });
   };
 
-  public render() {
-    const {rowNum, colNum, worldMap} = this.props;
-    const {highlightedKindom, panelSize} = this.state;
+  public render(): React.ReactNode {
+    const { rowNum, colNum, worldMap } = this.props;
+    const { highlightedKindom, panelSize } = this.state;
 
     const absolute: CSS.PositionProperty = 'absolute';
 
@@ -85,24 +85,29 @@ class Main extends React.Component<MainProps> {
 
     return (
       <React.Fragment>
-        <div id="mapDiv" style={mapDivStyle}>
+        <div id="mapDiv" style={ mapDivStyle }>
           <Map
-            colNum={colNum}
-            rowNum={rowNum}
-            worldMap={worldMap}
-            highlightedKindom={highlightedKindom}
-            cellSize={panelSize.mapCellSize}
-            onSelect={this.handleSelect}
+            colNum={ colNum }
+            rowNum={ rowNum }
+            worldMap={ worldMap }
+            highlightedKindom={ highlightedKindom }
+            cellSize={ panelSize.mapCellSize }
+            onSelect={ this.handleSelect }
         />
         </div>
-        <div id="dashDiv" style={dashDivStyle}>
-          <button onClick={runGame}>Start / Stop</button>
-          <button onClick={showPopulation}>Show Population</button>
-          <InfoPanel highlightedKindom={highlightedKindom}/>
+        <div id="dashDiv" style={ dashDivStyle }>
+          <button onClick={ runGame }>Start / Stop</button>
+          <button onClick={ showPopulation }>Show Population</button>
+          <InfoPanel
+            highlightedKindom={ highlightedKindom }
+            height={ panelSize.dashboardHeight/2 }
+            width={ panelSize.dashboardWidth }
+          />
         </div>
       </React.Fragment>
     );
-  }
+  };
+
 }
 
 export default Main;

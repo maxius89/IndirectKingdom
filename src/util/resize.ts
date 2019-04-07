@@ -1,4 +1,4 @@
-import {g} from '../script';
+import { g as Global } from '../script';
 
 enum Orientation {
   Portrait,
@@ -117,10 +117,10 @@ export default class Resize {
   };
 
   static calcCellSize(): void {
-    const verticalMapSize = g.sceneRows * Resize.mActualCellSize;
+    const verticalMapSize = Global.sceneRows * Resize.mActualCellSize;
     if (Resize.mHeight < verticalMapSize) return;
 
-    const horizontalMapSize = g.sceneCols * Resize.mActualCellSize;
+    const horizontalMapSize = Global.sceneCols * Resize.mActualCellSize;
     if (Resize.mWidth < horizontalMapSize) return;
 
     const verticalScale = Resize.mHeight / verticalMapSize;
@@ -153,6 +153,7 @@ export default class Resize {
     return Math.min(Resize.maxCellSize,
       Math.max(Resize.minCellSize, Resize.mActualCellSize));
   };
+
 }
 
 export interface Output {
