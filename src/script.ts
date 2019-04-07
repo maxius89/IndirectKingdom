@@ -19,8 +19,6 @@ $(document).ready(function() {
     }, 200);
   });
 
-  $("#mapDiv")[0].addEventListener("wheel", Layout.zoom.bind(Layout));
-
   //setTimeout(test,500);
 });
 

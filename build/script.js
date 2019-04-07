@@ -109,7 +109,6 @@ $(document).ready(function () {
             exports.g.resizeTimeout = 0;
         }, 200);
     });
-    $("#mapDiv")[0].addEventListener("wheel", layout_1.default.zoom.bind(layout_1.default));
     //setTimeout(test,500);
 });
 function setConsts() {
@@ -11953,8 +11952,8 @@ class Layout {
     static resizeCells() {
         Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
         Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
-        $(".cell").css("height", Layout.mActualCellSize + "px");
-        $(".cell").css("width", Layout.mActualCellSize + "px");
+        //$(".cell").css("height", Layout.mActualCellSize + "px");
+        //$(".cell").css("width", Layout.mActualCellSize + "px");
         //const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
         //$(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
         //  "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
@@ -11962,20 +11961,6 @@ class Layout {
         $(".cellImg").css("width", Layout.mActualCellSize / 2 + "px");
         $(".cellImg").css("top", Layout.mActualCellSize / 8 + "px");
         $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
-    }
-    static zoom(event) {
-        if (event.ctrlKey === true) {
-            event.preventDefault();
-            if (event.deltaY < 0) {
-                Layout.mActualCellSize += Layout.stepCellSize;
-            }
-            else {
-                Layout.mActualCellSize -= Layout.stepCellSize;
-            }
-            Layout.resizeCells();
-            $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
-            $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
-        }
     }
 }
 Layout.mActualCellSize = 30; // Actual Cell size
@@ -12016,7 +12001,7 @@ module.exports = ReactDOM;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function($) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
 const resize_1 = __webpack_require__(22);
@@ -12037,12 +12022,18 @@ class Main extends React.Component {
                 : clickedCellKingdom;
             this.setState({ highlightedKindom });
         };
+        this.zoomMap = (event) => {
+            const panelSize = Object.assign({}, this.state.panelSize);
+            panelSize.mapCellSize = resize_1.default.zoomMap(event);
+            this.setState({ panelSize });
+        };
     }
     componentWillMount() {
         this.setState({ panelSize: resize_1.default.calculatePanelSizes(), highlightedKindom: null });
     }
     ;
     componentDidMount() {
+        $("#mapDiv")[0].addEventListener("wheel", this.zoomMap);
         window.addEventListener("resize", this.updateDimensions);
     }
     ;
@@ -12082,6 +12073,7 @@ class Main extends React.Component {
 }
 exports.default = Main;
 
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
 /* 22 */
@@ -12099,11 +12091,15 @@ class Resize {
     static calculatePanelSizes() {
         Resize.wWidth = Number(window.innerWidth);
         Resize.wHeight = Number(window.innerHeight);
+        //Resize.mActualCellSize = Resize.mActualCellSize === undefined ?
+        //  30: Resize.mActualCellSize ;
+        //  //console.log(Resize.mActualCellSize)
         Resize.decideWindowOrientation();
         Resize.calcDashboardSize();
         Resize.calcMapSize();
         Resize.positionDashboard();
         Resize.calcCellSize();
+        //console.log(Resize.mActualCellSize);
         return ({
             windowWidth: Resize.wWidth,
             windowHeight: Resize.wHeight,
@@ -12164,24 +12160,6 @@ class Resize {
             Resize.dTop = Resize.mHeight;
             Resize.dLeft = 0;
         }
-        /*  $("#mapDiv").css("width", Layout.mWidth + "px");
-          $("#mapDiv").css("height", Layout.mHeight + "px");
-          $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
-    
-          if (Layout.wOrientation == Orientation.Landscape) {
-            $("#dashDiv").css("width", Layout.dThickness + "px");
-            $("#dashDiv").css("height", Layout.dLength + "px");
-    
-            $("#dashDiv").css("top", "0px");
-            $("#dashDiv").css("left", Layout.mWidth + "px");
-          }
-          else {
-            $("#dashDiv").css("width", Layout.dLength + "px");
-            $("#dashDiv").css("height", Layout.dThickness + "px");
-    
-            $("#dashDiv").css("top", Layout.mHeight + "px");
-            $("#dashDiv").css("left", "0px");
-          }*/
     }
     ;
     static calcCellSize() {
@@ -12197,10 +12175,15 @@ class Resize {
         Resize.mActualCellSize = Math.floor(Resize.mActualCellSize * scale);
         Resize.mActualCellSize =
             Resize.roundToNumber(Resize.mActualCellSize, Resize.stepCellSize);
+        Resize.mActualCellSize = Resize.normalizeCellSize();
     }
     ;
     static roundToNumber(rounded, roundTo) {
         return Math.round(rounded / roundTo) * roundTo;
+    }
+    ;
+    static normalizeCellSize() {
+        return Math.min(Resize.maxCellSize, Math.max(Resize.minCellSize, Resize.mActualCellSize));
     }
     ;
 }
@@ -12216,6 +12199,15 @@ Resize.thicknessRatio = 0.2;
 Resize.minThickness = 200; // px      // Dashboard thickness minimum
 Resize.maxThickness = 400; // px      // Dashboard thickness maximum
 Resize.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
+Resize.zoomMap = (event) => {
+    if (event.ctrlKey === true) {
+        event.preventDefault();
+        Resize.mActualCellSize = event.deltaY < 0 ?
+            Resize.mActualCellSize += Resize.stepCellSize :
+            Resize.mActualCellSize -= Resize.stepCellSize;
+    }
+    return Resize.mActualCellSize = Resize.normalizeCellSize();
+};
 exports.default = Resize;
 
 
@@ -12232,13 +12224,13 @@ class Map extends React.Component {
     constructor() {
         super(...arguments);
         this.createTable = () => {
-            const { rowNum, colNum, worldMap, highlightedKindom } = this.props;
+            const { rowNum, colNum, worldMap, highlightedKindom, cellSize } = this.props;
             let table = [];
             for (let i = 0; i < rowNum; i++) {
                 let rows = [];
                 for (let j = 0; j < colNum; j++) {
                     const mapCell = worldMap[i][j];
-                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, row: i, col: j, cellObj: mapCell, onSelect: this.props.onSelect, isHighlighted: mapCell.owner === highlightedKindom }));
+                    rows.push(React.createElement(cell_1.default, { key: "r" + i + "c" + j, cellSize: cellSize, cellObj: mapCell, onSelect: this.props.onSelect, isHighlighted: mapCell.owner === highlightedKindom }));
                 }
                 table.push(React.createElement("tr", { key: "r" + i },
                     " ",
@@ -12315,13 +12307,13 @@ class Cell extends React.Component {
         return (React.createElement("img", { className: "cellImg", src: src }));
     }
     render() {
-        const { col, row, isHighlighted } = this.props;
+        const { isHighlighted, cellSize, cellObj } = this.props;
         const nonSelectedStyle = { boxShadow: "inset 1px 1px #ffffff, inset -1px -1px #ffffff" };
         const selectedStyle = { boxShadow: "inset 1px 1px #dddd55, inset -1px -1px #dddd55" }; // TODO: width calculation
         const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
         const backGroundstyle = { backgroundColor: this.props.cellObj.owner.color };
-        const cellSstyle = Object.assign({}, boxShadowStyle, backGroundstyle);
-        return (React.createElement("td", { id: "r" + row + "c" + col, className: "cell", style: cellSstyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, this.showCellIcon()));
+        const cellSstyle = Object.assign({ height: cellSize, width: cellSize }, boxShadowStyle, backGroundstyle);
+        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellSstyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, this.showCellIcon()));
     }
 }
 exports.default = Cell;

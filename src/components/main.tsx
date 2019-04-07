@@ -27,6 +27,7 @@ class Main extends React.Component<MainProps> {
   };
 
   componentDidMount() {
+    $("#mapDiv")[0].addEventListener("wheel", this.zoomMap);
     window.addEventListener("resize", this.updateDimensions);
   };
 
@@ -48,6 +49,12 @@ class Main extends React.Component<MainProps> {
       : clickedCellKingdom;
 
     this.setState({highlightedKindom});
+  };
+
+  zoomMap = (event: MouseWheelEvent): void => {
+    const panelSize = {...this.state.panelSize};
+    panelSize.mapCellSize= Resize.zoomMap(event);
+    this.setState({panelSize});
   };
 
   public render() {
@@ -84,7 +91,8 @@ class Main extends React.Component<MainProps> {
             worldMap={worldMap}
             highlightedKindom={highlightedKindom}
             cellSize={panelSize.mapCellSize}
-            onSelect={this.handleSelect}/>
+            onSelect={this.handleSelect}
+        />
         </div>
         <div id="dashDiv" style={dashDivStyle}>
           <button onClick={runGame}>Start / Stop</button>

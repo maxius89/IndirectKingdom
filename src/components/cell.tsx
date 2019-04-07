@@ -4,8 +4,7 @@ import CellObj from '../cell';
 import Kingdom from '../kingdom';
 
 export interface CellProps {
-  row: number;
-  col: number;
+  cellSize: number;
   cellObj: CellObj;
   onSelect?:(event: Kingdom) => void;
   isHighlighted: boolean
@@ -61,7 +60,7 @@ class Cell extends React.Component<CellProps> {
   }
 
   public render() {
-    const {col, row, isHighlighted} = this.props;
+    const {isHighlighted, cellSize, cellObj} = this.props;
 
     const nonSelectedStyle = {boxShadow: "inset 1px 1px #ffffff, inset -1px -1px #ffffff"};
     const selectedStyle = {boxShadow: "inset 1px 1px #dddd55, inset -1px -1px #dddd55"}; // TODO: width calculation
@@ -69,11 +68,16 @@ class Cell extends React.Component<CellProps> {
     const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
     const backGroundstyle = {backgroundColor: this.props.cellObj.owner.color};
 
-    const cellSstyle = {...boxShadowStyle, ...backGroundstyle};
+    const cellSstyle = {
+      height: cellSize,
+      width: cellSize,
+      ...boxShadowStyle,
+      ...backGroundstyle,
+    };
 
     return (
       <td
-        id={"r"+row+"c"+col}
+        id={"r"+cellObj.pos.row+"c"+cellObj.pos.col}
         className="cell"
         style={cellSstyle}
         onClick={() =>this.props.onSelect(this.props.cellObj.owner)}

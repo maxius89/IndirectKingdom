@@ -131,10 +131,28 @@ export default class Resize {
 
     Resize.mActualCellSize =
       Resize.roundToNumber(Resize.mActualCellSize, Resize.stepCellSize);
+    Resize.mActualCellSize = Resize.normalizeCellSize();
   };
+
+  static zoomMap = (event: MouseWheelEvent): number => {
+    if (event.ctrlKey === true) {
+      event.preventDefault();
+
+      Resize.mActualCellSize = event.deltaY < 0 ?
+      Resize.mActualCellSize += Resize.stepCellSize:
+      Resize.mActualCellSize -= Resize.stepCellSize;
+    }
+    return Resize.mActualCellSize = Resize.normalizeCellSize();
+  };
+
 
   static roundToNumber(rounded: number, roundTo: number): number {
     return Math.round(rounded / roundTo) * roundTo;
+  };
+
+  static normalizeCellSize(): number {
+    return Math.min(Resize.maxCellSize,
+      Math.max(Resize.minCellSize, Resize.mActualCellSize));
   };
 }
 

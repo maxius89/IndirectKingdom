@@ -9,13 +9,13 @@ export interface MapProps {
   worldMap: CellObj[][];
   highlightedKindom: (Kingdom | null);
   cellSize: number;
-  onSelect: (event: any) => void
+  onSelect: (event: any) => void;
 }
 
 class Map extends React.Component<MapProps>  {
 
   private createTable = () => {
-    const { rowNum, colNum, worldMap, highlightedKindom } = this.props;
+    const { rowNum, colNum, worldMap, highlightedKindom, cellSize } = this.props;
     let table = []
 
     for (let i = 0; i < rowNum; i++) {
@@ -25,8 +25,7 @@ class Map extends React.Component<MapProps>  {
         rows.push(
           <Cell
             key={ "r"+i + "c" + j }
-            row = { i }
-            col = { j }
+            cellSize= {cellSize}
             cellObj = { mapCell }
             onSelect = { this.props.onSelect }
             isHighlighted = { mapCell.owner === highlightedKindom }

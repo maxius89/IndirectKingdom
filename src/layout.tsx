@@ -149,8 +149,8 @@ export default class Layout {
     Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
     Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
 
-    $(".cell").css("height", Layout.mActualCellSize + "px");
-    $(".cell").css("width", Layout.mActualCellSize + "px");
+    //$(".cell").css("height", Layout.mActualCellSize + "px");
+    //$(".cell").css("width", Layout.mActualCellSize + "px");
 
     //const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
     //$(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
@@ -161,24 +161,6 @@ export default class Layout {
     $(".cellImg").css("top", Layout.mActualCellSize / 8 + "px");
     $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
   }
-
-  static zoom(event: MouseWheelEvent): void {
-    if (event.ctrlKey === true) {
-      event.preventDefault();
-
-      if (event.deltaY < 0) {
-        Layout.mActualCellSize += Layout.stepCellSize;
-      }
-      else {
-        Layout.mActualCellSize -= Layout.stepCellSize;
-      }
-
-      Layout.resizeCells();
-      $("#map").css("width", Layout.mActualCellSize * Layout.sceneCols + "px");
-      $("#map").css("height", Layout.mActualCellSize * Layout.sceneRows + "px");
-    }
-  }
-
 }
 
 enum Orientation {
