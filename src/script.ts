@@ -3,7 +3,7 @@ import World from './world';
 import Layout from './layout';
 export var g = new Globals;
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
   setConsts();
   new World({ cols: g.sceneCols, rows: g.sceneRows });
   Layout.renderLayout();

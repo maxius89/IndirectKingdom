@@ -66,7 +66,6 @@ class Cell extends React.Component<CellProps> {
 
   public render() {
     const {isHighlighted, cellSize, cellObj} = this.props;
-    console.log(g.showPopulation)
 
     const borderThickness = isHighlighted ?
       Math.ceil(cellSize * this.borderRatio)* 2 :

@@ -33,7 +33,7 @@ class Map extends React.Component<MapProps>  {
          )
       }
 
-      table.push(<tr key={"r"+i}> { rows } </tr>)
+      table.push(<tr key={"r"+i}>{ rows }</tr>)
     }
     return table
   }
