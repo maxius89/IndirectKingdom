@@ -2,6 +2,7 @@ import * as React from "react";
 import { LandType } from '../cell';
 import CellObj from '../cell';
 import Kingdom from '../kingdom';
+import { g } from '../script';
 
 export interface CellProps {
   cellSize: number;
@@ -18,17 +19,21 @@ class Cell extends React.Component<CellProps> {
     backgroundColor: this.props.cellObj.owner.color
   };
 
+  readonly borderRatio = 0.02;// Cell-size/border thickness ratio
+
   componentDidMount() {
     this.updateCell();
   }
 
    showCellIcon(): JSX.Element {
-    //img.css("height", Layout.mActualCellSize / 2 + "px"); //TODO
-    //img.css("width", Layout.mActualCellSize / 2 + "px");
-    //img.css("top", Layout.mActualCellSize / 8 + "px");
-    //img.css("left", Layout.mActualCellSize / 8 + "px");
-    const {cellObj} = this.props;
-    const type = cellObj.type;
+     const {cellObj, cellSize} = this.props;
+     const type = cellObj.type;
+     const cellImgStyle = {
+       height: cellSize / 2,
+       width: cellSize /2,
+       top: cellSize / 8,
+       left: cellSize / 8
+     };
 
     let src:string;
     switch (type) {
@@ -47,7 +52,7 @@ class Cell extends React.Component<CellProps> {
       default:
       //TODO: create Unknown cell-type svg.
     }
-    return (<img className="cellImg" src={src}></img>);
+    return (<img className="cellImg" style ={cellImgStyle} src={src}></img>);
   }
 
   updateCell = () => {
@@ -61,9 +66,16 @@ class Cell extends React.Component<CellProps> {
 
   public render() {
     const {isHighlighted, cellSize, cellObj} = this.props;
+    console.log(g.showPopulation)
 
-    const nonSelectedStyle = {boxShadow: "inset 1px 1px #ffffff, inset -1px -1px #ffffff"};
-    const selectedStyle = {boxShadow: "inset 1px 1px #dddd55, inset -1px -1px #dddd55"}; // TODO: width calculation
+    const borderThickness = isHighlighted ?
+      Math.ceil(cellSize * this.borderRatio)* 2 :
+      Math.ceil(cellSize * this.borderRatio);
+
+    const nonSelectedStyle = {boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #ffffff," +
+      "inset -" + borderThickness + "px -" + borderThickness + "px #ffffff"};
+    const selectedStyle = {boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #dddd55," +
+      "inset -" + borderThickness + "px -" + borderThickness + "px #dddd55"};
 
     const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
     const backGroundstyle = {backgroundColor: this.props.cellObj.owner.color};
@@ -82,7 +94,7 @@ class Cell extends React.Component<CellProps> {
         style={cellSstyle}
         onClick={() =>this.props.onSelect(this.props.cellObj.owner)}
       >
-        {this.showCellIcon()}
+        {g.showPopulation ? String(Math.round(cellObj.population)) : this.showCellIcon()}
       </td>
     );
   }

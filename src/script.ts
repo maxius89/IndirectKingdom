@@ -4,20 +4,9 @@ import Layout from './layout';
 export var g = new Globals;
 
 $(document).ready(function() {
-
-  // Initializations
   setConsts();
   new World({ cols: g.sceneCols, rows: g.sceneRows });
-  Layout.initLayout();
-
-  // Event Listeners
-  $(window).resize(function() {
-    if (g.resizeTimeout != 0) clearTimeout(g.resizeTimeout);
-    g.resizeTimeout = setTimeout(function() {
-      Layout.rethinkPanels();
-      g.resizeTimeout = 0;
-    }, 200);
-  });
+  Layout.renderLayout();
 
   //setTimeout(test,500);
 });
@@ -25,8 +14,6 @@ $(document).ready(function() {
 function setConsts(): boolean {
 
   // System variables
-  g.highlightedKindom = null;
-  g.resizeTimeout = 0;
   g.runner = 0;
   g.showPopulation = false;
   g.started = false;
@@ -45,7 +32,7 @@ function setConsts(): boolean {
 }
 
 export function runGame(): void {
-  if (g.started === false) {
+  if (!g.started) {
     g.runner = setInterval(function() {
       nextRound();
     }, g.turnLength);
@@ -59,13 +46,7 @@ export function runGame(): void {
 
 function nextRound(): void {
   World.nextRound();
-  Layout.updateMap();
-
-  if (g.showPopulation) {  // TODO: Temporary solution
-    World.listOfCells.forEach(cell =>
-      $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population)))
-    );
-  }
+  Layout.renderLayout();
 }
 
 export function showPopulation(): void {

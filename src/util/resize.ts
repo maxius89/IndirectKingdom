@@ -1,3 +1,5 @@
+import {g} from '../script';
+
 enum Orientation {
   Portrait,
   Landscape
@@ -29,10 +31,7 @@ export default class Resize {
   static readonly stepCellSize = 5; 		// px      // Cell-size increment/decrement constant
   static readonly minDrawnCells = 3;               // Minimum number of drawn cells
 
-  static readonly sceneRows = 25;                  // Number of the rows of the Map
-  static readonly sceneCols = 25;                  // Number of the coloumns of the Map
-
-  static readonly thicknessRatio = 0.2;
+  static readonly thicknessRatio = 0.2;            // Dashboard width/height ratio
   static readonly minThickness = 200;   // px      // Dashboard thickness minimum
   static readonly maxThickness = 400;   // px      // Dashboard thickness maximum
   static readonly minDashboardThickessRatio = 2;   // Dashboard thickness/window shorter size minimum ratio
@@ -118,10 +117,10 @@ export default class Resize {
   };
 
   static calcCellSize(): void {
-    const verticalMapSize = Resize.sceneRows * Resize.mActualCellSize;
+    const verticalMapSize = g.sceneRows * Resize.mActualCellSize;
     if (Resize.mHeight < verticalMapSize) return;
 
-    const horizontalMapSize = Resize.sceneCols * Resize.mActualCellSize;
+    const horizontalMapSize = g.sceneCols * Resize.mActualCellSize;
     if (Resize.mWidth < horizontalMapSize) return;
 
     const verticalScale = Resize.mHeight / verticalMapSize;

@@ -27,11 +27,12 @@ class Main extends React.Component<MainProps> {
   };
 
   componentDidMount() {
-    $("#mapDiv")[0].addEventListener("wheel", this.zoomMap);
+    document.getElementById("mapDiv").addEventListener("wheel", this.zoomMap);
     window.addEventListener("resize", this.updateDimensions);
   };
 
   componentWillUnmount() {
+    document.getElementById("mapDiv").removeEventListener("wheel", this.zoomMap);
     window.removeEventListener("resize", this.updateDimensions);
   };
 
@@ -51,7 +52,7 @@ class Main extends React.Component<MainProps> {
     this.setState({highlightedKindom});
   };
 
-  zoomMap = (event: MouseWheelEvent): void => {
+  zoomMap = (event: MouseWheelEvent) => {
     const panelSize = {...this.state.panelSize};
     panelSize.mapCellSize= Resize.zoomMap(event);
     this.setState({panelSize});

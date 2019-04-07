@@ -1,10 +1,5 @@
-import Kingdom from './kingdom';
-
 export default class Globals {
 
-  highlightedKindom: Kingdom;
-
-  resizeTimeout: number = 0;
   runner: number = 0;
   showPopulation: boolean = false;
   started: boolean = false;

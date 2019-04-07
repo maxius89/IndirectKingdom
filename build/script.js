@@ -96,25 +96,13 @@ const world_1 = __webpack_require__(3);
 const layout_1 = __webpack_require__(18);
 exports.g = new global_1.default;
 $(document).ready(function () {
-    // Initializations
     setConsts();
     new world_1.default({ cols: exports.g.sceneCols, rows: exports.g.sceneRows });
-    layout_1.default.initLayout();
-    // Event Listeners
-    $(window).resize(function () {
-        if (exports.g.resizeTimeout != 0)
-            clearTimeout(exports.g.resizeTimeout);
-        exports.g.resizeTimeout = setTimeout(function () {
-            layout_1.default.rethinkPanels();
-            exports.g.resizeTimeout = 0;
-        }, 200);
-    });
+    layout_1.default.renderLayout();
     //setTimeout(test,500);
 });
 function setConsts() {
     // System variables
-    exports.g.highlightedKindom = null;
-    exports.g.resizeTimeout = 0;
     exports.g.runner = 0;
     exports.g.showPopulation = false;
     exports.g.started = false;
@@ -127,7 +115,7 @@ function setConsts() {
     return true;
 }
 function runGame() {
-    if (exports.g.started === false) {
+    if (!exports.g.started) {
         exports.g.runner = setInterval(function () {
             nextRound();
         }, exports.g.turnLength);
@@ -141,10 +129,7 @@ function runGame() {
 exports.runGame = runGame;
 function nextRound() {
     world_1.default.nextRound();
-    layout_1.default.updateMap();
-    if (exports.g.showPopulation) { // TODO: Temporary solution
-        world_1.default.listOfCells.forEach(cell => $(".cell[id='" + cell.id + "']").html(String(Math.round(cell.population))));
-    }
+    layout_1.default.renderLayout();
 }
 function showPopulation() {
     exports.g.showPopulation = true;
@@ -10533,7 +10518,6 @@ return jQuery;
 Object.defineProperty(exports, "__esModule", { value: true });
 class Globals {
     constructor() {
-        this.resizeTimeout = 0;
         this.runner = 0;
         this.showPopulation = false;
         this.started = false;
@@ -11762,7 +11746,6 @@ class Kingdom {
         this.cells = [];
         this.world = world;
         this.active = active;
-        this.highlighted = false;
         this.econ = {
             wealth: 0,
             industry: 0,
@@ -11856,133 +11839,20 @@ exports.default = Kingdom;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {
+
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
 const ReactDOM = __webpack_require__(20);
 const world_1 = __webpack_require__(3);
 const main_1 = __webpack_require__(21);
+const script_1 = __webpack_require__(0);
 class Layout {
-    static initLayout() {
-        ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
-        Layout.wWidth = Number(window.innerWidth);
-        Layout.wHeight = Number(window.innerHeight);
-        this.rethinkPanels();
-    }
-    static updateMap() {
-        ReactDOM.render(React.createElement(main_1.default, { colNum: Layout.sceneCols, rowNum: Layout.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
-    }
-    static rethinkPanels() {
-        Layout.wWidth = Number($(window).width());
-        Layout.wHeight = Number($(window).height());
-        this.decideWindowOrientation();
-        this.calcDashboardSize();
-        this.calcMapSize();
-        this.calcCellSize();
-    }
-    static decideWindowOrientation() {
-        Layout.wOrientation = (Layout.wWidth > Layout.wHeight ?
-            Orientation.Landscape : Orientation.Portrait);
-        if (Layout.wOrientation === Orientation.Portrait) {
-            Layout.wShort = Layout.wWidth;
-            Layout.wLong = Layout.wHeight;
-        }
-        else {
-            Layout.wShort = Layout.wHeight;
-            Layout.wLong = Layout.wWidth;
-        }
-    }
-    static calcDashboardSize() {
-        if (Layout.wLong < Layout.minThickness * Layout.minDashboardThickessRatio) {
-            Layout.dLength = 0;
-            Layout.dThickness = 0;
-            Layout.dDisabled = true;
-        }
-        else {
-            Layout.dLength = Layout.wShort;
-            Layout.dThickness = Math.floor(Layout.dLength * Layout.thicknessRatio);
-            Layout.dThickness = Math.max(Layout.dThickness, Layout.minThickness);
-            Layout.dThickness = Math.min(Layout.dThickness, Layout.maxThickness);
-            Layout.dDisabled = false;
-        }
-    }
-    static calcMapSize() {
-        Layout.mWidth = Layout.wWidth;
-        Layout.mHeight = Layout.wHeight;
-        if (Layout.wOrientation == Orientation.Landscape) {
-            Layout.mWidth -= Layout.dThickness;
-        }
-        else {
-            Layout.mHeight -= Layout.dThickness;
-        }
-    }
-    static calcCellNum() {
-        Layout.mUpscaled = this.upscaleCells();
-        if (Layout.mUpscaled)
-            return;
-        Layout.mDownscaled = this.makeCellsFit();
-    }
-    static calcCellSize() {
-        this.calcCellNum();
-        this.resizeCells();
-    }
-    static upscaleCells() {
-        const verticalMapSize = Layout.sceneRows * Layout.mActualCellSize;
-        if (Layout.mHeight < verticalMapSize)
-            return false;
-        const horizontalMapSize = Layout.sceneCols * Layout.mActualCellSize;
-        if (Layout.mWidth < horizontalMapSize)
-            return false;
-        const verticalScale = Layout.mHeight / verticalMapSize;
-        const horizontalScale = Layout.mWidth / horizontalMapSize;
-        const scale = Math.min(verticalScale, horizontalScale);
-        Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
-        return true;
-    }
-    static makeCellsFit() {
-        const minMapSize = Layout.minDrawnCells * Layout.mActualCellSize;
-        if (Layout.mWidth >= minMapSize && Layout.mHeight >= minMapSize)
-            return false;
-        const verticalScale = Layout.mWidth / minMapSize;
-        const horizontalScale = Layout.mHeight / minMapSize;
-        const scale = Math.min(verticalScale, horizontalScale);
-        Layout.mActualCellSize = Math.floor(Layout.mActualCellSize * scale);
-        return true;
-    }
-    static resizeCells() {
-        Layout.mActualCellSize = Math.max(Layout.mActualCellSize, Layout.minCellSize);
-        Layout.mActualCellSize = Math.min(Layout.mActualCellSize, Layout.maxCellSize);
-        //$(".cell").css("height", Layout.mActualCellSize + "px");
-        //$(".cell").css("width", Layout.mActualCellSize + "px");
-        //const bordersize = Math.ceil(Layout.mActualCellSize * Layout.borderRatio);
-        //$(".cell").css("box-shadow", "inset " + bordersize + "px " + bordersize + "px #ffffff," +
-        //  "inset -" + bordersize + "px -" + bordersize + "px #ffffff");
-        $(".cellImg").css("height", Layout.mActualCellSize / 2 + "px");
-        $(".cellImg").css("width", Layout.mActualCellSize / 2 + "px");
-        $(".cellImg").css("top", Layout.mActualCellSize / 8 + "px");
-        $(".cellImg").css("left", Layout.mActualCellSize / 8 + "px");
+    static renderLayout() {
+        ReactDOM.render(React.createElement(main_1.default, { colNum: script_1.g.sceneCols, rowNum: script_1.g.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
     }
 }
-Layout.mActualCellSize = 30; // Actual Cell size
-Layout.borderRatio = 0.02; // Cell-size/border thickness ratio
-Layout.minCellSize = 20; // px      // Minimum size of the drawn cells
-Layout.maxCellSize = 100; // px      // Maximum size of the drawn cells
-Layout.stepCellSize = 5; // px      // Cell-size increment/decrement constant
-Layout.minDrawnCells = 3; // Minimum number of drawn cells
-Layout.sceneRows = 25; // Number of the rows of the Map
-Layout.sceneCols = 25; // Number of the coloumns of the Map
-Layout.thicknessRatio = 0.2;
-Layout.minThickness = 200; // px      // Dashboard thickness minimum
-Layout.maxThickness = 400; // px      // Dashboard thickness maximum
-Layout.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
 exports.default = Layout;
-var Orientation;
-(function (Orientation) {
-    Orientation[Orientation["Portrait"] = 0] = "Portrait";
-    Orientation[Orientation["Landscape"] = 1] = "Landscape";
-})(Orientation || (Orientation = {}));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
 /* 19 */
@@ -12001,7 +11871,7 @@ module.exports = ReactDOM;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {
+
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
 const resize_1 = __webpack_require__(22);
@@ -12033,11 +11903,12 @@ class Main extends React.Component {
     }
     ;
     componentDidMount() {
-        $("#mapDiv")[0].addEventListener("wheel", this.zoomMap);
+        document.getElementById("mapDiv").addEventListener("wheel", this.zoomMap);
         window.addEventListener("resize", this.updateDimensions);
     }
     ;
     componentWillUnmount() {
+        document.getElementById("mapDiv").removeEventListener("wheel", this.zoomMap);
         window.removeEventListener("resize", this.updateDimensions);
     }
     ;
@@ -12073,7 +11944,6 @@ class Main extends React.Component {
 }
 exports.default = Main;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
 /* 22 */
@@ -12082,6 +11952,7 @@ exports.default = Main;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const script_1 = __webpack_require__(0);
 var Orientation;
 (function (Orientation) {
     Orientation[Orientation["Portrait"] = 0] = "Portrait";
@@ -12091,15 +11962,11 @@ class Resize {
     static calculatePanelSizes() {
         Resize.wWidth = Number(window.innerWidth);
         Resize.wHeight = Number(window.innerHeight);
-        //Resize.mActualCellSize = Resize.mActualCellSize === undefined ?
-        //  30: Resize.mActualCellSize ;
-        //  //console.log(Resize.mActualCellSize)
         Resize.decideWindowOrientation();
         Resize.calcDashboardSize();
         Resize.calcMapSize();
         Resize.positionDashboard();
         Resize.calcCellSize();
-        //console.log(Resize.mActualCellSize);
         return ({
             windowWidth: Resize.wWidth,
             windowHeight: Resize.wHeight,
@@ -12163,10 +12030,10 @@ class Resize {
     }
     ;
     static calcCellSize() {
-        const verticalMapSize = Resize.sceneRows * Resize.mActualCellSize;
+        const verticalMapSize = script_1.g.sceneRows * Resize.mActualCellSize;
         if (Resize.mHeight < verticalMapSize)
             return;
-        const horizontalMapSize = Resize.sceneCols * Resize.mActualCellSize;
+        const horizontalMapSize = script_1.g.sceneCols * Resize.mActualCellSize;
         if (Resize.mWidth < horizontalMapSize)
             return;
         const verticalScale = Resize.mHeight / verticalMapSize;
@@ -12193,9 +12060,7 @@ Resize.minCellSize = 20; // px      // Minimum size of the drawn cells
 Resize.maxCellSize = 100; // px      // Maximum size of the drawn cells
 Resize.stepCellSize = 5; // px      // Cell-size increment/decrement constant
 Resize.minDrawnCells = 3; // Minimum number of drawn cells
-Resize.sceneRows = 25; // Number of the rows of the Map
-Resize.sceneCols = 25; // Number of the coloumns of the Map
-Resize.thicknessRatio = 0.2;
+Resize.thicknessRatio = 0.2; // Dashboard width/height ratio
 Resize.minThickness = 200; // px      // Dashboard thickness minimum
 Resize.maxThickness = 400; // px      // Dashboard thickness maximum
 Resize.minDashboardThickessRatio = 2; // Dashboard thickness/window shorter size minimum ratio
@@ -12259,6 +12124,7 @@ exports.default = Map;
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(19);
 const cell_1 = __webpack_require__(4);
+const script_1 = __webpack_require__(0);
 ;
 class Cell extends React.Component {
     constructor() {
@@ -12269,6 +12135,7 @@ class Cell extends React.Component {
             type: 'none',
             backgroundColor: this.props.cellObj.owner.color
         };
+        this.borderRatio = 0.02; // Cell-size/border thickness ratio
         this.updateCell = () => {
             const owner = this.props.cellObj.owner;
             this.setState({
@@ -12281,12 +12148,14 @@ class Cell extends React.Component {
         this.updateCell();
     }
     showCellIcon() {
-        //img.css("height", Layout.mActualCellSize / 2 + "px"); //TODO
-        //img.css("width", Layout.mActualCellSize / 2 + "px");
-        //img.css("top", Layout.mActualCellSize / 8 + "px");
-        //img.css("left", Layout.mActualCellSize / 8 + "px");
-        const { cellObj } = this.props;
+        const { cellObj, cellSize } = this.props;
         const type = cellObj.type;
+        const cellImgStyle = {
+            height: cellSize / 2,
+            width: cellSize / 2,
+            top: cellSize / 8,
+            left: cellSize / 8
+        };
         let src;
         switch (type) {
             case cell_1.LandType.Farm:
@@ -12304,16 +12173,22 @@ class Cell extends React.Component {
             default:
             //TODO: create Unknown cell-type svg.
         }
-        return (React.createElement("img", { className: "cellImg", src: src }));
+        return (React.createElement("img", { className: "cellImg", style: cellImgStyle, src: src }));
     }
     render() {
         const { isHighlighted, cellSize, cellObj } = this.props;
-        const nonSelectedStyle = { boxShadow: "inset 1px 1px #ffffff, inset -1px -1px #ffffff" };
-        const selectedStyle = { boxShadow: "inset 1px 1px #dddd55, inset -1px -1px #dddd55" }; // TODO: width calculation
+        console.log(script_1.g.showPopulation);
+        const borderThickness = isHighlighted ?
+            Math.ceil(cellSize * this.borderRatio) * 2 :
+            Math.ceil(cellSize * this.borderRatio);
+        const nonSelectedStyle = { boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #ffffff," +
+                "inset -" + borderThickness + "px -" + borderThickness + "px #ffffff" };
+        const selectedStyle = { boxShadow: "inset " + borderThickness + "px " + borderThickness + "px #dddd55," +
+                "inset -" + borderThickness + "px -" + borderThickness + "px #dddd55" };
         const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
         const backGroundstyle = { backgroundColor: this.props.cellObj.owner.color };
         const cellSstyle = Object.assign({ height: cellSize, width: cellSize }, boxShadowStyle, backGroundstyle);
-        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellSstyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, this.showCellIcon()));
+        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellSstyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, script_1.g.showPopulation ? String(Math.round(cellObj.population)) : this.showCellIcon()));
     }
 }
 exports.default = Cell;
