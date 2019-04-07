@@ -1,5 +1,5 @@
 import Kingdom from './kingdom';
-import { g as global } from './script';
+import { g as Global } from './script';
 import * as seedrandom from 'seedrandom';
 
 export default class Cell {
@@ -77,7 +77,7 @@ export default class Cell {
   }
 
   static initCell(coordinates: CellCoordinates): Cell {
-    const rng = seedrandom(global.randomSeed + coordinates.row + coordinates.col);
+    const rng = seedrandom(Global.randomSeed + coordinates.row + coordinates.col);
     const numberOfLandTypes = Object.keys(LandType).length / 2;
     const type: LandType = Math.floor(rng() * numberOfLandTypes);
 

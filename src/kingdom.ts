@@ -7,7 +7,6 @@ export default class Kingdom {
   color: string;
   cells: Cell[] = [];
   world: World;
-  highlighted: boolean;
   active: boolean;
   econ: Economy;
   income: Income;
@@ -18,7 +17,6 @@ export default class Kingdom {
     this.cells = [];
     this.world = world;
     this.active = active;
-    this.highlighted = false;
 
     this.econ = {
       wealth: 0,

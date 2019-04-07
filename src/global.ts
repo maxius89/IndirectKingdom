@@ -1,20 +1,15 @@
-import Kingdom from './kingdom';
-
 export default class Globals {
 
-  highlightedKindom: Kingdom;
+  runner: number = 0;
+  showPopulation: boolean = false;
+  started: boolean = false;
 
-  resizeTimeout: number;
-  runner: number;
-  showPopulation: boolean;
-  started: boolean;
+  randomSeed: string = "";                  // Seed for random number generation
 
-  randomSeed: string;                  // Seed for random number generation
+  kingdomNames: string[] = [];              // Name of the kingdoms
 
-  kingdomNames: string[];              // Name of the kingdoms
+  turnLength: number = 0;				// ms		   // Length of a turn
 
-  turnLength: number;				// ms		   // Length of a turn
-
-  sceneRows: number;                   // Number of the rows of the Map
-  sceneCols: number;                   // Number of the coloumns of the Map
+  sceneRows: number = 0;                   // Number of the rows of the Map
+  sceneCols: number = 0;                   // Number of the coloumns of the Map
 }

@@ -1,3 +1,4 @@
+/*
 function assert(cond, text) {
   if (cond) {
 
@@ -139,3 +140,4 @@ function testCellDownscale() {
   assert(g.m.downscaled, "Map: Downscaled");
   assert(g.m.actualCellSize == 25, "Map: CellDownscale");
 }
+*/
