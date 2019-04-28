@@ -138,4 +138,5 @@ interface Output {
   money: number;
   goods: number;
   food: number;
+  [key: string]: number;
 }

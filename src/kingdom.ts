@@ -130,10 +130,12 @@ interface Economy {
   industry: number;
   agriculture: number;
   population: number;
+  [key: string]: number;
 };
 
 interface Income {
   money: number;
   goods: number;
   food: number;
+  [key: string]: number;
 };

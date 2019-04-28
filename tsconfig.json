@@ -3,6 +3,7 @@
     "outDir": "./build",
     "allowJs": true,
     "strictNullChecks": true,
+    "noImplicitAny": true,
     "target": "es6",
     "module": "commonjs",
     "lib": ["es6", "dom", "es2017"],
