@@ -56,7 +56,9 @@ export default class Kingdom {
     this.cells.forEach(cell => cell.owner = this);
   }
 
-  claimTerritory(this: Kingdom, claimedCell: Cell): void {
+  claimTerritory(this: Kingdom, claimedCell: Cell | undefined): void {
+    if (claimedCell === undefined) return;
+
     if (!this.cells.includes(claimedCell)) {
       if (claimedCell.owner != undefined) {
         claimedCell.owner.loseTerritory(claimedCell);

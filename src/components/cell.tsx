@@ -7,7 +7,7 @@ import { g } from '../script';
 export interface CellProps {
   cellSize: number;
   cellObj: CellObj;
-  onSelect?: (event: Kingdom) => void;
+  onSelect: (event: Kingdom|undefined) => void;
   isHighlighted: boolean;
 }
 
@@ -24,7 +24,7 @@ class Cell extends React.Component<CellProps> {
        left: cellSize / 8
      };
 
-    let src: string;
+    let src = '';
     switch (type) {
       case LandType.Farm:
         src = 'img/farm.svg';
@@ -51,7 +51,7 @@ class Cell extends React.Component<CellProps> {
   }
 
   public render(): React.ReactNode {
-    const { isHighlighted, cellSize, cellObj } = this.props;
+    const { isHighlighted, cellSize, cellObj, onSelect } = this.props;
 
     const borderThickness = isHighlighted ?
       Math.ceil(cellSize * this.borderRatio) * 2 :
@@ -79,7 +79,7 @@ class Cell extends React.Component<CellProps> {
         id={ "r"+cellObj.pos.row+"c"+cellObj.pos.col }
         className="cell"
         style={ cellStyle }
-        onClick={ () =>this.props.onSelect(this.props.cellObj.owner) }
+        onClick={() =>onSelect(cellObj.owner)}
       >
         {
           g.showPopulation ?

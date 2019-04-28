@@ -2,7 +2,7 @@ import * as React from "react";
 import Kingdom from '../kingdom';
 
 export interface InfoPanelProps {
-  highlightedKindom: (Kingdom | undefined);
+  highlightedKindom: (Kingdom | null);
   height: number;
   width: number;
  }
@@ -19,7 +19,7 @@ class InfoPanel extends React.Component<InfoPanelProps> {
 
     if (!highlightedKindom){return <div id ="infoPanel" style={infoPanelStyle}/>;}
 
-    const {name, econ} = this.props.highlightedKindom;
+    const {name, econ} = highlightedKindom;
     return (
       <div id ="infoPanel" style={infoPanelStyle}>
         <div id="infoWealth">

@@ -1404,6 +1404,8 @@ class Kingdom {
         this.cells.forEach(cell => cell.owner = this);
     }
     claimTerritory(claimedCell) {
+        if (claimedCell === undefined)
+            return;
         if (!this.cells.includes(claimedCell)) {
             if (claimedCell.owner != undefined) {
                 claimedCell.owner.loseTerritory(claimedCell);
@@ -1512,6 +1514,8 @@ class Main extends React.Component {
             this.setState({ panelSize: resize_1.default.calculatePanelSizes() });
         };
         this.handleSelect = (kingdom) => {
+            if (kingdom === undefined)
+                return;
             const clickedCellKingdom = world_1.default.listOfKingdoms.find(listKingdom => listKingdom === kingdom);
             let highlightedKindom = this.state.highlightedKindom === clickedCellKingdom
                 ? null
@@ -1529,13 +1533,19 @@ class Main extends React.Component {
     }
     ;
     componentDidMount() {
-        document.getElementById("mapDiv").addEventListener("wheel", this.zoomMap);
         window.addEventListener("resize", this.updateDimensions);
+        const mapDiv = document.getElementById("mapDiv");
+        if (mapDiv === null)
+            return;
+        mapDiv.addEventListener("wheel", this.zoomMap);
     }
     ;
     componentWillUnmount() {
-        document.getElementById("mapDiv").removeEventListener("wheel", this.zoomMap);
         window.removeEventListener("resize", this.updateDimensions);
+        const mapDiv = document.getElementById("mapDiv");
+        if (mapDiv === null)
+            return;
+        mapDiv.removeEventListener("wheel", this.zoomMap);
     }
     ;
     render() {
@@ -1633,7 +1643,7 @@ class Cell extends React.Component {
             top: cellSize / 8,
             left: cellSize / 8
         };
-        let src;
+        let src = '';
         switch (type) {
             case cell_1.LandType.Farm:
                 src = 'img/farm.svg';
@@ -1653,7 +1663,7 @@ class Cell extends React.Component {
         return (React.createElement("img", { className: "cellImg", style: cellImgStyle, src: src }));
     }
     render() {
-        const { isHighlighted, cellSize, cellObj } = this.props;
+        const { isHighlighted, cellSize, cellObj, onSelect } = this.props;
         const borderThickness = isHighlighted ?
             Math.ceil(cellSize * this.borderRatio) * 2 :
             Math.ceil(cellSize * this.borderRatio);
@@ -1664,7 +1674,7 @@ class Cell extends React.Component {
         const boxShadowStyle = isHighlighted ? selectedStyle : nonSelectedStyle;
         const backGroundstyle = { backgroundColor: cellObj.owner.color };
         const cellStyle = Object.assign({ height: cellSize, width: cellSize }, boxShadowStyle, backGroundstyle);
-        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellStyle, onClick: () => this.props.onSelect(this.props.cellObj.owner) }, script_1.g.showPopulation ?
+        return (React.createElement("td", { id: "r" + cellObj.pos.row + "c" + cellObj.pos.col, className: "cell", style: cellStyle, onClick: () => onSelect(cellObj.owner) }, script_1.g.showPopulation ?
             String(Math.round(cellObj.population))
             : this.showCellIcon()));
     }
@@ -1692,7 +1702,7 @@ class InfoPanel extends React.Component {
         if (!highlightedKindom) {
             return React.createElement("div", { id: "infoPanel", style: infoPanelStyle });
         }
-        const { name, econ } = this.props.highlightedKindom;
+        const { name, econ } = highlightedKindom;
         return (React.createElement("div", { id: "infoPanel", style: infoPanelStyle },
             React.createElement("div", { id: "infoWealth" }, name + " wealth: " + econ.wealth),
             React.createElement("div", { id: "infoIndustry" }, name + " industry: " + econ.industry),

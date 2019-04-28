@@ -27,20 +27,28 @@ class Main extends React.Component<MainProps> {
   };
 
   componentDidMount(): void {
-    document.getElementById("mapDiv").addEventListener("wheel", this.zoomMap);
     window.addEventListener("resize", this.updateDimensions);
+
+    const mapDiv = document.getElementById("mapDiv");
+    if (mapDiv === null) return;
+    mapDiv.addEventListener("wheel", this.zoomMap);
   };
 
   componentWillUnmount(): void {
-    document.getElementById("mapDiv").removeEventListener("wheel", this.zoomMap);
     window.removeEventListener("resize", this.updateDimensions);
+
+    const mapDiv = document.getElementById("mapDiv");
+    if (mapDiv === null) return;
+    mapDiv.removeEventListener("wheel", this.zoomMap);
   };
 
   updateDimensions = (): void => {
     this.setState({ panelSize: Resize.calculatePanelSizes() });
   };
 
-  handleSelect = (kingdom : Kingdom): void => {
+  handleSelect = (kingdom : Kingdom|undefined): void => {
+    if (kingdom === undefined) return;
+
     const clickedCellKingdom = World.listOfKingdoms.find(
       listKingdom => listKingdom === kingdom
     );
