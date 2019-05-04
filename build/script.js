@@ -192,7 +192,7 @@ class World {
         for (let i = 0; i < this.numRows; ++i) {
             World.map[i] = [];
             for (let j = 0; j < this.numCols; ++j) {
-                var newCell = cell_1.default.initCell({ row: i, col: j });
+                var newCell = new cell_1.default({ row: i, col: j });
                 World.listOfCells.push(newCell);
                 World.map[i][j] = newCell;
             }
@@ -220,10 +220,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const script_1 = __webpack_require__(0);
 const seedrandom = __webpack_require__(4);
 class Cell {
-    constructor(coordinates, type) {
+    constructor(coordinates) {
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
-        this.type = type;
+        this.type = this.setRandomType();
         this.output = {
             money: 0,
             goods: 0,
@@ -241,17 +241,11 @@ class Cell {
             people: 0.01
         };
         switch (this.type) {
-            case LandType.Farm:
+            case LandType.Field:
                 this.wealth = 5;
                 this.industry = 0;
                 this.agriculture = 100;
                 this.population = 10;
-                break;
-            case LandType.Settlement:
-                this.wealth = 50;
-                this.industry = 25;
-                this.agriculture = 0;
-                this.population = 100;
                 break;
             case LandType.Forest:
                 this.wealth = 20;
@@ -269,11 +263,10 @@ class Cell {
                 console.warn("Cell type not defined!");
         }
     }
-    static initCell(coordinates) {
-        const rng = seedrandom(script_1.g.randomSeed + coordinates.row + coordinates.col);
+    setRandomType() {
+        const rng = seedrandom(script_1.g.randomSeed + this.id);
         const numberOfLandTypes = Object.keys(LandType).length / 2;
-        const type = Math.floor(rng() * numberOfLandTypes);
-        return new Cell(coordinates, type);
+        return Math.floor(rng() * numberOfLandTypes);
     }
     updateCell() {
         const populationPower = this.population; // TODO: Get a function with diminishing return;
@@ -300,10 +293,9 @@ class Cell {
 exports.default = Cell;
 var LandType;
 (function (LandType) {
-    LandType[LandType["Farm"] = 0] = "Farm";
-    LandType[LandType["Settlement"] = 1] = "Settlement";
-    LandType[LandType["Forest"] = 2] = "Forest";
-    LandType[LandType["Mountain"] = 3] = "Mountain";
+    LandType[LandType["Field"] = 0] = "Field";
+    LandType[LandType["Forest"] = 1] = "Forest";
+    LandType[LandType["Mountain"] = 2] = "Mountain";
 })(LandType = exports.LandType || (exports.LandType = {}));
 
 
@@ -1645,11 +1637,8 @@ class Cell extends React.Component {
         };
         let src = '';
         switch (type) {
-            case cell_1.LandType.Farm:
+            case cell_1.LandType.Field:
                 src = 'img/farm.svg';
-                break;
-            case cell_1.LandType.Settlement:
-                src = 'img/settlement.svg';
                 break;
             case cell_1.LandType.Forest:
                 src = 'img/forest.svg';

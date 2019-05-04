@@ -26,11 +26,8 @@ class Cell extends React.Component<CellProps> {
 
     let src = '';
     switch (type) {
-      case LandType.Farm:
+      case LandType.Field:
         src = 'img/farm.svg';
-        break;
-      case LandType.Settlement:
-        src = 'img/settlement.svg';
         break;
       case LandType.Forest:
         src = 'img/forest.svg';

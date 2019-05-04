@@ -39,7 +39,7 @@ export default class World {
     for (let i = 0; i < this.numRows; ++i) {
       World.map[i] = [];
       for (let j = 0; j < this.numCols; ++j) {
-        var newCell = Cell.initCell({ row: i, col: j });
+        var newCell = new Cell({ row: i, col: j });
         World.listOfCells.push(newCell);
         World.map[i][j] = newCell;
       }

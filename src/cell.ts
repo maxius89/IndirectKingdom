@@ -22,10 +22,10 @@ export default class Cell {
 
   baseEfficiency: BaseEfficiency;
 
-  constructor(coordinates: CellCoordinates, type: LandType) {
+  constructor(coordinates: CellCoordinates) {
     this.pos = coordinates;
     this.id = "r" + coordinates.row + "c" + coordinates.col;
-    this.type = type;
+    this.type = this.setRandomType();
 
     this.output = {    // Object for cell output per turn
       money: 0,
@@ -47,17 +47,11 @@ export default class Cell {
     };
 
     switch (this.type) {
-      case LandType.Farm:
+      case LandType.Field:
         this.wealth = 5;
         this.industry = 0;
         this.agriculture = 100;
         this.population = 10;
-        break;
-      case LandType.Settlement:
-        this.wealth = 50;
-        this.industry = 25;
-        this.agriculture = 0;
-        this.population = 100;
         break;
       case LandType.Forest:
         this.wealth = 20;
@@ -76,12 +70,11 @@ export default class Cell {
     }
   }
 
-  static initCell(coordinates: CellCoordinates): Cell {
-    const rng = seedrandom(Global.randomSeed + coordinates.row + coordinates.col);
+  setRandomType(): LandType {
+    const rng = seedrandom(Global.randomSeed + this.id);
     const numberOfLandTypes = Object.keys(LandType).length / 2;
-    const type: LandType = Math.floor(rng() * numberOfLandTypes);
 
-    return new Cell(coordinates, type);
+    return Math.floor(rng() * numberOfLandTypes);
   }
 
   updateCell(this: Cell): void {
@@ -116,8 +109,7 @@ export default class Cell {
 }
 
 export enum LandType {
-  Farm,
-  Settlement,
+  Field,
   Forest,
   Mountain
 }
