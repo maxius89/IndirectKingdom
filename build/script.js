@@ -93,7 +93,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const global_1 = __webpack_require__(1);
 const world_1 = __webpack_require__(2);
-const layout_1 = __webpack_require__(17);
+const layout_1 = __webpack_require__(18);
 exports.g = new global_1.default;
 document.addEventListener("DOMContentLoaded", function () {
     setConsts();
@@ -166,9 +166,9 @@ exports.default = Globals;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const cell_1 = __webpack_require__(3);
-const kingdom_1 = __webpack_require__(16);
+const kingdom_1 = __webpack_require__(17);
 const script_1 = __webpack_require__(0);
-const seedrandom = __webpack_require__(4);
+const seedrandom = __webpack_require__(5);
 class World {
     constructor(dim) {
         this.numRows = dim.rows;
@@ -217,10 +217,13 @@ exports.default = World;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const person_1 = __webpack_require__(4);
 const script_1 = __webpack_require__(0);
-const seedrandom = __webpack_require__(4);
+const seedrandom = __webpack_require__(5);
 class Cell {
     constructor(coordinates) {
+        this.listOfResidents = [];
+        this.listOfTravelers = [];
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
         this.type = this.setRandomType();
@@ -240,28 +243,74 @@ class Cell {
             food: 0.01,
             people: 0.01
         };
+        let initPopulation = 0;
         switch (this.type) {
             case LandType.Field:
                 this.wealth = 5;
                 this.industry = 0;
                 this.agriculture = 100;
-                this.population = 10;
+                initPopulation = 10;
                 break;
             case LandType.Forest:
                 this.wealth = 20;
                 this.industry = 25;
                 this.agriculture = 20;
-                this.population = 5;
+                initPopulation = 5;
                 break;
             case LandType.Mountain:
                 this.wealth = 50;
                 this.industry = 100;
                 this.agriculture = 0;
-                this.population = 5;
+                initPopulation = 5;
                 break;
             default:
                 console.warn("Cell type not defined!");
         }
+        for (let i = 0; i < initPopulation; ++i) {
+            this.listOfResidents.push(new person_1.default(this.decideProfession()));
+        }
+    }
+    decideProfession() {
+        if (this.listOfResidents.length === 0)
+            return person_1.Profession.Leader;
+        let profession = person_1.Profession.Trader;
+        let chance = [];
+        chance[person_1.Profession.Farmer] = 0;
+        chance[person_1.Profession.Lumberman] = 0;
+        chance[person_1.Profession.Hunter] = 0;
+        chance[person_1.Profession.Miner] = 0;
+        chance[person_1.Profession.Craftsman] = 0;
+        chance[person_1.Profession.Trader] = 0;
+        switch (this.type) {
+            case LandType.Field:
+                chance[person_1.Profession.Farmer] = 0.7;
+                chance[person_1.Profession.Craftsman] = 0.2;
+                chance[person_1.Profession.Trader] = 0.1;
+                break;
+            case LandType.Forest:
+                chance[person_1.Profession.Lumberman] = 0.4;
+                chance[person_1.Profession.Hunter] = 0.4;
+                chance[person_1.Profession.Craftsman] = 0.1;
+                chance[person_1.Profession.Trader] = 0.1;
+                break;
+            case LandType.Mountain:
+                chance[person_1.Profession.Miner] = 0.6;
+                chance[person_1.Profession.Craftsman] = 0.2;
+                chance[person_1.Profession.Trader] = 0.2;
+                break;
+            default:
+                profession = person_1.Profession.Trader;
+        }
+        const rng = seedrandom(script_1.g.randomSeed + this.id);
+        let chanceSum = 0;
+        for (let i = 0; i < chance.length; ++i) {
+            chanceSum += chance[i];
+            if (chanceSum >= rng()) {
+                profession = person_1.Profession[person_1.Profession[i]];
+                break;
+            }
+        }
+        return profession;
     }
     setRandomType() {
         const rng = seedrandom(script_1.g.randomSeed + this.id);
@@ -303,6 +352,31 @@ var LandType;
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+class Person {
+    constructor(profession) {
+        this.profession = profession;
+    }
+}
+exports.default = Person;
+var Profession;
+(function (Profession) {
+    Profession[Profession["Farmer"] = 0] = "Farmer";
+    Profession[Profession["Lumberman"] = 1] = "Lumberman";
+    Profession[Profession["Hunter"] = 2] = "Hunter";
+    Profession[Profession["Miner"] = 3] = "Miner";
+    Profession[Profession["Craftsman"] = 4] = "Craftsman";
+    Profession[Profession["Trader"] = 5] = "Trader";
+    Profession[Profession["Leader"] = 6] = "Leader";
+})(Profession = exports.Profession || (exports.Profession = {}));
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
 // A library of seedable RNGs implemented in Javascript.
 //
 // Usage:
@@ -315,17 +389,17 @@ var LandType;
 // alea, a 53-bit multiply-with-carry generator by Johannes Baagøe.
 // Period: ~2^116
 // Reported to pass all BigCrush tests.
-var alea = __webpack_require__(5);
+var alea = __webpack_require__(6);
 
 // xor128, a pure xor-shift generator by George Marsaglia.
 // Period: 2^128-1.
 // Reported to fail: MatrixRank and LinearComp.
-var xor128 = __webpack_require__(9);
+var xor128 = __webpack_require__(10);
 
 // xorwow, George Marsaglia's 160-bit xor-shift combined plus weyl.
 // Period: 2^192-2^32
 // Reported to fail: CollisionOver, SimpPoker, and LinearComp.
-var xorwow = __webpack_require__(10);
+var xorwow = __webpack_require__(11);
 
 // xorshift7, by François Panneton and Pierre L'ecuyer, takes
 // a different approach: it adds robustness by allowing more shifts
@@ -333,7 +407,7 @@ var xorwow = __webpack_require__(10);
 // with 256 bits, that passes BigCrush with no systmatic failures.
 // Period 2^256-1.
 // No systematic BigCrush failures reported.
-var xorshift7 = __webpack_require__(11);
+var xorshift7 = __webpack_require__(12);
 
 // xor4096, by Richard Brent, is a 4096-bit xor-shift with a
 // very long period that also adds a Weyl generator. It also passes
@@ -342,18 +416,18 @@ var xorshift7 = __webpack_require__(11);
 // collisions.
 // Period: 2^4128-2^32.
 // No systematic BigCrush failures reported.
-var xor4096 = __webpack_require__(12);
+var xor4096 = __webpack_require__(13);
 
 // Tyche-i, by Samuel Neves and Filipe Araujo, is a bit-shifting random
 // number generator derived from ChaCha, a modern stream cipher.
 // https://eden.dei.uc.pt/~sneves/pubs/2011-snfa2.pdf
 // Period: ~2^127
 // No systematic BigCrush failures reported.
-var tychei = __webpack_require__(13);
+var tychei = __webpack_require__(14);
 
 // The original ARC4-based prng included in this library.
 // Period: ~2^1600
-var sr = __webpack_require__(14);
+var sr = __webpack_require__(15);
 
 sr.alea = alea;
 sr.xor128 = xor128;
@@ -366,7 +440,7 @@ module.exports = sr;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;// A port of an algorithm by Johannes Baagøe <baagoe@baagoe.com>, 2010
@@ -470,7 +544,7 @@ function Mash() {
 
 if (module && module.exports) {
   module.exports = impl;
-} else if (__webpack_require__(7) && __webpack_require__(8)) {
+} else if (__webpack_require__(8) && __webpack_require__(9)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return impl; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {
@@ -480,15 +554,15 @@ if (module && module.exports) {
 })(
   this,
    true && module,    // present in node.js
-  __webpack_require__(7)   // present with an AMD loader
+  __webpack_require__(8)   // present with an AMD loader
 );
 
 
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -516,7 +590,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -525,7 +599,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -534,7 +608,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(this, {}))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;// A Javascript implementaion of the "xor128" prng algorithm by
@@ -605,7 +679,7 @@ function impl(seed, opts) {
 
 if (module && module.exports) {
   module.exports = impl;
-} else if (__webpack_require__(7) && __webpack_require__(8)) {
+} else if (__webpack_require__(8) && __webpack_require__(9)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return impl; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {
@@ -615,15 +689,15 @@ if (module && module.exports) {
 })(
   this,
    true && module,    // present in node.js
-  __webpack_require__(7)   // present with an AMD loader
+  __webpack_require__(8)   // present with an AMD loader
 );
 
 
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;// A Javascript implementaion of the "xorwow" prng algorithm by
@@ -699,7 +773,7 @@ function impl(seed, opts) {
 
 if (module && module.exports) {
   module.exports = impl;
-} else if (__webpack_require__(7) && __webpack_require__(8)) {
+} else if (__webpack_require__(8) && __webpack_require__(9)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return impl; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {
@@ -709,15 +783,15 @@ if (module && module.exports) {
 })(
   this,
    true && module,    // present in node.js
-  __webpack_require__(7)   // present with an AMD loader
+  __webpack_require__(8)   // present with an AMD loader
 );
 
 
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;// A Javascript implementaion of the "xorshift7" algorithm by
@@ -805,7 +879,7 @@ function impl(seed, opts) {
 
 if (module && module.exports) {
   module.exports = impl;
-} else if (__webpack_require__(7) && __webpack_require__(8)) {
+} else if (__webpack_require__(8) && __webpack_require__(9)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return impl; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {
@@ -815,14 +889,14 @@ if (module && module.exports) {
 })(
   this,
    true && module,    // present in node.js
-  __webpack_require__(7)   // present with an AMD loader
+  __webpack_require__(8)   // present with an AMD loader
 );
 
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;// A Javascript implementaion of Richard Brent's Xorgens xor4096 algorithm.
@@ -960,7 +1034,7 @@ function impl(seed, opts) {
 
 if (module && module.exports) {
   module.exports = impl;
-} else if (__webpack_require__(7) && __webpack_require__(8)) {
+} else if (__webpack_require__(8) && __webpack_require__(9)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return impl; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {
@@ -970,13 +1044,13 @@ if (module && module.exports) {
 })(
   this,                                     // window object or global
    true && module,    // present in node.js
-  __webpack_require__(7)   // present with an AMD loader
+  __webpack_require__(8)   // present with an AMD loader
 );
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_RESULT__;// A Javascript implementaion of the "Tyche-i" prng algorithm by
@@ -1069,7 +1143,7 @@ function impl(seed, opts) {
 
 if (module && module.exports) {
   module.exports = impl;
-} else if (__webpack_require__(7) && __webpack_require__(8)) {
+} else if (__webpack_require__(8) && __webpack_require__(9)) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return impl; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 } else {
@@ -1079,15 +1153,15 @@ if (module && module.exports) {
 })(
   this,
    true && module,    // present in node.js
-  __webpack_require__(7)   // present with an AMD loader
+  __webpack_require__(8)   // present with an AMD loader
 );
 
 
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -1329,7 +1403,7 @@ if ( true && module.exports) {
   module.exports = seedrandom;
   // When in node.js, try using crypto package for autoseeding.
   try {
-    nodecrypto = __webpack_require__(15);
+    nodecrypto = __webpack_require__(16);
   } catch (ex) {}
 } else if (true) {
   !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { return seedrandom; }).call(exports, __webpack_require__, exports, module),
@@ -1344,13 +1418,13 @@ if ( true && module.exports) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1456,16 +1530,16 @@ exports.default = Kingdom;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
-const ReactDOM = __webpack_require__(19);
+const React = __webpack_require__(19);
+const ReactDOM = __webpack_require__(20);
 const world_1 = __webpack_require__(2);
-const main_1 = __webpack_require__(20);
+const main_1 = __webpack_require__(21);
 const script_1 = __webpack_require__(0);
 function renderLayout() {
     ReactDOM.render(React.createElement(main_1.default, { colNum: script_1.g.sceneCols, rowNum: script_1.g.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
@@ -1475,30 +1549,30 @@ exports.default = renderLayout;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = React;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = ReactDOM;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
-const map_1 = __webpack_require__(21);
-const infoPanel_1 = __webpack_require__(23);
+const React = __webpack_require__(19);
+const map_1 = __webpack_require__(22);
+const infoPanel_1 = __webpack_require__(24);
 const world_1 = __webpack_require__(2);
 const script_1 = __webpack_require__(0);
-const resize_1 = __webpack_require__(24);
+const resize_1 = __webpack_require__(25);
 class Main extends React.Component {
     constructor() {
         super(...arguments);
@@ -1575,14 +1649,14 @@ exports.default = Main;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
-const cell_1 = __webpack_require__(22);
+const React = __webpack_require__(19);
+const cell_1 = __webpack_require__(23);
 class Map extends React.Component {
     constructor() {
         super(...arguments);
@@ -1612,13 +1686,13 @@ exports.default = Map;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
+const React = __webpack_require__(19);
 const cell_1 = __webpack_require__(3);
 const script_1 = __webpack_require__(0);
 class Cell extends React.Component {
@@ -1673,13 +1747,13 @@ exports.default = Cell;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(18);
+const React = __webpack_require__(19);
 class InfoPanel extends React.Component {
     render() {
         const { highlightedKindom, height, width } = this.props;
@@ -1704,7 +1778,7 @@ exports.default = InfoPanel;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

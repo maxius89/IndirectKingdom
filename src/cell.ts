@@ -1,4 +1,5 @@
 import Kingdom from './kingdom';
+import Person, { Profession } from './person';
 import { g as Global } from './script';
 import * as seedrandom from 'seedrandom';
 
@@ -19,6 +20,9 @@ export default class Cell {
   industry: number;
   agriculture: number;
   population: number;
+
+  listOfResidents: Person[] = [];
+  listOfTravelers: Person[] = [];
 
   baseEfficiency: BaseEfficiency;
 
@@ -46,28 +50,78 @@ export default class Cell {
       people: 0.01
     };
 
+    let initPopulation: number = 0;
     switch (this.type) {
       case LandType.Field:
         this.wealth = 5;
         this.industry = 0;
         this.agriculture = 100;
-        this.population = 10;
+        initPopulation = 10;
         break;
       case LandType.Forest:
         this.wealth = 20;
         this.industry = 25;
         this.agriculture = 20;
-        this.population = 5;
+        initPopulation = 5;
         break;
       case LandType.Mountain:
         this.wealth = 50;
         this.industry = 100;
         this.agriculture = 0;
-        this.population = 5;
+        initPopulation = 5;
         break;
       default:
         console.warn("Cell type not defined!");
     }
+
+    for (let i = 0; i < initPopulation; ++i) {
+      this.listOfResidents.push(new Person(this.decideProfession()));
+    }
+  }
+
+  decideProfession(): Profession {
+    if (this.listOfResidents.length === 0)
+      return Profession.Leader;
+
+    let profession: Profession = Profession.Trader;
+    let chance: number[] = [];
+    chance[Profession.Farmer] = 0;
+    chance[Profession.Lumberman] = 0;
+    chance[Profession.Hunter] = 0;
+    chance[Profession.Miner] = 0;
+    chance[Profession.Craftsman] = 0;
+    chance[Profession.Trader] = 0;
+
+    switch (this.type) {
+      case LandType.Field:
+        chance[Profession.Farmer] = 0.7;
+        chance[Profession.Craftsman] = 0.2;
+        chance[Profession.Trader] = 0.1;
+        break;
+      case LandType.Forest:
+        chance[Profession.Lumberman] = 0.4;
+        chance[Profession.Hunter] = 0.4;
+        chance[Profession.Craftsman] = 0.1;
+        chance[Profession.Trader] = 0.1;
+        break;
+      case LandType.Mountain:
+        chance[Profession.Miner] = 0.6;
+        chance[Profession.Craftsman] = 0.2;
+        chance[Profession.Trader] = 0.2;
+        break;
+      default:
+        profession = Profession.Trader;
+    }
+    const rng = seedrandom(Global.randomSeed + this.id);
+    let chanceSum = 0;
+    for (let i = 0; i < chance.length; ++i) {
+      chanceSum += chance[i];
+      if (chanceSum >= rng()) {
+        profession = Profession[Profession[i] as keyof typeof Profession];
+        break;
+      }
+    }
+    return profession;
   }
 
   setRandomType(): LandType {

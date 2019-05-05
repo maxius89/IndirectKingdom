@@ -8,11 +8,18 @@ export default class Person {
   profession: Profession;
   home: Cell;
   stats: {};
+
+  constructor(profession: Profession) {
+    this.profession = profession;
+  }
+
+
 }
 
 
-enum Profession {
+export enum Profession {
   Farmer,
+  Lumberman,
   Hunter,
   Miner,
   Craftsman,
