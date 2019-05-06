@@ -303,10 +303,13 @@ class Cell {
         }
         const rng = seedrandom(script_1.g.randomSeed + this.id);
         let chanceSum = 0;
+        const professionEnumValues = Object.keys(person_1.Profession)
+            .map(n => Number.parseInt(n))
+            .filter(n => !Number.isNaN(n));
         for (let i = 0; i < chance.length; ++i) {
             chanceSum += chance[i];
             if (chanceSum >= rng()) {
-                profession = person_1.Profession[person_1.Profession[i]];
+                profession = professionEnumValues[i];
                 break;
             }
         }

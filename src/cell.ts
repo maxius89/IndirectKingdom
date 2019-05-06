@@ -112,12 +112,17 @@ export default class Cell {
       default:
         profession = Profession.Trader;
     }
-    const rng = seedrandom(Global.randomSeed + this.id);
+
     let chanceSum = 0;
+    const rng = seedrandom(Global.randomSeed + this.id);
+    const professionEnumValues = Object.keys(Profession)
+      .map(n => Number.parseInt(n))
+      .filter(n => !Number.isNaN(n))
+
     for (let i = 0; i < chance.length; ++i) {
       chanceSum += chance[i];
       if (chanceSum >= rng()) {
-        profession = Profession[Profession[i] as keyof typeof Profession];
+        profession = professionEnumValues[i];
         break;
       }
     }
