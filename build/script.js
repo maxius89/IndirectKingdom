@@ -93,7 +93,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const global_1 = __webpack_require__(1);
 const world_1 = __webpack_require__(2);
-const layout_1 = __webpack_require__(18);
+const layout_1 = __webpack_require__(19);
 exports.g = new global_1.default;
 document.addEventListener("DOMContentLoaded", function () {
     setConsts();
@@ -166,7 +166,7 @@ exports.default = Globals;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const cell_1 = __webpack_require__(3);
-const kingdom_1 = __webpack_require__(17);
+const kingdom_1 = __webpack_require__(18);
 const script_1 = __webpack_require__(0);
 const seedrandom = __webpack_require__(5);
 class World {
@@ -220,6 +220,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const person_1 = __webpack_require__(4);
 const script_1 = __webpack_require__(0);
 const seedrandom = __webpack_require__(5);
+const weightedRandom_1 = __webpack_require__(17);
 class Cell {
     constructor(coordinates) {
         this.listOfResidents = [];
@@ -267,53 +268,39 @@ class Cell {
                 console.warn("Cell type not defined!");
         }
         for (let i = 0; i < initPopulation; ++i) {
-            this.listOfResidents.push(new person_1.default(this.decideProfession()));
+            this.listOfResidents.push(new person_1.default(this.decideProfession(i)));
         }
     }
-    decideProfession() {
+    decideProfession(index) {
         if (this.listOfResidents.length === 0)
             return person_1.Profession.Leader;
-        let profession = person_1.Profession.Trader;
-        let chance = [];
-        chance[person_1.Profession.Farmer] = 0;
-        chance[person_1.Profession.Lumberman] = 0;
-        chance[person_1.Profession.Hunter] = 0;
-        chance[person_1.Profession.Miner] = 0;
-        chance[person_1.Profession.Craftsman] = 0;
-        chance[person_1.Profession.Trader] = 0;
+        const professionRaffle = new weightedRandom_1.default(script_1.g.randomSeed + this.id + index);
         switch (this.type) {
             case LandType.Field:
-                chance[person_1.Profession.Farmer] = 0.7;
-                chance[person_1.Profession.Craftsman] = 0.2;
-                chance[person_1.Profession.Trader] = 0.1;
+                professionRaffle.addEntry(person_1.Profession.Farmer, 0.7);
+                professionRaffle.addEntry(person_1.Profession.Craftsman, 0.2);
+                professionRaffle.addEntry(person_1.Profession.Trader, 0.1);
                 break;
             case LandType.Forest:
-                chance[person_1.Profession.Lumberman] = 0.4;
-                chance[person_1.Profession.Hunter] = 0.4;
-                chance[person_1.Profession.Craftsman] = 0.1;
-                chance[person_1.Profession.Trader] = 0.1;
+                professionRaffle.addEntry(person_1.Profession.Lumberman, 0.4);
+                professionRaffle.addEntry(person_1.Profession.Hunter, 0.4);
+                professionRaffle.addEntry(person_1.Profession.Craftsman, 0.1);
+                professionRaffle.addEntry(person_1.Profession.Trader, 0.1);
                 break;
             case LandType.Mountain:
-                chance[person_1.Profession.Miner] = 0.6;
-                chance[person_1.Profession.Craftsman] = 0.2;
-                chance[person_1.Profession.Trader] = 0.2;
+                professionRaffle.addEntry(person_1.Profession.Miner, 0.6);
+                professionRaffle.addEntry(person_1.Profession.Craftsman, 0.2);
+                professionRaffle.addEntry(person_1.Profession.Trader, 0.2);
                 break;
             default:
-                profession = person_1.Profession.Trader;
+                console.warn('Undefined LandType at decideProfession().');
         }
-        const rng = seedrandom(script_1.g.randomSeed + this.id);
-        let chanceSum = 0;
-        const professionEnumValues = Object.keys(person_1.Profession)
-            .map(n => Number.parseInt(n))
-            .filter(n => !Number.isNaN(n));
-        for (let i = 0; i < chance.length; ++i) {
-            chanceSum += chance[i];
-            if (chanceSum >= rng()) {
-                profession = professionEnumValues[i];
-                break;
-            }
-        }
-        return profession;
+        const profession = professionRaffle.drawRandom();
+        if (profession !== undefined)
+            return profession;
+        else
+            console.warn('professionRaffle was unsuccessful at decideProfession(), Trader was assinged by default.');
+        return person_1.Profession.Trader;
     }
     setRandomType() {
         const rng = seedrandom(script_1.g.randomSeed + this.id);
@@ -1433,6 +1420,47 @@ if ( true && module.exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const seedrandom = __webpack_require__(5);
+class weightedRandom {
+    constructor(seed = "") {
+        this.keys = [];
+        this.chances = [];
+        this.unsuccesfulWarning = 'drawRandom was unsuccessful.';
+        this.seed = seed;
+    }
+    addEntry(key, chance) {
+        this.keys.push(key);
+        this.chances.push(chance);
+    }
+    ;
+    setSeed(seed) { this.seed = seed; }
+    ;
+    drawRandom() {
+        const chancesSum = this.chances.reduce((a, b) => a + b, 0);
+        const rng = this.seed === "" ? seedrandom() : seedrandom(this.seed);
+        const rand = rng() * chancesSum;
+        let chanceSum = 0;
+        for (let i = 0; i < this.chances.length; ++i) {
+            chanceSum += this.chances[i];
+            if (chanceSum >= rand)
+                return this.keys[i];
+        }
+        ;
+        console.warn(this.unsuccesfulWarning);
+        return undefined;
+    }
+    ;
+}
+exports.default = weightedRandom;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const world_1 = __webpack_require__(2);
 class Kingdom {
     constructor(name, color, cellIDs, active, world) {
@@ -1533,16 +1561,16 @@ exports.default = Kingdom;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(19);
-const ReactDOM = __webpack_require__(20);
+const React = __webpack_require__(20);
+const ReactDOM = __webpack_require__(21);
 const world_1 = __webpack_require__(2);
-const main_1 = __webpack_require__(21);
+const main_1 = __webpack_require__(22);
 const script_1 = __webpack_require__(0);
 function renderLayout() {
     ReactDOM.render(React.createElement(main_1.default, { colNum: script_1.g.sceneCols, rowNum: script_1.g.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
@@ -1552,30 +1580,30 @@ exports.default = renderLayout;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = React;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = ReactDOM;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(19);
-const map_1 = __webpack_require__(22);
-const infoPanel_1 = __webpack_require__(24);
+const React = __webpack_require__(20);
+const map_1 = __webpack_require__(23);
+const infoPanel_1 = __webpack_require__(25);
 const world_1 = __webpack_require__(2);
 const script_1 = __webpack_require__(0);
-const resize_1 = __webpack_require__(25);
+const resize_1 = __webpack_require__(26);
 class Main extends React.Component {
     constructor() {
         super(...arguments);
@@ -1652,14 +1680,14 @@ exports.default = Main;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(19);
-const cell_1 = __webpack_require__(23);
+const React = __webpack_require__(20);
+const cell_1 = __webpack_require__(24);
 class Map extends React.Component {
     constructor() {
         super(...arguments);
@@ -1689,13 +1717,13 @@ exports.default = Map;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(19);
+const React = __webpack_require__(20);
 const cell_1 = __webpack_require__(3);
 const script_1 = __webpack_require__(0);
 class Cell extends React.Component {
@@ -1750,13 +1778,13 @@ exports.default = Cell;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(19);
+const React = __webpack_require__(20);
 class InfoPanel extends React.Component {
     render() {
         const { highlightedKindom, height, width } = this.props;
@@ -1781,7 +1809,7 @@ exports.default = InfoPanel;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

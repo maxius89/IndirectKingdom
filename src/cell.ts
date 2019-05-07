@@ -2,6 +2,7 @@ import Kingdom from './kingdom';
 import Person, { Profession } from './person';
 import { g as Global } from './script';
 import * as seedrandom from 'seedrandom';
+import WeightedRandom from './util/weightedRandom';
 
 export default class Cell {
 
@@ -75,58 +76,46 @@ export default class Cell {
     }
 
     for (let i = 0; i < initPopulation; ++i) {
-      this.listOfResidents.push(new Person(this.decideProfession()));
+      this.listOfResidents.push(new Person(this.decideProfession(i)));
     }
   }
 
-  decideProfession(): Profession {
+  decideProfession(index: number): Profession {
     if (this.listOfResidents.length === 0)
       return Profession.Leader;
 
-    let profession: Profession = Profession.Trader;
-    let chance: number[] = [];
-    chance[Profession.Farmer] = 0;
-    chance[Profession.Lumberman] = 0;
-    chance[Profession.Hunter] = 0;
-    chance[Profession.Miner] = 0;
-    chance[Profession.Craftsman] = 0;
-    chance[Profession.Trader] = 0;
+    const professionRaffle =
+      new WeightedRandom<Profession>(Global.randomSeed + this.id + index);
 
     switch (this.type) {
       case LandType.Field:
-        chance[Profession.Farmer] = 0.7;
-        chance[Profession.Craftsman] = 0.2;
-        chance[Profession.Trader] = 0.1;
+        professionRaffle.addEntry(Profession.Farmer, 0.7);
+        professionRaffle.addEntry(Profession.Craftsman, 0.2);
+        professionRaffle.addEntry(Profession.Trader, 0.1);
         break;
       case LandType.Forest:
-        chance[Profession.Lumberman] = 0.4;
-        chance[Profession.Hunter] = 0.4;
-        chance[Profession.Craftsman] = 0.1;
-        chance[Profession.Trader] = 0.1;
+        professionRaffle.addEntry(Profession.Lumberman, 0.4);
+        professionRaffle.addEntry(Profession.Hunter, 0.4);
+        professionRaffle.addEntry(Profession.Craftsman, 0.1);
+        professionRaffle.addEntry(Profession.Trader, 0.1);
         break;
       case LandType.Mountain:
-        chance[Profession.Miner] = 0.6;
-        chance[Profession.Craftsman] = 0.2;
-        chance[Profession.Trader] = 0.2;
+        professionRaffle.addEntry(Profession.Miner, 0.6);
+        professionRaffle.addEntry(Profession.Craftsman, 0.2);
+        professionRaffle.addEntry(Profession.Trader, 0.2);
         break;
       default:
-        profession = Profession.Trader;
+        console.warn('Undefined LandType at decideProfession().')
     }
 
-    let chanceSum = 0;
-    const rng = seedrandom(Global.randomSeed + this.id);
-    const professionEnumValues = Object.keys(Profession)
-      .map(n => Number.parseInt(n))
-      .filter(n => !Number.isNaN(n))
+    const profession = professionRaffle.drawRandom();
 
-    for (let i = 0; i < chance.length; ++i) {
-      chanceSum += chance[i];
-      if (chanceSum >= rng()) {
-        profession = professionEnumValues[i];
-        break;
-      }
-    }
-    return profession;
+    if (profession !== undefined)
+      return profession;
+    else
+      console.warn('professionRaffle was unsuccessful at decideProfession(), Trader was assinged by default.')
+
+    return Profession.Trader;
   }
 
   setRandomType(): LandType {
