@@ -76,8 +76,9 @@ export default class Cell {
     }
 
     for (let i = 0; i < initPopulation; ++i) {
-      this.listOfResidents.push(new Person(this.decideProfession(i)));
+      this.listOfResidents.push(new Person(this.decideProfession(i), this));
     }
+    console.log(this.listOfResidents);
   }
 
   decideProfession(index: number): Profession {
@@ -136,7 +137,15 @@ export default class Cell {
 
     this.population += this.populationGrowth;
 
+    let output = 0;
+    this.listOfResidents.forEach(person => {
+      output += person.nextRound()
+    });
   }
+
+  testFarmer() { console.log('Map test called: Farmer.') };
+  testLumber() { console.log('Map test called: Lumberman.') };
+  testHunter() { console.log('Map test called: Hunter.') };
 
   generateOutput(this: Cell): Output {
     this.output.money = this.wealth * this.moneyEfficiency;

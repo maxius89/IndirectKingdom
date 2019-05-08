@@ -268,8 +268,9 @@ class Cell {
                 console.warn("Cell type not defined!");
         }
         for (let i = 0; i < initPopulation; ++i) {
-            this.listOfResidents.push(new person_1.default(this.decideProfession(i)));
+            this.listOfResidents.push(new person_1.default(this.decideProfession(i), this));
         }
+        console.log(this.listOfResidents);
     }
     decideProfession(index) {
         if (this.listOfResidents.length === 0)
@@ -315,7 +316,17 @@ class Cell {
         this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
         this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
         this.population += this.populationGrowth;
+        let output = 0;
+        this.listOfResidents.forEach(person => {
+            output += person.nextRound();
+        });
     }
+    testFarmer() { console.log('Map test called: Farmer.'); }
+    ;
+    testLumber() { console.log('Map test called: Lumberman.'); }
+    ;
+    testHunter() { console.log('Map test called: Hunter.'); }
+    ;
     generateOutput() {
         this.output.money = this.wealth * this.moneyEfficiency;
         this.output.goods = this.industry * this.industryEfficiency;
@@ -346,10 +357,36 @@ var LandType;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 class Person {
-    constructor(profession) {
+    constructor(profession, home) {
         this.profession = profession;
+        this.home = home;
+        this.age = 0;
+        this.id = Person.counter++;
+        this.name = this.generateName();
+        this.stats = { efficiency: 100 };
     }
+    generateName() {
+        return "";
+    }
+    ;
+    nextRound() {
+        this.consume();
+        return this.work();
+    }
+    ;
+    work() {
+        return this.stats.efficiency;
+    }
+    ;
+    consume() {
+        //    if (this.home.foodStorage > 0)
+        //      this.home.foodStorage--;
+        //    else
+        //      this.stats.efficiency--;
+    }
+    ;
 }
+Person.counter = 0;
 exports.default = Person;
 var Profession;
 (function (Profession) {
