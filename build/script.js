@@ -225,6 +225,11 @@ class Cell {
     constructor(coordinates) {
         this.listOfResidents = [];
         this.listOfTravelers = [];
+        this.ActionMap = new Map([
+            [person_1.Profession.Farmer, this.testFarmer],
+            [person_1.Profession.Lumberman, this.testLumber],
+            [person_1.Profession.Hunter, this.testHunter],
+        ]);
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
         this.type = this.setRandomType();
@@ -318,6 +323,9 @@ class Cell {
         this.population += this.populationGrowth;
         let output = 0;
         this.listOfResidents.forEach(person => {
+            const action = this.ActionMap.get(person.profession);
+            if (action !== undefined)
+                action();
             output += person.nextRound();
         });
     }
@@ -370,6 +378,7 @@ class Person {
     }
     ;
     nextRound() {
+        ++this.age;
         this.consume();
         return this.work();
     }

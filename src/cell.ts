@@ -27,6 +27,12 @@ export default class Cell {
 
   baseEfficiency: BaseEfficiency;
 
+  readonly ActionMap = new Map<Profession, () => void>([
+    [Profession.Farmer, this.testFarmer],
+    [Profession.Lumberman, this.testLumber],
+    [Profession.Hunter, this.testHunter],
+  ]);
+
   constructor(coordinates: CellCoordinates) {
     this.pos = coordinates;
     this.id = "r" + coordinates.row + "c" + coordinates.col;
@@ -139,6 +145,9 @@ export default class Cell {
 
     let output = 0;
     this.listOfResidents.forEach(person => {
+      const action = this.ActionMap.get(person.profession);
+      if (action !== undefined) action();
+
       output += person.nextRound()
     });
   }

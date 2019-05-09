@@ -24,6 +24,7 @@ export default class Person {
   };
 
   nextRound(): number {
+    ++this.age;
     this.consume();
     return this.work();
   };
