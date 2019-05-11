@@ -322,14 +322,13 @@ class Cell {
         this.industryEfficiency = 0;
         this.agricultureEfficiency = 0;
         this.populationGrowth = 0;
-        //Object.keys(this.productivity).forEach(k => this.productivity[k] = 0);
         this.population += this.populationGrowth;
+        Object.keys(this.productivity).forEach(k => this.productivity[k] = 0);
         this.listOfResidents.forEach(person => {
             const action = this.ActionMap.get(person.profession);
             if (action !== undefined)
                 action(person.nextRound());
         });
-        console.log(this.productivity.food);
     }
     workFarmer(production) { this.productivity.food += production; }
     ;
