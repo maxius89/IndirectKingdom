@@ -225,14 +225,24 @@ class Cell {
     constructor(coordinates) {
         this.listOfResidents = [];
         this.listOfTravelers = [];
+        this.productivity = {
+            ore: 0,
+            craft: 0,
+            food: 0,
+            wood: 0
+        };
         this.ActionMap = new Map([
-            [person_1.Profession.Farmer, this.testFarmer],
-            [person_1.Profession.Lumberman, this.testLumber],
-            [person_1.Profession.Hunter, this.testHunter],
+            [person_1.Profession.Farmer, this.workFarmer.bind(this)],
+            [person_1.Profession.Lumberman, this.workLumber.bind(this)],
+            [person_1.Profession.Hunter, this.workHunter.bind(this)],
+            [person_1.Profession.Miner, this.workMiner.bind(this)],
+            [person_1.Profession.Craftsman, this.workCraftsman.bind(this)],
+            [person_1.Profession.Trader, this.workTrader.bind(this)],
+            [person_1.Profession.Leader, this.workLeader.bind(this)]
         ]);
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
-        this.type = this.setRandomType();
+        this.type = this.setRandomLandType();
         this.output = {
             money: 0,
             goods: 0,
@@ -243,12 +253,6 @@ class Cell {
         this.industryEfficiency = 0;
         this.agricultureEfficiency = 0;
         this.populationGrowth = 0;
-        this.baseEfficiency = {
-            money: 0.01,
-            goods: 0.01,
-            food: 0.01,
-            people: 0.01
-        };
         let initPopulation = 0;
         switch (this.type) {
             case LandType.Field:
@@ -308,33 +312,39 @@ class Cell {
             console.warn('professionRaffle was unsuccessful at decideProfession(), Trader was assinged by default.');
         return person_1.Profession.Trader;
     }
-    setRandomType() {
+    setRandomLandType() {
         const rng = seedrandom(script_1.g.randomSeed + this.id);
         const numberOfLandTypes = Object.keys(LandType).length / 2;
         return Math.floor(rng() * numberOfLandTypes);
     }
     updateCell() {
-        const populationPower = this.population; // TODO: Get a function with diminishing return;
-        const excessFood = this.agriculture - this.population;
-        this.moneyEfficiency = this.baseEfficiency.money * populationPower;
-        this.industryEfficiency = this.baseEfficiency.goods * populationPower;
-        this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
-        this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
+        this.moneyEfficiency = 0;
+        this.industryEfficiency = 0;
+        this.agricultureEfficiency = 0;
+        this.populationGrowth = 0;
+        //Object.keys(this.productivity).forEach(k => this.productivity[k] = 0);
         this.population += this.populationGrowth;
-        let output = 0;
         this.listOfResidents.forEach(person => {
             const action = this.ActionMap.get(person.profession);
             if (action !== undefined)
-                action();
-            output += person.nextRound();
+                action(person.nextRound());
         });
+        console.log(this.productivity.food);
     }
-    testFarmer() { console.log('Map test called: Farmer.'); }
+    workFarmer(production) { this.productivity.food += production; }
     ;
-    testLumber() { console.log('Map test called: Lumberman.'); }
+    workLumber(production) { this.productivity.wood += production; }
     ;
-    testHunter() { console.log('Map test called: Hunter.'); }
+    workHunter(production) { this.productivity.food += production; }
     ;
+    workMiner(production) { this.productivity.ore += production; }
+    ;
+    workCraftsman(production) { this.productivity.craft += production; }
+    ;
+    workTrader() { }
+    ; //TODO: Trading
+    workLeader() { }
+    ; //TODO: Leading
     generateOutput() {
         this.output.money = this.wealth * this.moneyEfficiency;
         this.output.goods = this.industry * this.industryEfficiency;
