@@ -25,18 +25,27 @@ export default class Cell {
   listOfResidents: Person[] = [];
   listOfTravelers: Person[] = [];
 
-  baseEfficiency: BaseEfficiency;
+  productivity: Efficiency = {
+    ore: 0,
+    craft: 0,
+    food: 0,
+    wood: 0
+  };
 
-  readonly ActionMap = new Map<Profession, () => void>([
-    [Profession.Farmer, this.testFarmer],
-    [Profession.Lumberman, this.testLumber],
-    [Profession.Hunter, this.testHunter],
+  readonly ActionMap = new Map<Profession, (production: number) => void>([
+    [Profession.Farmer, this.workFarmer.bind(this)],
+    [Profession.Lumberman, this.workLumber.bind(this)],
+    [Profession.Hunter, this.workHunter.bind(this)],
+    [Profession.Miner, this.workMiner.bind(this)],
+    [Profession.Craftsman, this.workCraftsman.bind(this)],
+    [Profession.Trader, this.workTrader.bind(this)],
+    [Profession.Leader, this.workLeader.bind(this)]
   ]);
 
   constructor(coordinates: CellCoordinates) {
     this.pos = coordinates;
     this.id = "r" + coordinates.row + "c" + coordinates.col;
-    this.type = this.setRandomType();
+    this.type = this.setRandomLandType();
 
     this.output = {    // Object for cell output per turn
       money: 0,
@@ -49,13 +58,6 @@ export default class Cell {
     this.industryEfficiency = 0;
     this.agricultureEfficiency = 0;
     this.populationGrowth = 0;
-
-    this.baseEfficiency = { // Object for production efficieny constants. Can be modified by world-events.
-      money: 0.01,
-      goods: 0.01,
-      food: 0.01,
-      people: 0.01
-    };
 
     let initPopulation: number = 0;
     switch (this.type) {
@@ -125,7 +127,7 @@ export default class Cell {
     return Profession.Trader;
   }
 
-  setRandomType(): LandType {
+  setRandomLandType(): LandType {
     const rng = seedrandom(Global.randomSeed + this.id);
     const numberOfLandTypes = Object.keys(LandType).length / 2;
 
@@ -133,28 +135,26 @@ export default class Cell {
   }
 
   updateCell(this: Cell): void {
-    const populationPower = this.population; // TODO: Get a function with diminishing return;
-    const excessFood = this.agriculture - this.population;
-
-    this.moneyEfficiency = this.baseEfficiency.money * populationPower;
-    this.industryEfficiency = this.baseEfficiency.goods * populationPower;
-    this.agricultureEfficiency = this.baseEfficiency.food * populationPower;
-    this.populationGrowth = this.baseEfficiency.people * populationPower * excessFood;
-
+    this.moneyEfficiency = 0;
+    this.industryEfficiency = 0;
+    this.agricultureEfficiency = 0;
+    this.populationGrowth = 0;
     this.population += this.populationGrowth;
 
-    let output = 0;
+    Object.keys(this.productivity).forEach(k => this.productivity[k] = 0);
     this.listOfResidents.forEach(person => {
       const action = this.ActionMap.get(person.profession);
-      if (action !== undefined) action();
-
-      output += person.nextRound()
+      if (action !== undefined) action(person.nextRound());
     });
   }
 
-  testFarmer() { console.log('Map test called: Farmer.') };
-  testLumber() { console.log('Map test called: Lumberman.') };
-  testHunter() { console.log('Map test called: Hunter.') };
+  workFarmer(production: number) { this.productivity.food += production; };
+  workLumber(production: number) { this.productivity.wood += production; };
+  workHunter(production: number) { this.productivity.food += production; };
+  workMiner(production: number) { this.productivity.ore += production; };
+  workCraftsman(production: number) { this.productivity.craft += production; };
+  workTrader() { };//TODO: Trading
+  workLeader() { };//TODO: Leading
 
   generateOutput(this: Cell): Output {
     this.output.money = this.wealth * this.moneyEfficiency;
@@ -180,11 +180,12 @@ export enum LandType {
   Mountain
 }
 
-interface BaseEfficiency {
-  money: number;
-  goods: number;
+interface Efficiency {
+  ore: number;
+  craft: number;
   food: number;
-  people: number;
+  wood: number;
+  [key: string]: number;
 }
 
 export interface CellCoordinates {
