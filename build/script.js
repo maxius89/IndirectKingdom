@@ -225,7 +225,27 @@ class Cell {
     constructor(coordinates) {
         this.listOfResidents = [];
         this.listOfTravelers = [];
+        this.buildings = {
+            houses: 0,
+            farms: 0,
+            hunterCamps: 0,
+            lumberCamps: 0,
+            mines: 1,
+            workshops: 0
+        };
         this.productivity = {
+            ore: 0,
+            craft: 0,
+            food: 0,
+            wood: 0
+        };
+        this.productionCapacity = {
+            ore: 0,
+            craft: 0,
+            food: 0,
+            wood: 0
+        };
+        this.production = {
             ore: 0,
             craft: 0,
             food: 0,
@@ -323,12 +343,23 @@ class Cell {
         this.agricultureEfficiency = 0;
         this.populationGrowth = 0;
         this.population += this.populationGrowth;
+        // Calculate productivity from each Person
         Object.keys(this.productivity).forEach(k => this.productivity[k] = 0);
         this.listOfResidents.forEach(person => {
             const action = this.ActionMap.get(person.profession);
             if (action !== undefined)
                 action(person.nextRound());
         });
+        // Calculate production capacity
+        this.productionCapacity.ore = this.buildings.mines;
+        this.productionCapacity.craft = this.buildings.workshops;
+        this.productionCapacity.food = this.buildings.farms + this.buildings.hunterCamps;
+        this.productionCapacity.wood = this.buildings.lumberCamps;
+        // Calculate production from productivity and capacity
+        this.production.ore = this.calculateProduction(this.productivity.ore, this.productionCapacity.ore);
+        this.production.craft = this.calculateProduction(this.productivity.craft, this.productionCapacity.craft);
+        this.production.food = this.calculateProduction(this.productivity.food, this.productionCapacity.food);
+        this.production.wood = this.calculateProduction(this.productivity.wood, this.productionCapacity.wood);
     }
     workFarmer(production) { this.productivity.food += production; }
     ;
@@ -344,6 +375,10 @@ class Cell {
     ; //TODO: Trading
     workLeader() { }
     ; //TODO: Leading
+    calculateProduction(productivity, capacity) {
+        return Math.min(productivity / 100, capacity);
+    }
+    ;
     generateOutput() {
         this.output.money = this.wealth * this.moneyEfficiency;
         this.output.goods = this.industry * this.industryEfficiency;
