@@ -30,7 +30,7 @@ export default class Person {
   };
 
   work(): number {
-    return this.stats.efficiency;
+    return this.stats.efficiency / 100;
   };
 
   consume(): void {

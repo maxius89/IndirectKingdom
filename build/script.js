@@ -230,8 +230,14 @@ class Cell {
             farms: 0,
             hunterCamps: 0,
             lumberCamps: 0,
-            mines: 1,
-            workshops: 0
+            mines: 0,
+            workshops: 0,
+            storages: {
+                ore: 0,
+                craft: 0,
+                food: 0,
+                wood: 0
+            }
         };
         this.productivity = {
             ore: 0,
@@ -245,7 +251,7 @@ class Cell {
             food: 0,
             wood: 0
         };
-        this.production = {
+        this.storage = {
             ore: 0,
             craft: 0,
             food: 0,
@@ -263,16 +269,6 @@ class Cell {
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
         this.type = this.setRandomLandType();
-        this.output = {
-            money: 0,
-            goods: 0,
-            food: 0
-        };
-        // Efficiencies calculated from different elements for output calculation
-        this.moneyEfficiency = 0;
-        this.industryEfficiency = 0;
-        this.agricultureEfficiency = 0;
-        this.populationGrowth = 0;
         let initPopulation = 0;
         switch (this.type) {
             case LandType.Field:
@@ -301,6 +297,7 @@ class Cell {
         }
         console.log(this.listOfResidents);
     }
+    ;
     decideProfession(index) {
         if (this.listOfResidents.length === 0)
             return person_1.Profession.Leader;
@@ -325,6 +322,7 @@ class Cell {
             default:
                 console.warn('Undefined LandType at decideProfession().');
         }
+        ;
         const profession = professionRaffle.drawRandom();
         if (profession !== undefined)
             return profession;
@@ -332,35 +330,54 @@ class Cell {
             console.warn('professionRaffle was unsuccessful at decideProfession(), Trader was assinged by default.');
         return person_1.Profession.Trader;
     }
+    ;
     setRandomLandType() {
         const rng = seedrandom(script_1.g.randomSeed + this.id);
         const numberOfLandTypes = Object.keys(LandType).length / 2;
         return Math.floor(rng() * numberOfLandTypes);
     }
-    updateCell() {
-        this.moneyEfficiency = 0;
-        this.industryEfficiency = 0;
-        this.agricultureEfficiency = 0;
-        this.populationGrowth = 0;
-        this.population += this.populationGrowth;
-        // Calculate productivity from each Person
+    ;
+    updateSettlement() {
+        this.updateProductionCapacity();
+        this.resetProductivity();
+        this.doResidentsAction();
+        this.updateStorages();
+    }
+    ;
+    resetProductivity() {
         Object.keys(this.productivity).forEach(k => this.productivity[k] = 0);
+    }
+    ;
+    doResidentsAction() {
         this.listOfResidents.forEach(person => {
             const action = this.ActionMap.get(person.profession);
             if (action !== undefined)
                 action(person.nextRound());
         });
-        // Calculate production capacity
+    }
+    ;
+    updateStorages() {
+        Object.keys(this.storage).forEach(k => {
+            const spaceInStorage = this.buildings.storages[k] - this.storage[k];
+            this.storage[k] += this.calculateProduction(this.productivity[k], this.productionCapacity[k], spaceInStorage);
+        });
+    }
+    ;
+    calculateProduction(productivity, capacity, availableSpace) {
+        return Math.min(productivity, capacity, availableSpace);
+    }
+    ;
+    updateProductionCapacity() {
         this.productionCapacity.ore = this.buildings.mines;
         this.productionCapacity.craft = this.buildings.workshops;
         this.productionCapacity.food = this.buildings.farms + this.buildings.hunterCamps;
         this.productionCapacity.wood = this.buildings.lumberCamps;
-        // Calculate production from productivity and capacity
-        this.production.ore = this.calculateProduction(this.productivity.ore, this.productionCapacity.ore);
-        this.production.craft = this.calculateProduction(this.productivity.craft, this.productionCapacity.craft);
-        this.production.food = this.calculateProduction(this.productivity.food, this.productionCapacity.food);
-        this.production.wood = this.calculateProduction(this.productivity.wood, this.productionCapacity.wood);
     }
+    ;
+    nextRound() {
+        this.updateSettlement();
+    }
+    ;
     workFarmer(production) { this.productivity.food += production; }
     ;
     workLumber(production) { this.productivity.wood += production; }
@@ -375,22 +392,6 @@ class Cell {
     ; //TODO: Trading
     workLeader() { }
     ; //TODO: Leading
-    calculateProduction(productivity, capacity) {
-        return Math.min(productivity / 100, capacity);
-    }
-    ;
-    generateOutput() {
-        this.output.money = this.wealth * this.moneyEfficiency;
-        this.output.goods = this.industry * this.industryEfficiency;
-        this.output.food = this.agriculture * this.agricultureEfficiency;
-        return this.output;
-    }
-    nextRound() {
-        this.updateCell();
-        Object.keys(this.output).map(function (i) {
-            this.owner.income[i] += this.generateOutput()[i];
-        }, this);
-    }
 }
 exports.default = Cell;
 var LandType;
@@ -428,7 +429,7 @@ class Person {
     }
     ;
     work() {
-        return this.stats.efficiency;
+        return this.stats.efficiency / 100;
     }
     ;
     consume() {
