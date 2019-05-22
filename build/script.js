@@ -93,7 +93,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const global_1 = __webpack_require__(1);
 const world_1 = __webpack_require__(2);
-const layout_1 = __webpack_require__(19);
+const layout_1 = __webpack_require__(20);
 exports.g = new global_1.default;
 document.addEventListener("DOMContentLoaded", function () {
     setConsts();
@@ -166,7 +166,7 @@ exports.default = Globals;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const cell_1 = __webpack_require__(3);
-const kingdom_1 = __webpack_require__(18);
+const kingdom_1 = __webpack_require__(19);
 const script_1 = __webpack_require__(0);
 const seedrandom = __webpack_require__(5);
 class World {
@@ -221,6 +221,7 @@ const person_1 = __webpack_require__(4);
 const script_1 = __webpack_require__(0);
 const seedrandom = __webpack_require__(5);
 const weightedRandom_1 = __webpack_require__(17);
+const building_1 = __webpack_require__(18);
 class Cell {
     constructor(coordinates) {
         this.listOfResidents = [];
@@ -337,11 +338,18 @@ class Cell {
         return Math.floor(rng() * numberOfLandTypes);
     }
     ;
-    updateSettlement() {
+    doSettlementProduction() {
         this.updateProductionCapacity();
         this.resetProductivity();
         this.doResidentsAction();
         this.updateStorages();
+    }
+    ;
+    updateProductionCapacity() {
+        this.productionCapacity.ore = this.buildings.mines;
+        this.productionCapacity.craft = this.buildings.workshops;
+        this.productionCapacity.food = this.buildings.farms + this.buildings.hunterCamps;
+        this.productionCapacity.wood = this.buildings.lumberCamps;
     }
     ;
     resetProductivity() {
@@ -367,15 +375,16 @@ class Cell {
         return Math.min(productivity, capacity, availableSpace);
     }
     ;
-    updateProductionCapacity() {
-        this.productionCapacity.ore = this.buildings.mines;
-        this.productionCapacity.craft = this.buildings.workshops;
-        this.productionCapacity.food = this.buildings.farms + this.buildings.hunterCamps;
-        this.productionCapacity.wood = this.buildings.lumberCamps;
+    build() {
+        if (!this.buildingUnderConstruction.type) {
+            this.buildingUnderConstruction.type = building_1.BuildingType.Farm;
+        }
+        // remove resources from storages, finish building is cost is payed
     }
     ;
     nextRound() {
-        this.updateSettlement();
+        this.doSettlementProduction();
+        this.build();
     }
     ;
     workFarmer(production) { this.productivity.food += production; }
@@ -1552,6 +1561,62 @@ exports.default = weightedRandom;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuildingCost = {
+    House: {
+        ore: 0,
+        craft: 5,
+        wood: 10
+    },
+    Farm: {
+        ore: 0,
+        craft: 3,
+        wood: 3
+    },
+    HunterCamp: {
+        ore: 1,
+        craft: 3,
+        wood: 2
+    },
+    LumberCamp: {
+        ore: 2,
+        craft: 5,
+        wood: 4
+    },
+    Mine: {
+        ore: 5,
+        craft: 15,
+        wood: 5
+    },
+    Workshop: {
+        ore: 10,
+        craft: 15,
+        wood: 10
+    },
+    Storage: {
+        ore: 0,
+        craft: 5,
+        wood: 6
+    }
+};
+var BuildingType;
+(function (BuildingType) {
+    BuildingType[BuildingType["House"] = 0] = "House";
+    BuildingType[BuildingType["Farm"] = 1] = "Farm";
+    BuildingType[BuildingType["HunterCamp"] = 2] = "HunterCamp";
+    BuildingType[BuildingType["LumberCamp"] = 3] = "LumberCamp";
+    BuildingType[BuildingType["Mine"] = 4] = "Mine";
+    BuildingType[BuildingType["Workshop"] = 5] = "Workshop";
+    BuildingType[BuildingType["Storage"] = 6] = "Storage";
+})(BuildingType = exports.BuildingType || (exports.BuildingType = {}));
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const world_1 = __webpack_require__(2);
 class Kingdom {
     constructor(name, color, cellIDs, active, world) {
@@ -1652,16 +1717,16 @@ exports.default = Kingdom;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(20);
-const ReactDOM = __webpack_require__(21);
+const React = __webpack_require__(21);
+const ReactDOM = __webpack_require__(22);
 const world_1 = __webpack_require__(2);
-const main_1 = __webpack_require__(22);
+const main_1 = __webpack_require__(23);
 const script_1 = __webpack_require__(0);
 function renderLayout() {
     ReactDOM.render(React.createElement(main_1.default, { colNum: script_1.g.sceneCols, rowNum: script_1.g.sceneRows, worldMap: world_1.default.map }), document.getElementById("main"));
@@ -1671,30 +1736,30 @@ exports.default = renderLayout;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = React;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = ReactDOM;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(20);
-const map_1 = __webpack_require__(23);
-const infoPanel_1 = __webpack_require__(25);
+const React = __webpack_require__(21);
+const map_1 = __webpack_require__(24);
+const infoPanel_1 = __webpack_require__(26);
 const world_1 = __webpack_require__(2);
 const script_1 = __webpack_require__(0);
-const resize_1 = __webpack_require__(26);
+const resize_1 = __webpack_require__(27);
 class Main extends React.Component {
     constructor() {
         super(...arguments);
@@ -1771,14 +1836,14 @@ exports.default = Main;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(20);
-const cell_1 = __webpack_require__(24);
+const React = __webpack_require__(21);
+const cell_1 = __webpack_require__(25);
 class Map extends React.Component {
     constructor() {
         super(...arguments);
@@ -1808,13 +1873,13 @@ exports.default = Map;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(20);
+const React = __webpack_require__(21);
 const cell_1 = __webpack_require__(3);
 const script_1 = __webpack_require__(0);
 class Cell extends React.Component {
@@ -1869,13 +1934,13 @@ exports.default = Cell;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(20);
+const React = __webpack_require__(21);
 class InfoPanel extends React.Component {
     render() {
         const { highlightedKindom, height, width } = this.props;
@@ -1900,7 +1965,7 @@ exports.default = InfoPanel;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

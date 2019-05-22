@@ -3,6 +3,7 @@ import Person, { Profession } from './person';
 import { g as Global } from './script';
 import * as seedrandom from 'seedrandom';
 import WeightedRandom from './util/weightedRandom';
+import { BuildingCost, BuildingType } from './building';
 
 export default class Cell {
 
@@ -38,6 +39,8 @@ export default class Cell {
       wood: 0
     }
   };
+
+  buildingUnderConstruction: { type: BuildingType, remainingCost: Production };
 
   productivity: Production = {
     ore: 0,
@@ -150,11 +153,18 @@ export default class Cell {
     return Math.floor(rng() * numberOfLandTypes);
   };
 
-  updateSettlement(this: Cell): void {
+  doSettlementProduction(this: Cell): void {
     this.updateProductionCapacity();
     this.resetProductivity();
     this.doResidentsAction();
     this.updateStorages();
+  };
+
+  updateProductionCapacity(): void {
+    this.productionCapacity.ore = this.buildings.mines;
+    this.productionCapacity.craft = this.buildings.workshops;
+    this.productionCapacity.food = this.buildings.farms + this.buildings.hunterCamps;
+    this.productionCapacity.wood = this.buildings.lumberCamps;
   };
 
   resetProductivity(): void {
@@ -183,15 +193,16 @@ export default class Cell {
     return Math.min(productivity, capacity, availableSpace);
   };
 
-  updateProductionCapacity(): void {
-    this.productionCapacity.ore = this.buildings.mines;
-    this.productionCapacity.craft = this.buildings.workshops;
-    this.productionCapacity.food = this.buildings.farms + this.buildings.hunterCamps;
-    this.productionCapacity.wood = this.buildings.lumberCamps;
+  build(): void {
+    if (!this.buildingUnderConstruction.type) {
+      this.buildingUnderConstruction.type = BuildingType.Farm;
+    }
+    // remove resources from storages, finish building is cost is payed
   };
 
   nextRound(this: Cell): void {
-    this.updateSettlement();
+    this.doSettlementProduction();
+    this.build();
   };
 
   workFarmer(production: number) { this.productivity.food += production; };
