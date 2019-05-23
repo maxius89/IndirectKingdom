@@ -200,7 +200,11 @@ class World {
     }
     static nextRound() {
         var rng = seedrandom();
-        World.listOfCells.forEach(cell => cell.nextRound());
+        World.listOfCells.forEach(cell => {
+            //console.log(cell.id + " " + cell.buildingUnderConstruction.remainingCost.craft);
+            //console.log(cell.buildingUnderConstruction.remainingCost.craft);
+            cell.nextRound();
+        });
         World.listOfKingdoms.forEach(kingdom => kingdom.nextRound(rng()));
     }
 }
@@ -232,10 +236,10 @@ class Cell {
             hunterCamps: 0,
             lumberCamps: 0,
             mines: 0,
-            workshops: 0,
+            workshops: 1,
             storages: {
                 ore: 0,
-                craft: 0,
+                craft: 1,
                 food: 0,
                 wood: 0
             }
@@ -270,6 +274,7 @@ class Cell {
         this.pos = coordinates;
         this.id = "r" + coordinates.row + "c" + coordinates.col;
         this.type = this.setRandomLandType();
+        this.buildingUnderConstruction = new building_1.UnderConstruction(this.id);
         let initPopulation = 0;
         switch (this.type) {
             case LandType.Field:
@@ -296,7 +301,6 @@ class Cell {
         for (let i = 0; i < initPopulation; ++i) {
             this.listOfResidents.push(new person_1.default(this.decideProfession(i), this));
         }
-        console.log(this.listOfResidents);
     }
     ;
     decideProfession(index) {
@@ -317,7 +321,7 @@ class Cell {
                 break;
             case LandType.Mountain:
                 professionRaffle.addEntry(person_1.Profession.Miner, 0.6);
-                professionRaffle.addEntry(person_1.Profession.Craftsman, 0.2);
+                professionRaffle.addEntry(person_1.Profession.Craftsman, 0.8);
                 professionRaffle.addEntry(person_1.Profession.Trader, 0.2);
                 break;
             default:
@@ -375,16 +379,34 @@ class Cell {
         return Math.min(productivity, capacity, availableSpace);
     }
     ;
-    build() {
+    construct() {
+        console.log(this);
+        // remove resources from storages, finish building if cost is payed
+        const cost = this.buildingUnderConstruction.build(this.storage);
+        Object.keys(this.storage).forEach(k => {
+            if (cost[k] === undefined)
+                cost[k] = 0;
+            this.storage[k] -= cost[k];
+        });
+    }
+    ;
+    decideNextBuilding() {
         if (!this.buildingUnderConstruction.type) {
-            this.buildingUnderConstruction.type = building_1.BuildingType.Farm;
+            this.buildingUnderConstruction.type = building_1.BuildingType.House;
+            this.buildingUnderConstruction.remainingCost = building_1.BuildingCost.House;
         }
-        // remove resources from storages, finish building is cost is payed
     }
     ;
     nextRound() {
+        //  console.log(Cell.counter++)
         this.doSettlementProduction();
-        this.build();
+        //if (this.id === "r0c0") {
+        console.group();
+        console.log(this.id + " " + this.buildingUnderConstruction.remainingCost.craft);
+        this.construct();
+        console.log(this.id + " " + this.buildingUnderConstruction.remainingCost.craft);
+        console.groupEnd();
+        //}
     }
     ;
     workFarmer(production) { this.productivity.food += production; }
@@ -399,9 +421,10 @@ class Cell {
     ;
     workTrader() { }
     ; //TODO: Trading
-    workLeader() { }
+    workLeader() { this.decideNextBuilding(); }
     ; //TODO: Leading
 }
+Cell.counter = 0;
 exports.default = Cell;
 var LandType;
 (function (LandType) {
@@ -1608,6 +1631,32 @@ var BuildingType;
     BuildingType[BuildingType["Workshop"] = 5] = "Workshop";
     BuildingType[BuildingType["Storage"] = 6] = "Storage";
 })(BuildingType = exports.BuildingType || (exports.BuildingType = {}));
+class UnderConstruction {
+    constructor(id) {
+        this.type = undefined;
+        this.remainingCost = {
+            ore: 0,
+            craft: 0,
+            wood: 0
+        };
+        this.id = id;
+    }
+    ;
+    build(resource) {
+        let cost = { ore: 0, craft: 0, wood: 0 };
+        Object.keys(this.remainingCost).forEach(k => {
+            cost[k] = Math.min(this.remainingCost[k], resource[k]);
+            this.remainingCost[k] -= cost[k];
+        });
+        return cost;
+    }
+    checkReady() {
+        const remainingTotalCost = Object.values(this.remainingCost).reduce((acc, k) => acc + k);
+        return remainingTotalCost === 0 ? true : false;
+    }
+}
+exports.UnderConstruction = UnderConstruction;
+;
 
 
 /***/ }),

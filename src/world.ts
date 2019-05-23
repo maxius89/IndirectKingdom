@@ -49,8 +49,13 @@ export default class World {
   static nextRound(): void {
     var rng = seedrandom();
 
-    World.listOfCells.forEach(cell => cell.nextRound());
+    World.listOfCells.forEach(cell => {
+      //console.log(cell.id + " " + cell.buildingUnderConstruction.remainingCost.craft);
+      //console.log(cell.buildingUnderConstruction.remainingCost.craft);
+      cell.nextRound()
+    });
     World.listOfKingdoms.forEach(kingdom => kingdom.nextRound(rng()));
+
   }
 
 }

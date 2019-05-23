@@ -3,9 +3,10 @@ import Person, { Profession } from './person';
 import { g as Global } from './script';
 import * as seedrandom from 'seedrandom';
 import WeightedRandom from './util/weightedRandom';
-import { BuildingCost, BuildingType } from './building';
+import { BuildingCost, BuildingType, Cost, UnderConstruction } from './building';
 
 export default class Cell {
+  static counter = 0;
 
   id: string;
   owner: Kingdom;
@@ -31,16 +32,16 @@ export default class Cell {
     hunterCamps: 0,
     lumberCamps: 0,
     mines: 0,
-    workshops: 0,
+    workshops: 1,
     storages: {
       ore: 0,
-      craft: 0,
+      craft: 1,
       food: 0,
       wood: 0
     }
   };
 
-  buildingUnderConstruction: { type: BuildingType, remainingCost: Production };
+  buildingUnderConstruction: UnderConstruction;
 
   productivity: Production = {
     ore: 0,
@@ -77,7 +78,7 @@ export default class Cell {
     this.pos = coordinates;
     this.id = "r" + coordinates.row + "c" + coordinates.col;
     this.type = this.setRandomLandType();
-
+    this.buildingUnderConstruction = new UnderConstruction(this.id);
     let initPopulation: number = 0;
     switch (this.type) {
       case LandType.Field:
@@ -105,7 +106,6 @@ export default class Cell {
     for (let i = 0; i < initPopulation; ++i) {
       this.listOfResidents.push(new Person(this.decideProfession(i), this));
     }
-    console.log(this.listOfResidents);
   };
 
   decideProfession(index: number): Profession {
@@ -129,7 +129,7 @@ export default class Cell {
         break;
       case LandType.Mountain:
         professionRaffle.addEntry(Profession.Miner, 0.6);
-        professionRaffle.addEntry(Profession.Craftsman, 0.2);
+        professionRaffle.addEntry(Profession.Craftsman, 0.8);
         professionRaffle.addEntry(Profession.Trader, 0.2);
         break;
       default:
@@ -193,16 +193,39 @@ export default class Cell {
     return Math.min(productivity, capacity, availableSpace);
   };
 
-  build(): void {
+  construct(this: Cell): void {
+    console.log(this);
+    // remove resources from storages, finish building if cost is payed
+    const cost = this.buildingUnderConstruction.build(this.storage);
+    Object.keys(this.storage).forEach(k => {
+      if (cost[k] === undefined) cost[k] = 0;
+      this.storage[k] -= cost[k]
+    });
+
+  };
+
+  decideNextBuilding(): void { //TODO
     if (!this.buildingUnderConstruction.type) {
-      this.buildingUnderConstruction.type = BuildingType.Farm;
+      this.buildingUnderConstruction.type = BuildingType.House;
+      this.buildingUnderConstruction.remainingCost = BuildingCost.House;
     }
-    // remove resources from storages, finish building is cost is payed
   };
 
   nextRound(this: Cell): void {
+    //  console.log(Cell.counter++)
     this.doSettlementProduction();
-    this.build();
+
+    //if (this.id === "r0c0") {
+
+    console.group();
+    console.log(this.id + " " + this.buildingUnderConstruction.remainingCost.craft)
+
+    this.construct();
+
+    console.log(this.id + " " + this.buildingUnderConstruction.remainingCost.craft)
+    console.groupEnd();
+    //}
+
   };
 
   workFarmer(production: number) { this.productivity.food += production; };
@@ -211,7 +234,7 @@ export default class Cell {
   workMiner(production: number) { this.productivity.ore += production; };
   workCraftsman(production: number) { this.productivity.craft += production; };
   workTrader() { };//TODO: Trading
-  workLeader() { };//TODO: Leading
+  workLeader() { this.decideNextBuilding(); };//TODO: Leading
 
 }
 
